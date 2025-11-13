@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -320,6 +319,7 @@
             font-weight: normal;
             color: var(--muted);
             text-align: right;
+            margin-top: 2px;
         }
         .checkout-btn {
             width: 100%;
@@ -610,7 +610,7 @@
             .sidebar {
                 width: 100%;
                 min-height: auto;
-                order: 2; 
+                order: 2; /* جعل الشريط الجانبي يظهر أسفل المحتوى الرئيسي */
                 padding: 15px;
             }
             .main-content {
@@ -726,7 +726,7 @@
                 <button onclick="handleAISearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
             <div class="sort-tools">
-                 <p style="margin:0; color:var(--muted);" data-ar="فرز حسب:" data-en="Sort by:">فرز حسب:</p>
+                <p style="margin:0; color:var(--muted);" data-ar="فرز حسب:" data-en="Sort by:">فرز حسب:</p>
                 <select id="sortSelect" onchange="handleSortChange(this.value)">
                     <option value="default" data-ar="الأحدث" data-en="Newest">الأحدث</option>
                     <option value="rating_desc" data-ar="التقييم (الأعلى)" data-en="Rating (Highest)">التقييم (الأعلى)</option>
@@ -772,9 +772,9 @@
             <p style="font-weight: bold; margin-top: 15px; margin-bottom: 10px;" data-ar="سجل الأحداث (AI & TX)" data-en="AI & TX Log">سجل الأحداث (AI & TX)</p>
             <div class="tx-log" id="txLog">
                 </div>
-             <button onclick="clearLogs()" style="width:100%; background: none; color: var(--error); border: 1px solid var(--error); padding: 5px; border-radius: 4px; margin-top: 10px; cursor: pointer;">
-                 <i class="fa-solid fa-trash"></i> <span data-ar="مسح السجل" data-en="Clear Log">مسح السجل</span>
-             </button>
+              <button onclick="clearLogs()" style="width:100%; background: none; color: var(--error); border: 1px solid var(--error); padding: 5px; border-radius: 4px; margin-top: 10px; cursor: pointer;">
+                <i class="fa-solid fa-trash"></i> <span data-ar="مسح السجل" data-en="Clear Log">مسح السجل</span>
+              </button>
         </div>
     </div>
 
@@ -837,7 +837,7 @@
          * Phase 2: AI Automation (Smart Search, Logy Chat for tracking/resolution).
          * Phase 3: Mainnet/Testnet Auto-switch Logic.
          * The JavaScript part remains identical to the original for functionality continuity.
-        */
+         */
         (function(){
 
             'use strict';
@@ -876,564 +876,709 @@
                 {id:'p3',cat:'electronics', name_ar:'ساعة Pi', name_en:'Pi Smart Watch', desc_ar:'لياقة • 7 أيام بطارية', desc_en:'Fitness • 7-day battery', price:12.75, img:'https://placehold.co/800x600/1A2E44/FFD400?text=Watch', rating:4.1, created:'2025-03-01', seller_rating: 4.9},
                 {id:'p4',cat:'real', name_ar:'شقة 120م بالزمالك', name_en:'120m Apartment in Zamalek', desc_ar:'مفروشة • موقع مميز', desc_en:'Furnished • Prime location', price:21000, img:'https://placehold.co/800x600/08121a/FFD400?text=Apartment', rating:4.6, created:'2025-01-20', seller_rating: 4.2},
                 {id:'p5',cat:'fashion', name_ar:'جاكيت جلد', name_en:'Leather Jacket', desc_ar:'جلد طبيعي • جديد', desc_en:'Genuine leather • New', price:120, img:'https://placehold.co/800x600/1A2E44/FFD400?text=Jacket', rating:4.0, created:'2025-04-10', seller_rating: 4.7},
-                {id:'p6',cat:'home', name_ar:'طقم كنبة 3 مقاعد', name_en:'3-Seater Sofa Set', desc_ar:'قماش فاخر • ضمان سنة', desc_en:'Premium fabric • 1yr warranty', price:450, img:'https://placehold.co/800x600/0D1B2A/FFD400?text=Sofa', rating:4.2, created:'2025-03-18', seller_rating: 4.1},
-                {id:'p7',cat:'services', name_ar:'تصميم موقع إلكتروني', name_en:'Web Design Service', desc_ar:'تصميم كامل • سنة دعم مجانية', desc_en:'Full design • 1yr free support', price:1500, img:'https://placehold.co/800x600/FFD400/0D1B2A?text=Web+Design', rating:4.9, created:'2025-04-20', seller_rating: 5.0, is_ai_pick: true},
-                {id:'p8',cat:'cars', name_ar:'دراجة نارية رياضية', name_en:'Sport Motorcycle', desc_ar:'2023 • 1500 كم', desc_en:'2023 • 1500 km', price:9500, img:'https://placehold.co/800x600/1A2E44/FFD400?text=Bike', rating:4.4, created:'2025-02-28', seller_rating: 4.6},
-                {id:'p9',cat:'electronics', name_ar:'شاشة 4K ذكية', name_en:'4K Smart TV', desc_ar:'55 بوصة • أندرويد', desc_en:'55 inch • Android', price:320, img:'https://placehold.co/800x600/0D1B2A/FFD400?text=Smart+TV', rating:4.5, created:'2025-01-05', seller_rating: 4.3},
-                {id:'p10',cat:'real', name_ar:'فيلا في التجمع الخامس', name_en:'Villa in New Cairo', desc_ar:'مساحة 500م • تشطيب فاخر', desc_en:'500m area • Luxury finish', price:550000, img:'https://placehold.co/800x600/08121a/FFD400?text=Villa', rating:4.8, created:'2025-04-01', seller_rating: 4.9}
+                {id:'p6',cat:'home', name_ar:'طقم كنبة 3 مقاعد', name_en:'3-Seater Sofa Set', desc_ar:'قماش فاخر • ضمان سنة', desc_en:'Premium fabric • 1yr warranty', price:450, img:'https://placehold.co/800x600/0D1B2A/FFD400?text=Sofa', rating:4.5, created:'2025-03-22', seller_rating: 4.1},
+                {id:'p7',cat:'services', name_ar:'خدمات تصميم شعار', name_en:'Logo Design Service', desc_ar:'3 تصاميم • تسليم يومين', desc_en:'3 designs • 2-day delivery', price:5, img:'https://placehold.co/800x600/1A2E44/FFD400?text=Logo', rating:4.9, created:'2025-05-01', seller_rating: 5.0, is_ai_pick: true},
+                {id:'p8',cat:'cars', name_ar:'دراجة نارية رياضية', name_en:'Sport Motorcycle', desc_ar:'2023 • 1500 كم', desc_en:'2023 • 1500 km', price:9000, img:'https://placehold.co/800x600/08121a/FFD400?text=Bike', rating:3.9, created:'2025-03-15', seller_rating: 4.4},
             ];
 
-            let cart = [];
-            let piConnected = false;
-            let isMainnet = false;
-            let currentLang = document.documentElement.lang;
+            let cartItems = [];
+            let currentLang = 'ar';
+            let currentNetwork = 'Testnet';
             let currentFilter = 'all';
             let currentSort = 'default';
-            let piStatus = {
-                network: isMainnet ? 'Mainnet' : 'Testnet',
-                username: 'غير متصل',
-                balance: 0
-            };
+            let piUser = null;
             let logyChatHistory = [];
-            
-            // --- Utility Functions ---
-            
-            function convertPiToUSD(pi) {
-                return (pi * PI_TO_USD_RATE).toFixed(2);
+            let selectedProduct = null;
+
+
+            // --- Core Pi SDK Logic ---
+
+            /**
+             * Initialize Pi SDK
+             */
+            async function piInit() {
+                try {
+                    await Pi.init({
+                        version: "2.0",
+                        api_version: "beta",
+                        timeout: 5000,
+                    });
+                    logTransaction('SDK Ready.', 'success');
+                } catch (err) {
+                    logTransaction('SDK Error: ' + err.message, 'error');
+                }
             }
 
-            function getTranslation(key) {
-                const elements = document.querySelectorAll(`[data-ar="${key}"], [data-en="${key}"]`);
-                elements.forEach(el => {
-                    const translatedText = el.getAttribute(`data-${currentLang}`) || key;
-                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                        el.placeholder = translatedText;
-                    } else if (el.tagName === 'TITLE') {
-                        el.textContent = translatedText;
-                    } else if (el.tagName === 'OPTION') {
-                        // For select options, which are special, update later or use data-attributes
-                    } else {
-                        el.textContent = translatedText;
-                    }
-                });
+            /**
+             * Authenticate user with Pi Network.
+             */
+            window.piConnect = async function () {
+                showLoadingBar(true);
+                try {
+                    const auth = await Pi.authenticate([], onIncompletePayment);
+                    piUser = auth.user;
+                    document.querySelector('.username-text').textContent = TRANSLATIONS.connected_as[currentLang] + ' ' + piUser.username;
+                    document.getElementById('statusIcon').className = 'fa-solid fa-circle-check';
+                    document.getElementById('connectBtn').textContent = currentLang === 'ar' ? 'متصل' : 'Connected';
+                    document.getElementById('connectBtn').disabled = true;
+                    logTransaction(`Connected as: ${piUser.username}`, 'success');
+                    piGetBalance();
+                } catch (err) {
+                    document.querySelector('.username-text').textContent = TRANSLATIONS.disconnected[currentLang];
+                    document.getElementById('statusIcon').className = 'fa-solid fa-circle-xmark';
+                    document.getElementById('connectBtn').textContent = TRANSLATIONS.connectBtn[currentLang];
+                    document.getElementById('connectBtn').disabled = false;
+                    logTransaction('Connection failed: ' + (err.message || 'User cancelled'), 'error');
+                } finally {
+                    showLoadingBar(false);
+                }
+            }
 
-                // Handle select options
-                const selectElement = document.getElementById('sortSelect');
-                if (selectElement) {
-                    Array.from(selectElement.options).forEach(option => {
-                        const arText = option.getAttribute('data-ar');
-                        const enText = option.getAttribute('data-en');
-                        if (arText && enText) {
-                            option.textContent = currentLang === 'ar' ? arText : enText;
-                        }
-                    });
+            /**
+             * Get the current user's Testnet balance (Mock for display).
+             */
+            window.piGetBalance = async function() {
+                try {
+                    // Mocking the getBalance() for Testnet display
+                    const balance = await Pi.payments.getBalance();
+                    document.querySelector('.balance-text').textContent = `Balance: ${balance.amount} Pi`;
+                    logTransaction(`Balance fetched: ${balance.amount} Pi`, 'info');
+                } catch (err) {
+                     document.querySelector('.balance-text').textContent = currentLang === 'ar' ? 'فشل جلب الرصيد' : 'Failed to fetch balance';
+                     logTransaction('Failed to get balance: ' + err.message, 'error');
+                }
+            }
+
+            /**
+             * Process the shopping cart checkout using Pi Payments.
+             */
+            window.piCheckout = async function () {
+                if (!piUser) {
+                    showToast(currentLang === 'ar' ? 'يرجى الاتصال بشبكة Pi أولاً' : 'Please connect to Pi Network first.', 'error');
+                    return;
+                }
+                if (cartItems.length === 0) {
+                     showToast(currentLang === 'ar' ? 'السلة فارغة' : 'Cart is empty.', 'error');
+                     return;
+                }
+
+                showLoadingBar(true);
+                const totalPi = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+                const paymentData = {
+                    amount: totalPi.toFixed(2),
+                    memo: `Purchase of ${cartItems.length} items from Forsale.`,
+                    metadata: {
+                        cart: cartItems.map(item => ({id: item.id, qty: item.quantity, price: item.price}))
+                    }
+                };
+
+                try {
+                    const payment = await Pi.payments.request(paymentData);
+                    
+                    // Mock server-side completion
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    logTransaction(`Payment successful. TX ID: ${payment.identifier}`, 'success');
+                    showToast(TRANSLATIONS.checkout_success[currentLang] + ` Total: ${totalPi.toFixed(2)} Pi`, 'success');
+                    
+                    // Clear cart and update UI
+                    cartItems = [];
+                    renderCart();
+
+                } catch (err) {
+                    logTransaction('Payment failed: ' + (err.message || 'Unknown error'), 'error');
+                    showToast(currentLang === 'ar' ? 'فشل عملية الدفع' : 'Payment failed.', 'error');
+                } finally {
+                    showLoadingBar(false);
                 }
             }
             
-            function updateAllTranslations() {
-                // Get all elements with data-ar or data-en attributes
-                const translatableElements = document.querySelectorAll('[data-ar], [data-en]');
-                translatableElements.forEach(el => {
-                    const langAttr = `data-${currentLang}`;
-                    const translatedText = el.getAttribute(langAttr);
-                    if (translatedText) {
-                        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                            el.placeholder = translatedText;
-                        } else if (el.tagName === 'TITLE') {
-                            el.textContent = translatedText;
-                        } else {
-                            el.textContent = translatedText;
-                        }
-                    }
-                });
-
-                // Specific element translations (like button labels that change dynamically)
-                document.getElementById('connectBtn').textContent = currentLang === 'ar' ? TRANSLATIONS.connectBtn.ar : TRANSLATIONS.connectBtn.en;
-                document.getElementById('netBtn').textContent = isMainnet ? (currentLang === 'ar' ? TRANSLATIONS.netBtnMain.ar : TRANSLATIONS.netBtnMain.en) : (currentLang === 'ar' ? TRANSLATIONS.netBtnTest.ar : TRANSLATIONS.netBtnTest.en);
-                
-                // Update checkout button text
-                const checkoutBtn = document.getElementById('checkoutBtn');
-                const btnTextKey = piStatus.network === 'Mainnet' ? 'pay' : 'pay (Testnet)';
-                checkoutBtn.textContent = currentLang === 'ar' ? `${TRANSLATIONS.pay.ar} (${piStatus.network})` : `${TRANSLATIONS.pay.en} (${piStatus.network})`;
-                
-                // Update dynamic status texts
-                updatePiStatusDisplay();
-                updateCartDisplay();
-                
-                // Re-render categories and products to apply language changes
-                renderCategories();
-                renderProducts(PRODUCTS.filter(p => currentFilter === 'all' || p.cat === currentFilter));
+            /**
+             * Callback function for incomplete payments.
+             * @param {Object} payment - The payment object.
+             */
+            function onIncompletePayment(payment) {
+                // In a real application, this should contact the backend to check and complete the payment.
+                logTransaction(`Incomplete Payment detected: ${payment.identifier}`, 'warning');
             }
+
+
+            /**
+             * Toggle between Testnet and Mainnet (updates UI only).
+             */
+            window.toggleNetwork = function () {
+                currentNetwork = currentNetwork === 'Testnet' ? 'Mainnet' : 'Testnet';
+                document.getElementById('netBtn').textContent = currentNetwork;
+                
+                const checkoutBtn = document.getElementById('checkoutBtn');
+                const btnText = TRANSLATIONS.pay[currentLang] + ` (${currentNetwork})`;
+                checkoutBtn.setAttribute('data-ar', `${TRANSLATIONS.pay.ar} (${currentNetwork})`);
+                checkoutBtn.setAttribute('data-en', `${TRANSLATIONS.pay.en} (${currentNetwork})`);
+                checkoutBtn.textContent = btnText;
+                
+                logTransaction(`Switched to ${currentNetwork}`, 'info');
+                
+                // Re-authenticate and get balance when network changes
+                if(piUser) {
+                    piConnect(); 
+                }
+            }
+
+
+            // --- Marketplace & UI Logic ---
             
-            window.toggleLanguage = function() {
+            /**
+             * Toggles the display language between Arabic and English.
+             */
+            window.toggleLanguage = function () {
                 currentLang = currentLang === 'ar' ? 'en' : 'ar';
                 document.documentElement.lang = currentLang;
                 document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
                 document.getElementById('langToggleTop').textContent = currentLang === 'ar' ? 'EN' : 'AR';
-                updateAllTranslations();
-            }
 
-            function showToast(message, duration = 3000) {
-                const toast = document.getElementById('toast');
-                toast.textContent = message;
-                toast.style.display = 'block';
-                setTimeout(() => {
-                    toast.style.display = 'none';
-                }, duration);
-            }
-
-            function logEvent(message) {
-                const log = document.getElementById('txLog');
-                const eventTime = new Date().toLocaleTimeString(currentLang, {hour: '2-digit', minute: '2-digit'});
-                const entry = document.createElement('div');
-                entry.innerHTML = `[${eventTime}] ${message}`;
-                log.prepend(entry);
-            }
-            
-            window.clearLogs = function() {
-                document.getElementById('txLog').innerHTML = '';
-                logEvent(currentLang === 'ar' ? 'تم مسح السجل.' : 'Log cleared.');
-            }
-            
-            // --- Pi SDK Mock Functions ---
-
-            function startLoading() {
-                document.getElementById('loadingBar').style.opacity = '1';
-            }
-
-            function stopLoading() {
-                document.getElementById('loadingBar').style.opacity = '0';
-            }
-
-            window.piConnect = function() {
-                if (piConnected) return;
-                
-                startLoading();
-                
-                // Mock Pi SDK initialization
-                setTimeout(() => {
-                    piConnected = true;
-                    piStatus.username = 'Pioneer_XYZ';
-                    piStatus.balance = 1250.75; // Mock balance
-                    updatePiStatusDisplay();
-                    logEvent(currentLang === 'ar' ? `تم الاتصال بنجاح كـ ${piStatus.username}` : `Successfully connected as ${piStatus.username}`);
-                    stopLoading();
-                    updateCheckoutButtonState();
-                }, 2000);
-            }
-            
-            window.toggleNetwork = function() {
-                isMainnet = !isMainnet;
-                piStatus.network = isMainnet ? 'Mainnet' : 'Testnet';
-                document.getElementById('netBtn').textContent = isMainnet ? (currentLang === 'ar' ? TRANSLATIONS.netBtnMain.ar : TRANSLATIONS.netBtnMain.en) : (currentLang === 'ar' ? TRANSLATIONS.netBtnTest.ar : TRANSLATIONS.netBtnTest.en);
-                updatePiStatusDisplay();
-                updateCheckoutButtonState();
-                
-                // Update checkout button text
-                const checkoutBtn = document.getElementById('checkoutBtn');
-                checkoutBtn.textContent = currentLang === 'ar' ? `${TRANSLATIONS.pay.ar} (${piStatus.network})` : `${TRANSLATIONS.pay.en} (${piStatus.network})`;
-                
-                logEvent(currentLang === 'ar' ? `تم التبديل إلى شبكة ${piStatus.network}` : `Switched to ${piStatus.network} network`);
-            }
-            
-            function updatePiStatusDisplay() {
-                const statusIcon = document.getElementById('statusIcon');
-                const usernameText = document.querySelector('.username-text');
-                const balanceText = document.querySelector('.balance-text');
-                const connectBtn = document.getElementById('connectBtn');
-                
-                if (piConnected) {
-                    statusIcon.className = 'fa-solid fa-circle-check';
-                    statusIcon.title = 'Connected';
-                    usernameText.textContent = `${currentLang === 'ar' ? TRANSLATIONS.connected_as.ar : TRANSLATIONS.connected_as.en} ${piStatus.username}`;
-                    balanceText.textContent = `${piStatus.balance.toFixed(2)} Pi Balance (${piStatus.network})`;
-                    connectBtn.disabled = true;
-                    connectBtn.textContent = currentLang === 'ar' ? 'متصل' : 'Connected';
-                    connectBtn.style.backgroundColor = 'var(--success)';
-                    connectBtn.style.color = 'var(--secondary)';
-                } else {
-                    statusIcon.className = 'fa-solid fa-circle-xmark';
-                    statusIcon.title = 'Disconnected';
-                    usernameText.textContent = currentLang === 'ar' ? TRANSLATIONS.disconnected.ar : TRANSLATIONS.disconnected.en;
-                    balanceText.textContent = '';
-                    connectBtn.disabled = false;
-                    connectBtn.textContent = currentLang === 'ar' ? TRANSLATIONS.connectBtn.ar : TRANSLATIONS.connectBtn.en;
-                    connectBtn.style.backgroundColor = 'var(--secondary)';
-                    connectBtn.style.color = 'var(--text-light)';
-                }
-            }
-
-            window.piCheckout = function() {
-                if (!piConnected || cart.length === 0) return;
-                
-                startLoading();
-                const totalPi = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-                
-                // Mock Pi Payment Logic
-                logEvent(currentLang === 'ar' ? `بدء الدفع لـ ${totalPi.toFixed(2)} Pi` : `Initiating payment for ${totalPi.toFixed(2)} Pi`);
-
-                setTimeout(() => {
-                    // Simulate successful Pi transaction
-                    cart = []; // Clear cart on success
-                    piStatus.balance -= totalPi; // Deduct from mock balance
-                    
-                    updateCartDisplay();
-                    updatePiStatusDisplay();
-                    updateCheckoutButtonState();
-                    stopLoading();
-                    
-                    const successMsg = currentLang === 'ar' ? TRANSLATIONS.checkout_success.ar : TRANSLATIONS.checkout_success.en;
-                    showToast(successMsg);
-                    logEvent(currentLang === 'ar' ? `تمت المعاملة بنجاح: تم خصم ${totalPi.toFixed(2)} Pi` : `TX Successful: ${totalPi.toFixed(2)} Pi deducted`);
-                }, 3000); // Simulate network delay
-            }
-            
-            // --- Product & Cart Management ---
-
-            function renderCategories() {
-                const catArea = document.getElementById('cats');
-                catArea.innerHTML = CATEGORIES.map(cat => `
-                    <div class="cat ${cat.key === currentFilter ? 'active' : ''}" 
-                         onclick="handleCategoryFilter('${cat.key}')" 
-                         data-ar="${cat.ar}" 
-                         data-en="${cat.en}">
-                        <i class="fa-solid ${cat.icon}"></i> ${currentLang === 'ar' ? cat.ar : cat.en}
-                    </div>
-                `).join('');
-            }
-            
-            function sortProducts(products, sortBy) {
-                return products.sort((a, b) => {
-                    switch (sortBy) {
-                        case 'rating_desc':
-                            return b.rating - a.rating;
-                        case 'price_asc':
-                            return a.price - b.price;
-                        case 'price_desc':
-                            return b.price - a.price;
-                        case 'default':
-                        default:
-                            return new Date(b.created) - new Date(a.created); // Newest first
+                // Update all elements with data-ar/data-en attributes
+                document.querySelectorAll('[data-ar], [data-en]').forEach(el => {
+                    const translation = el.getAttribute('data-' + currentLang);
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = translation;
+                    } else if (el.tagName === 'TITLE') {
+                        document.title = translation;
+                    } else if (el.tagName === 'OPTION') {
+                         // Options require special handling to update the visible text
+                         // However, for simplicity, we rely on re-rendering for dynamic lists (like categories/products/cart)
+                         el.textContent = translation;
+                    } else {
+                        el.textContent = translation;
                     }
+                });
+
+                // Re-render dynamic components
+                renderCategories();
+                renderProducts(PRODUCTS, currentFilter, currentSort);
+                renderCart();
+                
+                // Fix for checkout button text on network toggle
+                const netBtnText = currentNetwork === 'Testnet' ? TRANSLATIONS.netBtnTest[currentLang] : TRANSLATIONS.netBtnMain[currentLang];
+                document.getElementById('netBtn').textContent = netBtnText;
+                
+                // Fix for connect button text
+                const connectBtn = document.getElementById('connectBtn');
+                if (piUser) {
+                    connectBtn.textContent = currentLang === 'ar' ? 'متصل' : 'Connected';
+                } else {
+                    connectBtn.textContent = TRANSLATIONS.connectBtn[currentLang];
+                }
+                
+                // Fix for username text
+                document.querySelector('.username-text').textContent = piUser 
+                    ? TRANSLATIONS.connected_as[currentLang] + ' ' + piUser.username
+                    : TRANSLATIONS.disconnected[currentLang];
+            }
+            
+            /**
+             * Generates the category filter buttons.
+             */
+            function renderCategories() {
+                const catsEl = document.getElementById('cats');
+                catsEl.innerHTML = '';
+                
+                CATEGORIES.forEach(cat => {
+                    const catEl = document.createElement('div');
+                    catEl.className = `cat ${currentFilter === cat.key ? 'active' : ''}`;
+                    catEl.setAttribute('data-cat', cat.key);
+                    catEl.setAttribute('data-ar', cat.ar);
+                    catEl.setAttribute('data-en', cat.en);
+                    catEl.innerHTML = `<i class="fa-solid ${cat.icon}"></i> <span class="cat-text">${cat[currentLang]}</span>`;
+                    catEl.onclick = () => {
+                        currentFilter = cat.key;
+                        renderProducts(PRODUCTS, currentFilter, currentSort);
+                    };
+                    catsEl.appendChild(catEl);
                 });
             }
 
-            function renderProducts(products) {
-                const productList = document.getElementById('productList');
-                const sortedProducts = sortProducts(products, currentSort);
+            /**
+             * Renders the product grid based on filter and sort.
+             * @param {Array} products - The list of products.
+             * @param {string} filter - The category filter key.
+             * @param {string} sort - The sort key.
+             */
+            function renderProducts(products, filter, sort) {
+                const productListEl = document.getElementById('productList');
+                productListEl.innerHTML = '';
                 
-                productList.innerHTML = sortedProducts.map(p => {
-                    const name = currentLang === 'ar' ? p.name_ar : p.name_en;
-                    const desc = currentLang === 'ar' ? p.desc_ar : p.desc_en;
-                    const isAiPick = p.is_ai_pick ? `<div class="ai-badge">AI Pick</div>` : '';
+                let filteredProducts = filter === 'all' 
+                    ? products 
+                    : products.filter(p => p.cat === filter);
                     
-                    return `
-                        <div class="product ${p.is_ai_pick ? 'ai-pick' : ''}" onclick="openProductModal('${p.id}')">
-                            ${isAiPick}
-                            <img src="${p.img}" alt="${name}">
-                            <div class="product-content">
-                                <div class="title">${name}</div>
-                                <div class="desc">${desc}</div>
+                // Apply sorting
+                filteredProducts.sort((a, b) => {
+                    switch (sort) {
+                        case 'rating_desc': return b.rating - a.rating;
+                        case 'price_asc': return a.price - b.price;
+                        case 'price_desc': return b.price - a.price;
+                        case 'default': 
+                        default: return new Date(b.created) - new Date(a.created); // Newest
+                    }
+                });
+
+                filteredProducts.forEach(product => {
+                    const productEl = document.createElement('div');
+                    productEl.className = `product ${product.is_ai_pick ? 'ai-pick' : ''}`;
+                    productEl.setAttribute('data-id', product.id);
+                    productEl.onclick = () => openProductModal(product);
+
+                    const name = product[`name_${currentLang}`];
+                    const desc = product[`desc_${currentLang}`];
+                    const priceUSD = (product.price * PI_TO_USD_RATE).toFixed(2);
+                    const sellerRatingText = `${TRANSLATIONS.seller_rating[currentLang]}: ${product.seller_rating} <i class="fa-solid fa-star"></i>`;
+
+                    productEl.innerHTML = `
+                        ${product.is_ai_pick ? `<div class="ai-badge">${currentLang === 'ar' ? 'اختيار Logy' : 'Logy Pick'}</div>` : ''}
+                        <img src="${product.img}" alt="${name}">
+                        <div class="product-content">
+                            <div class="title">${name}</div>
+                            <div class="desc">${desc}</div>
+                            <div class="seller-rating">${sellerRatingText}</div>
+                        </div>
+                        <div class="price-row">
+                            <div>
+                                <div class="price">${product.price.toFixed(2)} Pi</div>
+                                <div class="usd-value">(~ $${priceUSD})</div>
                             </div>
-                            <div class="price-row">
-                                <div>
-                                    <div class="price">${p.price.toFixed(2)} Pi</div>
-                                    <div class="usd-value">(~ $${convertPiToUSD(p.price)})</div>
-                                </div>
-                                <div>
-                                    <div class="seller-rating">
-                                        ${p.seller_rating.toFixed(1)} <i class="fa-solid fa-star"></i>
-                                    </div>
-                                </div>
-                            </div>
+                            <i class="fa-solid fa-cart-plus" style="font-size: 20px; color: var(--success);"></i>
                         </div>
                     `;
-                }).join('');
+                    productListEl.appendChild(productEl);
+                });
             }
 
-            function updateCartDisplay() {
-                const cartArea = document.getElementById('cartArea');
-                const cartTotal = document.getElementById('cartTotal');
-                
-                if (cart.length === 0) {
-                    cartArea.innerHTML = `<p style="text-align: center; color: var(--muted); margin-top: 50px;" data-ar="سلة التسوق فارغة" data-en="Your cart is empty">سلة التسوق فارغة</p>`;
-                    cartTotal.querySelector('.total-pi').textContent = `${currentLang === 'ar' ? TRANSLATIONS.total.ar : TRANSLATIONS.total.en}: 0.00 Pi`;
-                    cartTotal.querySelector('.total-usd').textContent = `(~ $0.00)`;
-                    updateCheckoutButtonState();
+            /**
+             * Handles the change in the sort dropdown.
+             * @param {string} value - The selected sort key.
+             */
+            window.handleSortChange = function (value) {
+                currentSort = value;
+                renderProducts(PRODUCTS, currentFilter, currentSort);
+            }
+
+            /**
+             * Mock AI Search function.
+             */
+            window.handleAISearch = function () {
+                const query = document.getElementById('search-input').value.trim();
+                if (query === '') {
+                    showToast(currentLang === 'ar' ? 'يرجى إدخال كلمة للبحث' : 'Please enter a search term.', 'warning');
                     return;
                 }
                 
-                let totalPi = 0;
-                
-                cartArea.innerHTML = cart.map(item => {
-                    totalPi += item.price * item.qty;
-                    const name = currentLang === 'ar' ? item.name_ar : item.name_en;
+                showLoadingBar(true);
+                logTransaction(`AI Search: "${query}"`, 'info');
+
+                // Mocking search results and setting an AI Pick
+                setTimeout(() => {
+                    showLoadingBar(false);
                     
-                    return `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed rgba(255,255,255,0.05);">
-                            <div style="flex-grow: 1;">
-                                <div style="font-size: 14px; font-weight: bold; color: var(--text-light);">${name}</div>
-                                <div style="font-size: 12px; color: var(--primary);">${(item.price * item.qty).toFixed(2)} Pi</div>
+                    // Simple filtering by name/desc containing the query (case insensitive)
+                    const searchResults = PRODUCTS.filter(p => 
+                        p.name_ar.includes(query) || p.name_en.toLowerCase().includes(query.toLowerCase()) || 
+                        p.desc_ar.includes(query) || p.desc_en.toLowerCase().includes(query.toLowerCase())
+                    );
+                    
+                    // Clear existing AI picks
+                    PRODUCTS.forEach(p => p.is_ai_pick = false);
+
+                    if (searchResults.length > 0) {
+                         // Pick a random result as AI Pick
+                        const aiPickIndex = Math.floor(Math.random() * searchResults.length);
+                        const aiPickId = searchResults[aiPickIndex].id;
+                        
+                        const actualPick = PRODUCTS.find(p => p.id === aiPickId);
+                        if(actualPick) {
+                            actualPick.is_ai_pick = true;
+                            logTransaction(`Logy recommended: ${actualPick.name_en}`, 'success');
+                            showToast(currentLang === 'ar' ? `Logy رشح ${actualPick.name_ar}` : `Logy recommended ${actualPick.name_en}`, 'success');
+                        }
+                    } else {
+                        logTransaction(`No products found for "${query}"`, 'warning');
+                        showToast(currentLang === 'ar' ? `لا توجد نتائج لـ "${query}"` : `No results for "${query}"`, 'warning');
+                    }
+
+                    renderProducts(PRODUCTS, currentFilter, currentSort);
+                }, 1500);
+            }
+
+            /**
+             * Renders the shopping cart items.
+             */
+            function renderCart() {
+                const cartArea = document.getElementById('cartArea');
+                const cartTotal = document.getElementById('cartTotal');
+                const checkoutBtn = document.getElementById('checkoutBtn');
+                
+                let totalPi = 0;
+                let totalUSD = 0;
+                cartArea.innerHTML = '';
+
+                if (cartItems.length === 0) {
+                    cartArea.innerHTML = `<p style="color:var(--muted); text-align: center; padding: 20px;" data-ar="سلة التسوق فارغة." data-en="Shopping cart is empty.">سلة التسوق فارغة.</p>`;
+                    checkoutBtn.disabled = true;
+                } else {
+                    checkoutBtn.disabled = false;
+                    
+                    cartItems.forEach(item => {
+                        totalPi += item.price * item.quantity;
+                        const itemUSD = (item.price * item.quantity * PI_TO_USD_RATE).toFixed(2);
+                        
+                        const itemEl = document.createElement('div');
+                        itemEl.style.cssText = 'display: flex; gap: 10px; align-items: center; margin-bottom: 10px; background-color: var(--secondary); padding: 8px; border-radius: 6px;';
+                        itemEl.innerHTML = `
+                            <button class="cart-remove-btn" onclick="removeCartItem('${item.id}')" style="padding: 5px 8px;"><i class="fa-solid fa-trash-can"></i></button>
+                            <img src="${item.img}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
+                            <div style="flex-grow: 1; font-size: 14px;">
+                                <div style="font-weight: bold;">${item[`name_${currentLang}`]}</div>
+                                <div style="color:var(--primary); font-size: 13px;">${item.price.toFixed(2)} Pi</div>
                             </div>
                             <div style="display: flex; align-items: center; gap: 5px;">
-                                <button class="cart-qty-btn" onclick="updateCartQty('${item.id}', -1)">-</button>
-                                <span style="font-size: 14px; font-weight: bold; width: 20px; text-align: center;">${item.qty}</span>
-                                <button class="cart-qty-btn" onclick="updateCartQty('${item.id}', 1)">+</button>
-                                <button class="cart-remove-btn" style="border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;" onclick="removeFromCart('${item.id}')">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
+                                <button class="cart-qty-btn" onclick="updateCartItemQty('${item.id}', -1)" style="width: 20px; height: 20px; line-height: 1;"><i class="fa-solid fa-minus"></i></button>
+                                <span style="font-weight: bold;">${item.quantity}</span>
+                                <button class="cart-qty-btn" onclick="updateCartItemQty('${item.id}', 1)" style="width: 20px; height: 20px; line-height: 1;"><i class="fa-solid fa-plus"></i></button>
                             </div>
-                        </div>
-                    `;
-                }).join('');
-                
-                cartTotal.querySelector('.total-pi').textContent = `${currentLang === 'ar' ? TRANSLATIONS.total.ar : TRANSLATIONS.total.en}: ${totalPi.toFixed(2)} Pi`;
-                cartTotal.querySelector('.total-usd').textContent = `(~ $${convertPiToUSD(totalPi)})`;
-                
-                updateCheckoutButtonState();
-            }
-
-            function updateCheckoutButtonState() {
-                const checkoutBtn = document.getElementById('checkoutBtn');
-                if (piConnected && cart.length > 0) {
-                    checkoutBtn.disabled = false;
-                } else {
-                    checkoutBtn.disabled = true;
+                        `;
+                        cartArea.appendChild(itemEl);
+                    });
                 }
                 
-                // Update button network label
-                checkoutBtn.textContent = currentLang === 'ar' ? `${TRANSLATIONS.pay.ar} (${piStatus.network})` : `${TRANSLATIONS.pay.en} (${piStatus.network})`;
+                totalUSD = (totalPi * PI_TO_USD_RATE).toFixed(2);
+                
+                cartTotal.querySelector('.total-pi').innerHTML = `${TRANSLATIONS.total[currentLang]}: ${totalPi.toFixed(2)} Pi`;
+                cartTotal.querySelector('.total-usd').textContent = `(~ $${totalUSD})`;
             }
 
-            window.handleCategoryFilter = function(category) {
-                currentFilter = category;
-                
-                // Update active category
-                document.querySelectorAll('.cat').forEach(el => el.classList.remove('active'));
-                document.querySelector(`.cat[onclick*="'${category}'"]`).classList.add('active');
-                
-                // Filter products
-                const filteredProducts = category === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === category);
-                renderProducts(filteredProducts);
-            }
-            
-            window.handleSortChange = function(sortBy) {
-                currentSort = sortBy;
-                const filteredProducts = currentFilter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === currentFilter);
-                renderProducts(filteredProducts);
-            }
-            
-            window.openProductModal = function(id) {
-                const product = PRODUCTS.find(p => p.id === id);
-                if (!product) return;
-                
-                const modal = document.getElementById('productModal');
-                
-                // Content Update
-                const name = currentLang === 'ar' ? product.name_ar : product.name_en;
-                const desc = currentLang === 'ar' ? product.desc_ar : product.desc_en;
-                const sellerRatingText = currentLang === 'ar' ? TRANSLATIONS.seller_rating.ar : TRANSLATIONS.seller_rating.en;
+            /**
+             * Adds or updates a product in the cart.
+             * @param {Object} product - The product object.
+             * @param {number} quantity - The quantity to add.
+             */
+            function addToCart(product, quantity = 1) {
+                const existingItem = cartItems.find(item => item.id === product.id);
 
-                document.getElementById('modalName').textContent = name;
-                document.getElementById('modalImg').src = product.img;
-                document.getElementById('modalDesc').textContent = desc;
-                document.getElementById('modalSellerRating').innerHTML = `${sellerRatingText}: ${product.seller_rating.toFixed(1)} <i class="fa-solid fa-star"></i>`;
-                document.getElementById('modalExtra').textContent = `${currentLang === 'ar' ? 'تاريخ الإضافة' : 'Added Date'}: ${product.created}`;
-                document.getElementById('modalPrice').textContent = `${product.price.toFixed(2)} Pi`;
-                document.getElementById('modalUSD').textContent = `(~ $${convertPiToUSD(product.price)})`;
-                
-                // Action buttons update
-                const modalAddBtn = document.getElementById('modalAdd');
-                modalAddBtn.setAttribute('data-product-id', product.id);
-                const cartItem = cart.find(item => item.id === id);
-                if (cartItem) {
-                    modalAddBtn.textContent = currentLang === 'ar' ? 'موجود في العربة' : 'In Cart';
-                    modalAddBtn.disabled = true;
-                } else {
-                    modalAddBtn.textContent = currentLang === 'ar' ? TRANSLATIONS.add_to_cart.ar : TRANSLATIONS.add_to_cart.en;
-                    modalAddBtn.disabled = false;
-                }
-                
-                document.getElementById('modalChat').setAttribute('data-product-id', product.id);
-
-                // Show modal
-                modal.classList.add('show');
-                modal.setAttribute('aria-hidden', 'false');
-            }
-
-            window.closeModal = function(id) {
-                const modal = document.getElementById(id);
-                modal.classList.remove('show');
-                modal.setAttribute('aria-hidden', 'true');
-            }
-            
-            window.handleModalAdd = function(buttonElement) {
-                const id = buttonElement.getAttribute('data-product-id');
-                const product = PRODUCTS.find(p => p.id === id);
-                if (!product) return;
-                
-                addToCart(product);
-                closeModal('productModal');
-                showToast(currentLang === 'ar' ? `${product.name_ar} أُضيف إلى العربة.` : `${product.name_en} added to cart.`);
-            }
-
-            function addToCart(product) {
-                const existingItem = cart.find(item => item.id === product.id);
                 if (existingItem) {
-                    existingItem.qty += 1;
+                    existingItem.quantity += quantity;
                 } else {
-                    cart.push({...product, qty: 1});
+                    cartItems.push({...product, quantity: quantity});
                 }
-                updateCartDisplay();
+                
+                logTransaction(`Added ${product.name_en} x${quantity} to cart.`, 'success');
+                showToast(currentLang === 'ar' ? `أضيفت ${product[`name_${currentLang}`]} للعربة` : `${product[`name_${currentLang}`]} added to cart`, 'success');
+                renderCart();
             }
 
-            window.updateCartQty = function(id, delta) {
-                const item = cart.find(item => item.id === id);
+            /**
+             * Handles adding from the modal button.
+             * @param {HTMLElement} buttonEl - The button element clicked.
+             */
+            window.handleModalAdd = function (buttonEl) {
+                const productId = buttonEl.getAttribute('data-product-id');
+                const product = PRODUCTS.find(p => p.id === productId);
+                if (product) {
+                    addToCart(product, 1);
+                    closeModal('productModal');
+                }
+            }
+
+            /**
+             * Updates the quantity of a cart item.
+             * @param {string} id - Product ID.
+             * @param {number} delta - Change in quantity (-1 or 1).
+             */
+            window.updateCartItemQty = function (id, delta) {
+                const item = cartItems.find(i => i.id === id);
                 if (item) {
-                    item.qty += delta;
-                    if (item.qty <= 0) {
-                        removeFromCart(id);
+                    item.quantity += delta;
+                    if (item.quantity <= 0) {
+                        removeCartItem(id);
                     } else {
-                        updateCartDisplay();
+                        renderCart();
                     }
                 }
             }
 
-            window.removeFromCart = function(id) {
-                cart = cart.filter(item => item.id !== id);
-                updateCartDisplay();
+            /**
+             * Removes an item from the cart.
+             * @param {string} id - Product ID.
+             */
+            window.removeCartItem = function (id) {
+                cartItems = cartItems.filter(i => i.id !== id);
+                logTransaction(`Removed item ID: ${id} from cart.`, 'warning');
+                renderCart();
             }
 
-            // --- AI/Logy Chat Functions ---
-
-            window.openLogyModal = function(productId = null) {
-                const modal = document.getElementById('logyModal');
-                modal.classList.add('show');
-                modal.setAttribute('aria-hidden', 'false');
-                document.getElementById('logyStatus').textContent = currentLang === 'ar' ? 'جاهز للمساعدة.' : 'Ready to assist.';
+            /**
+             * Populates and opens the product details modal.
+             * @param {Object} product - The product object.
+             */
+            window.openProductModal = function (product) {
+                selectedProduct = product;
+                const modal = document.getElementById('productModal');
                 
+                document.getElementById('modalName').textContent = product[`name_${currentLang}`];
+                document.getElementById('modalImg').src = product.img;
+                document.getElementById('modalDesc').textContent = product[`desc_${currentLang}`];
+                
+                const sellerRatingText = `${TRANSLATIONS.seller_rating[currentLang]}: ${product.seller_rating} <i class="fa-solid fa-star"></i>`;
+                document.getElementById('modalSellerRating').innerHTML = sellerRatingText;
+                
+                // Extra detail - Mocking Date
+                document.getElementById('modalExtra').textContent = `${currentLang === 'ar' ? 'تاريخ الإضافة' : 'Date Added'}: ${product.created}`;
+                
+                const priceUSD = (product.price * PI_TO_USD_RATE).toFixed(2);
+                document.getElementById('modalPrice').textContent = `${product.price.toFixed(2)} Pi`;
+                document.getElementById('modalUSD').textContent = `(~ $${priceUSD})`;
+                
+                document.getElementById('modalAdd').setAttribute('data-product-id', product.id);
+                document.getElementById('modalChat').setAttribute('data-product-id', product.id);
+
+                showModal('productModal');
+            }
+
+            /**
+             * Opens the Logy chat modal and starts/resumes chat.
+             */
+            window.openLogyModal = function () {
+                showModal('logyModal');
                 if (logyChatHistory.length === 0) {
-                    logyChatHistory.push({sender: 'ai', text: currentLang === 'ar' ? 'مرحبًا! أنا Logy، مساعدك الذكي. كيف يمكنني مساعدتك في البحث أو تتبع طلبك؟' : 'Hello! I\'m Logy, your AI Assistant. How can I help you with search or order tracking?'});
+                    const welcomeMsg = currentLang === 'ar' 
+                        ? 'مرحباً! أنا Logy، مساعد الذكاء الاصطناعي الخاص بسوق Forsale. كيف يمكنني مساعدتك اليوم؟ (مثال: ما هو سعر الهاتف الذكي؟)'
+                        : 'Hello! I am Logy, the AI assistant for Forsale. How can I help you today? (e.g., What is the price of the smartphone?)';
+                    addLogyMessage(welcomeMsg, 'ai');
+                    document.getElementById('logyStatus').textContent = currentLang === 'ar' ? 'جاهز للمساعدة' : 'Ready to assist';
+                    document.getElementById('logyStatus').style.color = 'var(--success)';
                 }
-                renderLogyChat();
-                document.getElementById('logyInput').focus();
             }
             
-            window.handleModalChat = function(productId) {
-                closeModal('productModal');
-                openLogyModal();
+            /**
+             * Handles chat initiation from the product modal.
+             * @param {string} productId - The ID of the product being discussed.
+             */
+            window.handleModalChat = function (productId) {
                 const product = PRODUCTS.find(p => p.id === productId);
-                const name = currentLang === 'ar' ? product.name_ar : product.name_en;
-                const initialMessage = currentLang === 'ar' ? `ما هي تفاصيل المنتج "${name}"؟` : `What are the details of the product "${name}"?`;
-                document.getElementById('logyInput').value = initialMessage;
-                // Automatically send message for better flow
-                sendLogyMessage();
+                if (product) {
+                    openLogyModal();
+                    // Clear previous chat and start contextually
+                    logyChatHistory = [];
+                    const prompt = currentLang === 'ar' 
+                        ? `ما هي تفاصيل الشحن لـ ${product.name_ar}؟` 
+                        : `What are the shipping details for the ${product.name_en}?`;
+                    
+                    const welcomeMsg = currentLang === 'ar' 
+                        ? `مرحباً! أنا Logy. دعنا نناقش ${product.name_ar}.`
+                        : `Hello! I'm Logy. Let's discuss the ${product.name_en}.`;
+                        
+                    addLogyMessage(welcomeMsg, 'ai');
+                    
+                    // Simulate user asking the first question
+                    document.getElementById('logyInput').value = prompt;
+                    sendLogyMessage(true); // Send the contextual message immediately
+                }
+                closeModal('productModal');
             }
 
-            function renderLogyChat() {
+            /**
+             * Sends a message to the simulated Logy AI.
+             * @param {boolean} isContextual - If the message is automatically generated (from product modal).
+             */
+            window.sendLogyMessage = function (isContextual = false) {
+                const inputEl = document.getElementById('logyInput');
+                const message = inputEl.value.trim();
+                if (!message) return;
+
+                addLogyMessage(message, 'user');
+                inputEl.value = '';
+                
+                document.getElementById('logyStatus').textContent = currentLang === 'ar' ? 'Logy يفكر...' : 'Logy is thinking...';
+                document.getElementById('logyStatus').style.color = 'var(--primary)';
+
+                // AI Response Logic (Simulated)
+                setTimeout(() => {
+                    let response = '';
+                    const lowerMsg = message.toLowerCase();
+                    const productMatch = PRODUCTS.find(p => lowerMsg.includes(p.name_en.toLowerCase()) || lowerMsg.includes(p.name_ar));
+
+                    if (lowerMsg.includes(currentLang === 'ar' ? 'سعر' : 'price') || lowerMsg.includes(currentLang === 'ar' ? 'كم pi' : 'how much pi')) {
+                        if (productMatch) {
+                            response = currentLang === 'ar' 
+                                ? `سعر ${productMatch.name_ar} هو ${productMatch.price.toFixed(2)} Pi.`
+                                : `The price of the ${productMatch.name_en} is ${productMatch.price.toFixed(2)} Pi.`;
+                        } else {
+                            response = currentLang === 'ar' 
+                                ? 'للتأكد، يرجى تحديد اسم المنتج الذي تسأل عنه.'
+                                : 'Please specify the product name you are asking about for an accurate price.';
+                        }
+                    } else if (lowerMsg.includes(currentLang === 'ar' ? 'شحن' : 'shipping') || lowerMsg.includes(currentLang === 'ar' ? 'توصيل' : 'delivery')) {
+                        response = currentLang === 'ar' 
+                            ? 'الشحن يستغرق عادةً 3-7 أيام عمل. التفاصيل تختلف حسب البائع وموقعك.'
+                            : 'Shipping usually takes 3-7 business days. Details vary based on the seller and your location.';
+                    } else if (lowerMsg.includes(currentLang === 'ar' ? 'مشكلة' : 'issue') || lowerMsg.includes(currentLang === 'ar' ? 'ارجاع' : 'return')) {
+                        response = currentLang === 'ar' 
+                            ? 'لحل مشكلتك، يرجى تزويدي برقم طلبك أو رقم تتبع الشحنة.'
+                            : 'To resolve your issue, please provide me with your order number or tracking ID.';
+                        logTransaction('Logy handling customer issue.', 'warning');
+                    } else if (lowerMsg.includes(currentLang === 'ar' ? 'ترشيح' : 'recommend') || lowerMsg.includes('ai pick') || lowerMsg.includes('logy pick')) {
+                        const aiPick = PRODUCTS.find(p => p.is_ai_pick);
+                        if (aiPick) {
+                            response = currentLang === 'ar' 
+                                ? `أفضل ترشيح لي هو ${aiPick.name_ar}، لقد اختاره الذكاء الاصطناعي بسبب تقييمه العالي وقيمته الممتازة.`
+                                : `My best recommendation is the ${aiPick.name_en}, it's an AI Pick for its high rating and excellent value.`;
+                        } else {
+                            response = currentLang === 'ar' ? 'لا يوجد ترشيح حالي. يمكنك تصفح المنتجات الأعلى تقييماً!' : 'No current recommendations. Feel free to browse the highest-rated products!';
+                        }
+                    } else {
+                         response = currentLang === 'ar' 
+                            ? 'عفواً، لم أفهم سؤالك. يرجى محاولة صياغة مختلفة أو السؤال عن السعر، الشحن، أو المشاكل.'
+                            : 'I apologize, I didn\'t understand. Please try a different phrasing or ask about price, shipping, or issues.';
+                    }
+                    
+                    addLogyMessage(response, 'ai');
+                    document.getElementById('logyStatus').textContent = currentLang === 'ar' ? 'جاهز للمساعدة' : 'Ready to assist';
+                    document.getElementById('logyStatus').style.color = 'var(--success)';
+                }, 1500);
+            }
+
+            /**
+             * Renders a message bubble in the Logy modal.
+             * @param {string} message - The text message.
+             * @param {string} sender - 'user' or 'ai'.
+             */
+            function addLogyMessage(message, sender) {
+                logyChatHistory.push({sender, message});
                 const logyBody = document.getElementById('logyBody');
-                logyBody.innerHTML = logyChatHistory.map(msg => {
-                    return `
-                        <div class="chat-bubble ${msg.sender}">
-                            ${msg.text}
-                        </div>
-                    `;
-                }).join('');
+                
+                const bubble = document.createElement('div');
+                bubble.className = `chat-bubble ${sender}`;
+                bubble.textContent = message;
+                
+                logyBody.appendChild(bubble);
+                // Scroll to the bottom
                 logyBody.scrollTop = logyBody.scrollHeight;
             }
 
-            window.sendLogyMessage = function() {
-                const input = document.getElementById('logyInput');
-                const message = input.value.trim();
-                if (!message) return;
 
-                logyChatHistory.push({sender: 'user', text: message});
-                input.value = '';
-                renderLogyChat();
+            // --- Utility Functions ---
+
+            /**
+             * Logs an event to the transaction log in the sidebar.
+             * @param {string} message - The message to log.
+             * @param {string} type - 'success', 'error', 'warning', or 'info'.
+             */
+            function logTransaction(message, type) {
+                const logEl = document.getElementById('txLog');
+                const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
                 
-                // Mock AI Response
-                document.getElementById('logyStatus').textContent = currentLang === 'ar' ? 'Logy يكتب...' : 'Logy is typing...';
+                let icon = '';
+                let color = 'var(--text-light)';
+
+                switch (type) {
+                    case 'success': icon = '✅'; color = 'var(--success)'; break;
+                    case 'error': icon = '❌'; color = 'var(--error)'; break;
+                    case 'warning': icon = '⚠️'; color = 'var(--primary)'; break;
+                    case 'info': icon = 'ℹ️'; color = 'var(--muted)'; break;
+                }
+
+                const logItem = document.createElement('div');
+                logItem.innerHTML = `<span style="color: ${color};">${icon} [${timestamp}]</span> ${message}`;
                 
+                // Add to the top
+                logEl.prepend(logItem);
+                
+                // Keep only the last 10 logs
+                if (logEl.children.length > 10) {
+                    logEl.removeChild(logEl.lastChild);
+                }
+            }
+            
+            /**
+             * Clears the transaction log.
+             */
+            window.clearLogs = function() {
+                document.getElementById('txLog').innerHTML = '';
+            }
+
+            /**
+             * Shows a toast notification.
+             * @param {string} message - The message to display.
+             * @param {string} type - 'success' or 'error'.
+             */
+            function showToast(message, type = 'info') {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.style.backgroundColor = type === 'success' ? 'var(--success)' : 'var(--error)';
+                toast.style.color = 'var(--secondary)';
+                toast.style.display = 'block';
+
                 setTimeout(() => {
-                    const aiResponse = getMockAiResponse(message);
-                    logyChatHistory.push({sender: 'ai', text: aiResponse});
-                    renderLogyChat();
-                    document.getElementById('logyStatus').textContent = currentLang === 'ar' ? 'جاهز للمساعدة.' : 'Ready to assist.';
-                    logEvent(currentLang === 'ar' ? `رسالة Logy: ${message.substring(0, 30)}...` : `Logy Message: ${message.substring(0, 30)}...`);
-                }, 1500);
+                    toast.style.display = 'none';
+                }, 3000);
             }
             
-            function getMockAiResponse(message) {
-                const lowerMessage = message.toLowerCase();
-                const isArabic = currentLang === 'ar';
+            /**
+             * Shows or hides the loading bar.
+             * @param {boolean} show - True to show, false to hide.
+             */
+            function showLoadingBar(show) {
+                const loadingBar = document.getElementById('loadingBar');
+                loadingBar.style.opacity = show ? 1 : 0;
+            }
 
-                if (lowerMessage.includes(isArabic ? 'كم سعر' : 'how much') || lowerMessage.includes('price')) {
-                    const productMatch = PRODUCTS.find(p => (p.name_ar && lowerMessage.includes(p.name_ar.toLowerCase())) || (p.name_en && lowerMessage.includes(p.name_en.toLowerCase())));
-                    if (productMatch) {
-                        return isArabic 
-                            ? `سعر ${productMatch.name_ar} هو ${productMatch.price.toFixed(2)} Pi، أي ما يعادل حوالي $${convertPiToUSD(productMatch.price)} تقريبًا. هل تود إضافته إلى سلة التسوق؟`
-                            : `The price of ${productMatch.name_en} is ${productMatch.price.toFixed(2)} Pi, which is approximately $${convertPiToUSD(productMatch.price)}. Would you like to add it to your cart?`;
-                    }
-                }
-                
-                if (lowerMessage.includes(isArabic ? 'شحن' : 'shipping') || lowerMessage.includes(isArabic ? 'توصيل' : 'delivery')) {
-                    return isArabic 
-                        ? 'تكلفة الشحن لجميع المنتجات هي 5 Pi ثابتة، ويستغرق التوصيل ما بين 3-7 أيام عمل داخل المنطقة. هل لديك طلب محدد تريد تتبعه؟'
-                        : 'Shipping cost for all products is a flat 5 Pi, and delivery takes 3-7 business days within the region. Do you have a specific order you want to track?';
-                }
-                
-                if (lowerMessage.includes(isArabic ? 'تفاصيل' : 'details')) {
-                    return isArabic 
-                        ? 'يُرجى تحديد اسم المنتج الذي تسأل عنه لتقديم تفاصيل أدق، أو يمكنك زيارة صفحة المنتج مباشرة.'
-                        : 'Please specify the name of the product you are asking about to get more precise details, or you can check the product page directly.';
-                }
-                
-                return isArabic 
-                    ? 'أنا Logy، مساعد الذكاء الاصطناعي. يمكنني مساعدتك في البحث عن منتجات محددة، الإجابة على استفسارات الشحن، أو تتبع الطلبات. كيف يمكنني خدمتك بشكل أفضل؟'
-                    : 'I am Logy, the AI assistant. I can help you search for specific products, answer shipping inquiries, or track orders. How can I best serve you?';
+            /**
+             * Shows a modal.
+             * @param {string} id - The ID of the modal element.
+             */
+            function showModal(id) {
+                document.getElementById(id).classList.add('show');
+                document.getElementById(id).setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
             }
-            
-            window.handleAISearch = function() {
-                const searchTerm = document.getElementById('search-input').value.trim();
-                if (!searchTerm) return;
-                
-                // Mock AI Search Logic (Search by name or description in both languages)
-                const lowerSearchTerm = searchTerm.toLowerCase();
-                const filteredProducts = PRODUCTS.filter(p => 
-                    p.name_ar.toLowerCase().includes(lowerSearchTerm) || 
-                    p.name_en.toLowerCase().includes(lowerSearchTerm) || 
-                    p.desc_ar.toLowerCase().includes(lowerSearchTerm) || 
-                    p.desc_en.toLowerCase().includes(lowerSearchTerm)
-                );
-                
-                renderProducts(filteredProducts);
-                
-                const searchResultMsg = currentLang === 'ar' 
-                    ? `تم العثور على ${filteredProducts.length} نتائج بحث لـ "${searchTerm}"`
-                    : `${filteredProducts.length} search results found for "${searchTerm}"`;
-                
-                logEvent(`AI Search: ${searchResultMsg}`);
-                showToast(searchResultMsg);
+
+            /**
+             * Hides a modal.
+             * @param {string} id - The ID of the modal element.
+             */
+            window.closeModal = function (id) {
+                document.getElementById(id).classList.remove('show');
+                document.getElementById(id).setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = 'auto'; // Restore background scrolling
             }
+
 
             // --- Initialization ---
 
+            /**
+             * Main function to run on document load.
+             */
             function initialize() {
-                // Set initial language from HTML
-                currentLang = document.documentElement.lang;
-                document.getElementById('langToggleTop').textContent = currentLang === 'ar' ? 'EN' : 'AR';
-                
+                // Check if running inside Pi Browser
+                if (typeof Pi !== 'undefined') {
+                    piInit();
+                } else {
+                    logTransaction('Running outside Pi Browser. Pi SDK functionality is mocked.', 'error');
+                }
+
+                // Initial render
                 renderCategories();
-                renderProducts(PRODUCTS);
-                updateCartDisplay();
-                updatePiStatusDisplay();
-                logEvent(currentLang === 'ar' ? 'تم تحميل واجهة Forsale بنجاح.' : 'Forsale interface loaded successfully.');
+                renderProducts(PRODUCTS, currentFilter, currentSort);
+                renderCart();
+                
+                // Initial Language Setup (ensure AR is default)
+                toggleLanguage(); // Calls toggle once to set up for AR/RTL correctly
+                toggleLanguage(); // Calls toggle a second time to revert to default (AR) and trigger UI updates
             }
 
-            // Run initialization after DOM is ready
+            // Run initialization
             initialize();
         })();
     </script>
-    <div id="toast">تمت الإضافة إلى السلة</div>
+    <div id="toast"></div>
 </body>
 </html>

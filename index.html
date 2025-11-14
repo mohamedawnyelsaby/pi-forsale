@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forsale - AI Smart Marketplace</title>
+    <script src="https://sdk.minepi.com/v2/pi-sdk.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body id="body">
+    
+    <div id="loadingBar"></div>
+    <div class="main-content">
+        <header>
+            <div class="logo-section">
+                <div class="logo-icon">F</div>
+                <div>
+                    <h1 style="margin: 0; font-size: 24px;">Forsale —</h1>
+                    <p style="margin: 0; font-size: 14px; color: var(--muted);">AI Smart Marketplace • Global-ready</p>
+                </div>
+            </div>
+            <div class="pi-status">
+                <p class="username-text" style="margin: 0; font-weight: 500;">غير متصل</p>
+                <i id="statusIcon" class="fa-solid fa-circle-xmark" title="Disconnected"></i>
+                <button id="langToggleTop" onclick="toggleLanguage()">EN</button>
+            </div>
+        </header>
+    
+        <div class="tools-bar">
+            <div class="search-box">
+                <input type="text" id="search-input" data-ar="البحث عن أي شيء..." data-en="Search for anything..." placeholder="البحث عن أي شيء...">
+                <button onclick="handleAISearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+            <div class="sort-tools">
+                 <p style="margin:0; color:var(--muted);" data-ar="فرز حسب:" data-en="Sort by:">فرز حسب:</p>
+                <select id="sortSelect" onchange="handleSortChange(this.value)">
+                    <option value="default" data-ar="الأحدث" data-en="Newest">الأحدث</option>
+                    <option value="rating_desc" data-ar="التقييم (الأعلى)" data-en="Rating (Highest)">التقييم (الأعلى)</option>
+                    <option value="price_asc" data-ar="السعر (الأدنى)" data-en="Price (Lowest)">السعر (الأدنى)</option>
+                    <option value="price_desc" data-ar="السعر (الأعلى)" data-en="Price (Highest)">السعر (الأعلى)</option>
+                </select>
+            </div>
+        </div>
+    
+        <div class="category-menu" id="cats">
+            </div>
+    
+        <div class="product-grid" id="productList">
+            </div>
+        
+        <button onclick="openModal('logyModal')" style="position: fixed; bottom: 20px; right: 20px; background-color: var(--success); color: var(--secondary); padding: 15px; border-radius: 50%; border: none; font-size: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 500;">
+            <i class="fa-solid fa-robot"></i>
+        </button>
+    </div>
+    
+    <div class="sidebar">
+        <div style="border-bottom: 1px solid var(--muted); padding-bottom: 20px; margin-bottom: 20px; flex-shrink: 0;">
+            <p style="font-weight: bold; margin-bottom: 10px;" data-ar="حالة شبكة Pi" data-en="Pi Network Status">حالة شبكة Pi</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <button id="connectBtn" onclick="piConnect()" data-ar="اتصال" data-en="Connect">اتصال</button>
+                <button id="netBtn" onclick="toggleNetwork()" data-ar="Testnet" data-en="Testnet">Testnet</button>
+            </div>
+            <p class="balance-text" style="font-size: 14px; margin-top: 10px; color: var(--success);"></p>
+        </div>
+    
+        <div class="cart-title" data-ar="سلة التسوق" data-en="Shopping Cart">سلة التسوق</div>
+        <div class="cart-section" id="cartArea">
+            </div>
+        <div class="cart-footer">
+            <div class="cart-total-row" id="cartTotal">
+                <div class="total-pi">المجموع: 0.00 Pi</div>
+                <div class="total-usd">(~ $0.00)</div>
+            </div>
+            <button id="checkoutBtn" class="checkout-btn" onclick="piCheckout()" disabled data-ar="دفع (Testnet)" data-en="Pay (Testnet)">دفع (Testnet)</button>
+        </div>
+    
+        <div class="tx-log-container">
+            <p style="font-weight: bold; margin-top: 15px; margin-bottom: 10px;" data-ar="سجل الأحداث (AI & TX)" data-en="AI & TX Log">سجل الأحداث (AI & TX)</p>
+            <div class="tx-log" id="txLog">
+                </div>
+             <button onclick="clearLogs()" style="width:100%; background: none; color: var(--error); border: 1px solid var(--error); padding: 5px; border-radius: 4px; margin-top: 10px; cursor: pointer;">
+                 <i class="fa-solid fa-trash"></i> <span data-ar="مسح السجل" data-en="Clear Log">مسح السجل</span>
+             </button>
+        </div>
+    </div>
+    
+    <div id="productModal" class="modal" aria-hidden="true" onclick="if(event.target.classList.contains('modal')) closeModal('productModal')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalName">اسم المنتج</h2>
+                <button onclick="closeModal('productModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="product-modal-body">
+                <div class="modal-img-area">
+                    <img id="modalImg" src="https://placehold.co/800x600" alt="Product Image">
+                </div>
+                <div class="modal-details">
+                    <div>
+                        <p id="modalDesc" style="color: var(--muted); margin-bottom: 10px;">وصف المنتج.</p>
+                        <p id="modalSellerRating" style="font-weight: bold; color: var(--primary);">تقييم البائع: 4.5 <i class="fa-solid fa-star"></i></p>
+                        <p id="modalExtra">تفاصيل إضافية: 2025-01-01</p>
+                    </div>
+                    
+                    <div class="modal-price-section">
+                        <div class="price" id="modalPrice">0.00 Pi</div>
+                        <div class="usd-value" id="modalUSD">(~ $0.00)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-actions-wrapper">
+                 <div class="modal-actions">
+                    <button id="modalChat" onclick="handleModalChat(this.getAttribute('data-product-id'))" data-ar="تحدث مع Logy" data-en="Chat with Logy">تحدث مع Logy</button>
+                    <button id="modalAdd" onclick="handleModalAdd(this)" data-product-id="" data-ar="أضف للعربة" data-en="Add to Cart">أضف للعربة</button>
+                </div>
+            </div>
+            </div>
+    </div>
+    
+    <div id="logyModal" class="modal" aria-hidden="true" onclick="if(event.target.classList.contains('modal')) closeModal('logyModal')">
+        <div class="modal-content" style="max-width: 450px;">
+             <div class="modal-header">
+                <h2 style="color:var(--success);"><i class="fa-solid fa-robot"></i> Logy AI Assistant</h2>
+                <button onclick="closeModal('logyModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="logy-status" id="logyStatus" data-ar="جاري التهيئ..." data-en="Initializing...">جاري التهيئ...</div>
+            <div class="logy-modal-body" id="logyBody">
+                </div>
+            <div class="logy-footer">
+                <input type="text" id="logyInput" placeholder="اسأل Logy عن الشحن، التوصيات، أو أي مشكلة..." data-ar="اسأل Logy عن الشحن، التوصيات، أو أي مشكلة..." data-en="Ask Logy about shipping, recommendations, or any issue...">
+                <button onclick="sendLogyMessage()">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast">تمت الإضافة بنجاح!</div>
+    
+    <script src="app.js"></script>
+</body>
+</html>

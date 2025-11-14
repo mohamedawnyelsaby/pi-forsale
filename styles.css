@@ -146,7 +146,8 @@ main {
 /* Products Grid */
 .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    /* *** التعديل الهام: تم تغيير minmax(280px, 1fr) إلى 200px *** */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
     gap: 20px;
 }
 

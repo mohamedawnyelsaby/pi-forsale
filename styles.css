@@ -112,6 +112,10 @@ main {
     margin-bottom: 20px;
     border-radius: 8px;
     border-right: 4px solid var(--primary-color);
+    
+    /* *** التعديل لمعالجة التمدد في الشريط الجانبي *** */
+    max-width: 100%; 
+    overflow-x: hidden; 
 }
 
 .status-box {
@@ -146,7 +150,7 @@ main {
 /* Products Grid */
 .products-grid {
     display: grid;
-    /* *** التعديل الهام: تم تغيير minmax(280px, 1fr) إلى 200px *** */
+    /* تم تعديل الحد الأدنى للعرض ليتناسب مع الموبايل */
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
     gap: 20px;
 }
@@ -184,6 +188,10 @@ main {
     padding: 15px;
     margin-top: 20px;
     border-radius: 8px;
+    
+    /* *** التعديل لمعالجة التمدد في سجل الأحداث *** */
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 #log-output {
@@ -193,6 +201,11 @@ main {
     background-color: #111;
     overflow-y: auto;
     margin-bottom: 10px;
+    
+    /* *** التعديل لمعالجة التمدد في سجل الأحداث *** */
+    max-width: 100%;
+    word-break: break-word; /* لكسر الكلمات الطويلة */
+    overflow-x: hidden;
 }
 
 .clear-btn {

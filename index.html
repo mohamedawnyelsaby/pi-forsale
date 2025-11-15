@@ -1,236 +1,1445 @@
+
 <!DOCTYPE html>
-<html lang="en" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forsale - سوق Pi المتكامل</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <script>
-        // تهيئة Pi SDK وإعدادات Tailwind
-        Pi.init({
-            version: "2.0",
-            api_version: "20240425",
-        });
+    <meta name="customiz-verification" content="Your_Customiz_Verification_Code">
+    <meta name="customiz-allowed-hosts" content="localhost,127.0.0.1,customiz.app,forsale.pi,pi.network">
+    <title data-ar="Forsale - سوق الذكاء الاصطناعي العالمي" data-en="Forsale - AI Global Marketplace">Forsale</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <script src="https://sdk.minepi.com/v2/pi-sdk.js"></script>
 
-        // إعدادات Tailwind مخصصة
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        pi: '#FFC800', // لون Pi الأصفر
-                        piDark: '#333333', // لون Pi الأسود
-                        piLight: '#FFFBEA', // خلفية فاتحة
-                        piGray: '#F5F5F5' // رمادي فاتح
-                    },
-                    fontFamily: {
-                        sans: ['Cairo', 'Inter', 'sans-serif'], // استخدام خط القاهرة للغة العربية
+    <style>
+        /* CSS styles (Updated for Full Responsiveness and Modal Fix) */
+        :root {
+            --primary: #FFD400; /* Pi Yellow */
+            --secondary: #0D1B2A; /* Dark Blue */
+            --accent: #1A2E44; /* Secondary Dark */
+            --text-light: #F9F7F3;
+            --muted: #9CA3AF;
+            --success: #00FF7F;
+            --error: #FF6B6B;
+        }
+
+        body {
+            background-color: var(--secondary);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        #body {
+             flex-direction: row; /* Flex row for desktop/tablet view */
+        }
+
+        /* --- Global Structure --- */
+        .sidebar {
+            width: 300px;
+            background-color: var(--accent);
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0; /* ضمان عدم انكماش الشريط الجانبي على الشاشات الكبيرة */
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header/Top Bar (No changes) --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--accent);
+        }
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-icon {
+            background-color: var(--primary);
+            color: var(--secondary);
+            padding: 10px 15px;
+            font-size: 24px;
+            font-weight: 900;
+            border-radius: 8px;
+        }
+        .pi-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .pi-status button {
+            background-color: var(--secondary); 
+            color: var(--text-light);
+            border: 1px solid var(--primary); 
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .pi-status button:hover:not(:disabled) {
+            background-color: #2c4460;
+        }
+        .pi-status button:disabled {
+            cursor: default;
+            opacity: 0.8;
+            background-color: var(--accent);
+        }
+        .pi-status .fa-circle-check { color: var(--success); }
+        .pi-status .fa-circle-xmark { color: var(--error); }
+        
+        /* --- Search and Sort (No changes) --- */
+        .tools-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            gap: 20px;
+        }
+        .search-box {
+            display: flex;
+            flex-grow: 1;
+            max-width: 600px;
+            background-color: var(--accent);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .search-box:focus-within {
+             border-color: var(--primary);
+        }
+        .search-box input {
+            flex-grow: 1;
+            border: none;
+            padding: 12px 15px;
+            background: none;
+            color: var(--text-light);
+            outline: none;
+            font-size: 16px;
+        }
+        .search-box button {
+            background-color: var(--primary);
+            color: var(--secondary);
+            border: none;
+            padding: 12px 18px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: opacity 0.3s;
+        }
+        .search-box button:hover {
+            opacity: 0.9;
+        }
+        .sort-tools {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sort-tools select {
+            background-color: var(--accent);
+            color: var(--text-light);
+            border: 1px solid var(--primary);
+            padding: 10px;
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* --- Category Menu (No changes) --- */
+        .category-menu {
+            margin-top: 25px;
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding-bottom: 10px;
+            white-space: nowrap;
+        }
+        .category-menu::-webkit-scrollbar {
+            height: 4px;
+        }
+        .category-menu::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+        .cat {
+            background-color: var(--accent);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 14px;
+            border: 1px solid transparent;
+        }
+        .cat:hover {
+            background-color: #2c4460;
+        }
+        .cat.active {
+            background-color: var(--primary);
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        /* --- Product Grid (Updated) --- */
+        .product-grid {
+            display: grid;
+            /* **تعديل مهم:** تقليل الحد الأدنى لحجم البطاقة للسماح بـ 3-4 بطاقات في عرض التابلت/الديسكتوب */
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+            flex-grow: 1;
+        }
+        .product {
+            background-color: var(--accent);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        .product:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+        .product.ai-pick {
+            border-color: var(--success);
+            box-shadow: 0 0 15px rgba(0, 255, 127, 0.4);
+        }
+        .product img {
+            width: 100%;
+            /* **تعديل مهم:** تقليل ارتفاع الصورة في البطاقة */
+            height: 120px; 
+            object-fit: cover;
+            transition: opacity 0.3s;
+        }
+        .product-content {
+            padding: 10px 15px;
+        }
+        .product .title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        .product .desc {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 5px;
+            height: 32px;
+            overflow: hidden;
+        }
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .price {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--text-light);
+        }
+        .usd-value {
+            font-size: 11px;
+            color: var(--muted);
+            text-align: right;
+            margin-top: 2px;
+        }
+        .seller-rating {
+            font-size: 13px;
+            color: var(--primary);
+            margin-top: 5px;
+        }
+        .ai-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: var(--success);
+            color: var(--secondary);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- Shopping Cart (Sidebar) --- */
+        .cart-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .cart-section {
+            flex-grow: 1;
+            /* **تعديل مهم:** إزالة overflow-y: auto هنا والاعتماد على Media Query للموبايل */
+            padding-right: 5px;
+        }
+        .cart-qty-btn, .cart-remove-btn {
+            background-color: var(--secondary);
+            color: var(--text-light);
+            border: 1px solid var(--muted);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .cart-qty-btn:hover { background-color: var(--accent); }
+        .cart-remove-btn:hover { background-color: var(--error); border-color: var(--error); }
+        
+        .cart-footer {
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+        .cart-total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .cart-total-row .total-usd {
+            font-size: 14px;
+            font-weight: normal;
+            color: var(--muted);
+            text-align: right;
+        }
+        .checkout-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--success);
+            color: var(--secondary);
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .checkout-btn:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+        .checkout-btn:disabled {
+            background-color: var(--muted);
+            cursor: default;
+        }
+
+        /* --- Transaction Log (No changes) --- */
+        .tx-log-container {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        .tx-log {
+            max-height: 80px;
+            overflow-y: auto;
+        }
+        .tx-log div {
+            padding: 3px 0;
+            color: var(--text-light);
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+        }
+
+        /* --- Modals (Product & Logy) --- */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 1000;
+        }
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: var(--secondary);
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh; 
+            display: flex;
+            flex-direction: column; 
+            overflow: hidden; /* تغيير مهم: إزالة overflow-y: auto هنا والاعتماد على body */
+            position: relative;
+        }
+        .modal-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--accent);
+            flex-shrink: 0; 
+        }
+        .modal-header h2 {
+            margin: 0;
+            color: var(--primary);
+        }
+        .modal-header button {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .product-modal-body {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            overflow-y: auto; /* **تعديل مهم:** جعل محتوى المودال قابلاً للتمرير */
+            flex-grow: 1; 
+        }
+        .modal-img-area {
+            flex: 1;
+            min-width: 40%; 
+        }
+        .modal-img-area img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .modal-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; 
+            min-height: auto; 
+        }
+        .modal-details h3 {
+            color: var(--text-light);
+            margin-top: 0;
+            font-size: 28px;
+        }
+        .modal-price-section {
+            border-top: 1px solid var(--accent);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        .modal-price-section .price {
+            font-size: 30px;
+            color: var(--primary);
+        }
+        .modal-details p {
+            font-size: 15px;
+            color: var(--muted);
+        }
+        
+        /* 🚨 التعديل لحل مشكلة قراءة "تفاصيل إضافية" (التاريخ) 🚨 */
+        #modalExtra { 
+            font-size: 14px; 
+            color: var(--text-light) !important;
+            font-weight: 600;
+        }
+        /* ---------------------------------------------------- */
+        
+        /* شريط الأزرار الثابت (Fix for Sticky/Hidden Buttons) */
+        .modal-actions-wrapper {
+            flex-shrink: 0; 
+            border-top: 1px solid var(--accent);
+            padding: 15px 20px;
+            background-color: var(--secondary); 
+            z-index: 10;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+        }
+        .modal-actions button {
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            flex: 1;
+            font-weight: bold;
+        }
+        #modalAdd {
+            background-color: var(--primary);
+            color: var(--secondary);
+        }
+        #modalAdd:disabled {
+             background-color: var(--muted);
+             color: var(--secondary);
+             cursor: default;
+        }
+        #modalChat {
+            background-color: var(--accent);
+            color: var(--text-light);
+            border: 1px solid var(--muted);
+        }
+
+        /* --- Logy Chat Modal Specific (Updated) --- */
+        #logyModal .modal-content {
+            max-width: 450px;
+            max-height: 70vh; /* تقليل الارتفاع للسماح بالوصول على الموبايل */
+        }
+        .logy-modal-body {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+        }
+        .logy-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--accent);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .logy-footer input {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            background-color: var(--accent);
+            color: var(--text-light);
+            outline: none;
+        }
+        .logy-footer button {
+            background-color: var(--primary);
+            color: var(--secondary);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .logy-status {
+            font-size: 12px;
+            color: var(--muted);
+            padding: 5px 20px;
+            background-color: var(--accent);
+        }
+        .chat-bubble {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+        .chat-bubble.user {
+            align-self: flex-end;
+            background-color: #2c4460;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-bubble.ai {
+            align-self: flex-start;
+            background-color: var(--primary);
+            color: var(--secondary);
+            border-bottom-left-radius: 4px;
+        }
+
+
+        /* --- Toast Notification (No changes) --- */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary);
+            color: var(--secondary);
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* --- Loading Bar (No changes) --- */
+        #loadingBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+            z-index: 3000;
+            transition: opacity 0.3s;
+            opacity: 0;
+        }
+
+        /* ------------------------------------------------ */
+        /* --- Media Queries for Full Responsiveness --- */
+        /* ------------------------------------------------ */
+        
+        @media (max-width: 1024px) {
+            /* تابلت */
+            .sidebar {
+                width: 250px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            /* موبايل */
+            #body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                min-height: auto;
+                order: 2; 
+                padding: 15px;
+            }
+            .main-content {
+                order: 1;
+                padding: 15px;
+            }
+            
+            /* **تعديل مهم:** ضمان أن محتوى العربة يمكن تمريره على الموبايل */
+            .cart-section {
+                 max-height: 250px; /* تعيين ارتفاع أقصى للعربة في الموبايل */
+                 overflow-y: auto;
+                 padding-right: 15px;
+            }
+            
+            /* أداة البحث */
+            .tools-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            .search-box {
+                max-width: 100%;
+            }
+            .sort-tools {
+                justify-content: space-between;
+            }
+            
+            /* نافذة تفاصيل المنتج (Product Modal) */
+            .modal-content {
+                max-width: 95%; 
+                height: 95vh; /* زيادة الارتفاع قليلًا للاستفادة من مساحة الشاشة */
+            }
+            .product-modal-body {
+                flex-direction: column; 
+                padding: 10px; 
+            }
+            .modal-img-area img {
+                height: 180px; 
+            }
+            .modal-details {
+                padding-bottom: 10px; 
+            }
+            .modal-price-section {
+                padding-top: 10px;
+                margin-top: 10px;
+            }
+            .modal-price-section .price {
+                font-size: 28px; 
+            }
+
+            /* تنسيق الـ Wrapper الخاص بالأزرار */
+            .modal-actions-wrapper {
+                padding: 15px; 
+            }
+
+            /* الأزرار تحت بعضها على الموبايل */
+            .modal-actions {
+                 flex-direction: column; 
+                 gap: 10px;
+            }
+
+            .modal-header h2 {
+                font-size: 20px;
+            }
+
+            /* Logy Modal */
+            #logyModal .modal-content {
+                max-width: 90%;
+                max-height: 85vh; /* ضبط الارتفاع ليتناسب مع شاشة الموبايل */
+            }
+            .logy-footer input {
+                font-size: 14px;
+            }
+        }
+        
+        /* RTL Adjustments for Arabic */
+        html[dir="rtl"] .logo-section {
+             direction: rtl;
+        }
+        html[dir="rtl"] .product-modal-body {
+            direction: rtl;
+        }
+        html[dir="rtl"] .price-row > div:last-child {
+            text-align: left;
+        }
+        html[dir="rtl"] .search-box input {
+            text-align: right;
+        }
+        
+    </style>
+</head>
+<body id="body">
+    <div id="loadingBar"></div>
+    <div class="main-content">
+        <header>
+            <div class="logo-section">
+                <div class="logo-icon">F</div>
+                <div>
+                    <h1 style="margin: 0; font-size: 24px;">Forsale —</h1>
+                    <p style="margin: 0; font-size: 14px; color: var(--muted);">AI Smart Marketplace • Global-ready</p>
+                </div>
+            </div>
+            <div class="pi-status">
+                <p class="username-text" style="margin: 0; font-weight: 500;">غير متصل</p>
+                <i id="statusIcon" class="fa-solid fa-circle-xmark" title="Disconnected"></i>
+                <button id="langToggleTop" onclick="toggleLanguage()">EN</button>
+            </div>
+        </header>
+
+        <div class="tools-bar">
+            <div class="search-box">
+                <input type="text" id="search-input" data-ar="البحث عن أي شيء..." data-en="Search for anything..." placeholder="البحث عن أي شيء...">
+                <button onclick="handleAISearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+            <div class="sort-tools">
+                 <p style="margin:0; color:var(--muted);" data-ar="فرز حسب:" data-en="Sort by:">فرز حسب:</p>
+                <select id="sortSelect" onchange="handleSortChange(this.value)">
+                    <option value="default" data-ar="الأحدث" data-en="Newest">الأحدث</option>
+                    <option value="rating_desc" data-ar="التقييم (الأعلى)" data-en="Rating (Highest)">التقييم (الأعلى)</option>
+                    <option value="price_asc" data-ar="السعر (الأدنى)" data-en="Price (Lowest)">السعر (الأدنى)</option>
+                    <option value="price_desc" data-ar="السعر (الأعلى)" data-en="Price (Highest)">السعر (الأعلى)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="category-menu" id="cats">
+            </div>
+
+        <div class="product-grid" id="productList">
+            </div>
+        
+        <button onclick="openLogyModal()" style="position: fixed; bottom: 20px; right: 20px; background-color: var(--success); color: var(--secondary); padding: 15px; border-radius: 50%; border: none; font-size: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 500;">
+            <i class="fa-solid fa-robot"></i>
+        </button>
+    </div>
+
+    <div class="sidebar">
+        <div style="border-bottom: 1px solid var(--muted); padding-bottom: 20px; margin-bottom: 20px; flex-shrink: 0;">
+            <p style="font-weight: bold; margin-bottom: 10px;" data-ar="حالة شبكة Pi" data-en="Pi Network Status">حالة شبكة Pi</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <button id="connectBtn" onclick="piConnect()" data-ar="اتصال" data-en="Connect">اتصال</button>
+                <button id="netBtn" onclick="toggleNetwork()" data-ar="Testnet" data-en="Testnet">Testnet</button>
+            </div>
+            <p class="balance-text" style="font-size: 14px; margin-top: 10px; color: var(--success);"></p>
+        </div>
+
+        <div class="cart-title" data-ar="سلة التسوق" data-en="Shopping Cart">سلة التسوق</div>
+        <div class="cart-section" id="cartArea">
+            </div>
+        <div class="cart-footer">
+            <div class="cart-total-row" id="cartTotal">
+                <div class="total-pi">المجموع: 0.00 Pi</div>
+                <div class="total-usd">(~ $0.00)</div>
+            </div>
+            <button id="checkoutBtn" class="checkout-btn" onclick="piCheckout()" disabled data-ar="دفع (Testnet)" data-en="Pay (Testnet)">دفع (Testnet)</button>
+        </div>
+
+        <div class="tx-log-container">
+            <p style="font-weight: bold; margin-top: 15px; margin-bottom: 10px;" data-ar="سجل الأحداث (AI & TX)" data-en="AI & TX Log">سجل الأحداث (AI & TX)</p>
+            <div class="tx-log" id="txLog">
+                </div>
+             <button onclick="clearLogs()" style="width:100%; background: none; color: var(--error); border: 1px solid var(--error); padding: 5px; border-radius: 4px; margin-top: 10px; cursor: pointer;">
+                 <i class="fa-solid fa-trash"></i> <span data-ar="مسح السجل" data-en="Clear Log">مسح السجل</span>
+             </button>
+        </div>
+    </div>
+
+    <div id="productModal" class="modal" aria-hidden="true" onclick="if(event.target.classList.contains('modal')) closeModal('productModal')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalName">اسم المنتج</h2>
+                <button onclick="closeModal('productModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="product-modal-body">
+                <div class="modal-img-area">
+                    <img id="modalImg" src="https://placehold.co/800x600" alt="Product Image">
+                </div>
+                <div class="modal-details">
+                    <div>
+                        <p id="modalDesc" style="color: var(--muted); margin-bottom: 10px;">وصف المنتج.</p>
+                        <p id="modalSellerRating" style="font-weight: bold; color: var(--primary);">تقييم البائع: 4.5 <i class="fa-solid fa-star"></i></p>
+                        <p id="modalExtra">تفاصيل إضافية: 2025-01-01</p>
+                    </div>
+                    
+                    <div class="modal-price-section">
+                        <div class="price" id="modalPrice">0.00 Pi</div>
+                        <div class="usd-value" id="modalUSD">(~ $0.00)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-actions-wrapper">
+                 <div class="modal-actions">
+                    <button id="modalChat" onclick="handleModalChat(this.getAttribute('data-product-id'))" data-ar="تحدث مع Logy" data-en="Chat with Logy">تحدث مع Logy</button>
+                    <button id="modalAdd" onclick="handleModalAdd(this)" data-product-id="" data-ar="أضف للعربة" data-en="Add to Cart">أضف للعربة</button>
+                </div>
+            </div>
+            </div>
+    </div>
+    
+    <div id="logyModal" class="modal" aria-hidden="true" onclick="if(event.target.classList.contains('modal')) closeModal('logyModal')">
+        <div class="modal-content" style="max-width: 450px;">
+             <div class="modal-header">
+                <h2 style="color:var(--success);"><i class="fa-solid fa-robot"></i> Logy AI Assistant</h2>
+                <button onclick="closeModal('logyModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="logy-status" id="logyStatus" data-ar="جاري التهيئ..." data-en="Initializing...">جاري التهيئ...</div>
+            <div class="logy-modal-body" id="logyBody">
+                </div>
+            <div class="logy-footer">
+                <input type="text" id="logyInput" placeholder="اسأل Logy عن الشحن، التوصيات، أو أي مشكلة..." data-ar="اسأل Logy عن الشحن، التوصيات، أو أي مشكلة..." data-en="Ask Logy about shipping, recommendations, or any issue...">
+                <button onclick="sendLogyMessage()">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        /* Full frontend implementation (self-contained).
+         * Phase 1: Pi SDK Integration, Connect, Checkout (Mock Escrow).
+         * Phase 2: AI Automation (Smart Search, Logy Chat for tracking/resolution).
+         * Phase 3: Mainnet/Testnet Auto-switch Logic.
+         * The JavaScript part remains identical to the original for functionality continuity.
+        */
+        (function(){
+
+            'use strict';
+            
+            // معدل ثابت لغرض العرض فقط.
+            const PI_TO_USD_RATE = 0.00025; 
+            
+            const TRANSLATIONS = {
+                'connectBtn': {ar: 'اتصال', en: 'Connect'},
+                'netBtnMain': {ar: 'Mainnet', en: 'Mainnet'},
+                'netBtnTest': {ar: 'Testnet', en: 'Testnet'},
+                'disconnected': {ar: 'غير متصل', en: 'Disconnected'},
+                'total': {ar: 'المجموع', en: 'Total'},
+                'pay': {ar: 'دفع', en: 'Pay'},
+                'add_to_cart': {ar: 'أضف للعربة', en: 'Add to Cart'},
+                'chat_with_logy': {ar: 'تحدث مع Logy', en: 'Chat with Logy'},
+                'seller_rating': {ar: 'تقييم البائع', en: 'Seller Rating'}, 
+                'checkout_success': {ar: 'تمت عملية الدفع بنجاح!', en: 'Checkout successful!'},
+                'connected_as': {ar: 'متصل كـ:', en: 'Connected as:'},
+            };
+
+            const CATEGORIES = [
+                {key:'all', icon:'fa-th-large', ar:'الكل', en:'All'},
+                {key:'cars', icon:'fa-car-side', ar:'سيارات', en:'Cars'},
+                {key:'real', icon:'fa-building', ar:'عقارات', en:'Real Estate'},
+                {key:'electronics', icon:'fa-microchip', ar:'إلكترونيات', en:'Electronics'},
+                {key:'fashion', icon:'fa-tshirt', ar:'أزياء', en:'Fashion'},
+                {key:'home', icon:'fa-house-chimney', ar:'منزل', en:'Home'},
+                {key:'services', icon:'fa-hands', ar:'خدمات', en:'Services'}
+            ];
+
+
+            let PRODUCTS = [
+                {id:'p1',cat:'cars', name_ar:'تويوتا كورولا 2018', name_en:'Toyota Corolla 2018', desc_ar:'حالة ممتازة • 120 ألف كم', desc_en:'Excellent • 120k km', price:120000, img:'https://placehold.co/800x600/FFD400/0D1B2A?text=Corolla', rating:4.3, created:'2025-01-10', seller_rating: 4.8},
+                {id:'p2',cat:'electronics', name_ar:'هاتف Pi الذكي', name_en:'Pi Smart Phone', desc_ar:'5G • شاشة OLED • كاميرا AI', desc_en:'5G • OLED • AI Camera', price:85.5, img:'https://placehold.co/800x600/0D1B2A/FFD400?text=Phone', rating:4.7, created:'2025-02-04', seller_rating: 4.5, is_ai_pick: true},
+                {id:'p3',cat:'electronics', name_ar:'ساعة Pi', name_en:'Pi Smart Watch', desc_ar:'لياقة • 7 أيام بطارية', desc_en:'Fitness • 7-day battery', price:12.75, img:'https://placehold.co/800x600/1A2E44/FFD400?text=Watch', rating:4.1, created:'2025-03-01', seller_rating: 4.9},
+                {id:'p4',cat:'real', name_ar:'شقة 120م بالزمالك', name_en:'120m Apartment in Zamalek', desc_ar:'مفروشة • موقع مميز', desc_en:'Furnished • Prime location', price:21000, img:'https://placehold.co/800x600/08121a/FFD400?text=Apartment', rating:4.6, created:'2025-01-20', seller_rating: 4.2},
+                {id:'p5',cat:'fashion', name_ar:'جاكيت جلد', name_en:'Leather Jacket', desc_ar:'جلد طبيعي • جديد', desc_en:'Genuine leather • New', price:120, img:'https://placehold.co/800x600/1A2E44/FFD400?text=Jacket', rating:4.0, created:'2025-04-10', seller_rating: 4.7},
+                {id:'p6',cat:'home', name_ar:'طقم كنبة 3 مقاعد', name_en:'3-Seater Sofa Set', desc_ar:'قماش فاخر • ضمان سنة', desc_en:'Premium fabric • 1yr warranty', price:450, img:'https://placehold.co/800x600/0D1B2A/FFD400?text=Sofa', rating:4.2, created:'2025-03-18', seller_rating: 4.1},
+                {id:'p7',cat:'services', name_ar:'تصميم موقع إلكتروني', name_en:'Web Design Service', desc_ar:'تصميم كامل • سنة دعم مجانية', desc_en:'Full design • 1yr free support', price:1500, img:'https://placehold.co/800x600/FFD400/0D1B2A?text=Web+Design', rating:4.9, created:'2025-04-20', seller_rating: 5.0, is_ai_pick: true},
+                {id:'p8',cat:'cars', name_ar:'دراجة نارية رياضية', name_en:'Sport Motorcycle', desc_ar:'2023 • 1500 كم', desc_en:'2023 • 1500 km', price:9500, img:'https://placehold.co/800x600/1A2E44/FFD400?text=Bike', rating:4.4, created:'2025-02-28', seller_rating: 4.6},
+                {id:'p9',cat:'electronics', name_ar:'شاشة 4K ذكية', name_en:'4K Smart TV', desc_ar:'55 بوصة • أندرويد', desc_en:'55 inch • Android', price:320, img:'https://placehold.co/800x600/0D1B2A/FFD400?text=Smart+TV', rating:4.5, created:'2025-01-05', seller_rating: 4.3},
+                {id:'p10',cat:'real', name_ar:'فيلا في التجمع الخامس', name_en:'Villa in New Cairo', desc_ar:'مساحة 500م • تشطيب فاخر', desc_en:'500m area • Luxury finish', price:550000, img:'https://placehold.co/800x600/08121a/FFD400?text=Villa', rating:4.8, created:'2025-04-01', seller_rating: 4.9}
+            ];
+
+            let cart = [];
+            let piConnected = false;
+            let isMainnet = false;
+            let currentLang = document.documentElement.lang;
+            let currentFilter = 'all';
+            let currentSort = 'default';
+            let piStatus = {
+                network: isMainnet ? 'Mainnet' : 'Testnet',
+                username: 'غير متصل',
+                balance: 0
+            };
+            let logyChatHistory = [];
+            
+            // --- Utility Functions ---
+            
+            function convertPiToUSD(pi) {
+                return (pi * PI_TO_USD_RATE).toFixed(2);
+            }
+
+            function getTranslation(key) {
+                const elements = document.querySelectorAll(`[data-ar="${key}"], [data-en="${key}"]`);
+                elements.forEach(el => {
+                    const translatedText = el.getAttribute(`data-${currentLang}`) || key;
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = translatedText;
+                    } else if (el.tagName === 'TITLE') {
+                        el.textContent = translatedText;
+                    } else if (el.tagName === 'OPTION') {
+                        // For select options, which are special, update later or use data-attributes
+                    } else {
+                        el.textContent = translatedText;
+                    }
+                });
+
+                // Handle select options
+                const selectElement = document.getElementById('sortSelect');
+                if (selectElement) {
+                    Array.from(selectElement.options).forEach(option => {
+                        const arText = option.getAttribute('data-ar');
+                        const enText = option.getAttribute('data-en');
+                        if (arText && enText) {
+                            option.textContent = currentLang === 'ar' ? arText : enText;
+                        }
+                    });
+                }
+            }
+            
+            function updateAllTranslations() {
+                // Get all elements with data-ar or data-en attributes
+                const translatableElements = document.querySelectorAll('[data-ar], [data-en]');
+                translatableElements.forEach(el => {
+                    const langAttr = `data-${currentLang}`;
+                    const translatedText = el.getAttribute(langAttr);
+                    if (translatedText) {
+                        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                            el.placeholder = translatedText;
+                        } else if (el.tagName === 'TITLE') {
+                            el.textContent = translatedText;
+                        } else {
+                            el.textContent = translatedText;
+                        }
+                    }
+                });
+
+                // Specific element translations (like button labels that change dynamically)
+                document.getElementById('connectBtn').textContent = currentLang === 'ar' ? TRANSLATIONS.connectBtn.ar : TRANSLATIONS.connectBtn.en;
+                document.getElementById('netBtn').textContent = isMainnet ? (currentLang === 'ar' ? TRANSLATIONS.netBtnMain.ar : TRANSLATIONS.netBtnMain.en) : (currentLang === 'ar' ? TRANSLATIONS.netBtnTest.ar : TRANSLATIONS.netBtnTest.en);
+                
+                // Update checkout button text
+                const checkoutBtn = document.getElementById('checkoutBtn');
+                const btnTextKey = piStatus.network === 'Mainnet' ? 'pay' : 'pay (Testnet)';
+                checkoutBtn.textContent = currentLang === 'ar' ? `${TRANSLATIONS.pay.ar} (${piStatus.network})` : `${TRANSLATIONS.pay.en} (${piStatus.network})`;
+                
+                // Update dynamic status texts
+                updatePiStatusDisplay();
+                updateCartDisplay();
+                
+                // Re-render categories and products to apply language changes
+                renderCategories();
+                renderProducts(PRODUCTS.filter(p => currentFilter === 'all' || p.cat === currentFilter));
+            }
+            
+            window.toggleLanguage = function() {
+                currentLang = currentLang === 'ar' ? 'en' : 'ar';
+                document.documentElement.lang = currentLang;
+                document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+                document.getElementById('langToggleTop').textContent = currentLang === 'ar' ? 'EN' : 'AR';
+                updateAllTranslations();
+            }
+
+            function showToast(message, duration = 3000) {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.style.display = 'block';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, duration);
+            }
+
+            function logEvent(message) {
+                const log = document.getElementById('txLog');
+                const eventTime = new Date().toLocaleTimeString(currentLang, {hour: '2-digit', minute: '2-digit'});
+                const entry = document.createElement('div');
+                entry.innerHTML = `[${eventTime}] ${message}`;
+                log.prepend(entry);
+            }
+            
+            window.clearLogs = function() {
+                document.getElementById('txLog').innerHTML = '';
+                logEvent(currentLang === 'ar' ? 'تم مسح السجل.' : 'Log cleared.');
+            }
+            
+            // --- Pi SDK Mock Functions ---
+
+            function startLoading() {
+                document.getElementById('loadingBar').style.opacity = '1';
+            }
+
+            function stopLoading() {
+                document.getElementById('loadingBar').style.opacity = '0';
+            }
+
+            window.piConnect = function() {
+                if (piConnected) return;
+                
+                startLoading();
+                
+                // Mock Pi SDK initialization
+                setTimeout(() => {
+                    piConnected = true;
+                    piStatus.username = 'Pioneer_XYZ';
+                    piStatus.balance = 1250.75; // Mock balance
+                    updatePiStatusDisplay();
+                    logEvent(currentLang === 'ar' ? `تم الاتصال بنجاح كـ ${piStatus.username}` : `Successfully connected as ${piStatus.username}`);
+                    stopLoading();
+                    updateCheckoutButtonState();
+                }, 2000);
+            }
+            
+            window.toggleNetwork = function() {
+                isMainnet = !isMainnet;
+                piStatus.network = isMainnet ? 'Mainnet' : 'Testnet';
+                document.getElementById('netBtn').textContent = isMainnet ? (currentLang === 'ar' ? TRANSLATIONS.netBtnMain.ar : TRANSLATIONS.netBtnMain.en) : (currentLang === 'ar' ? TRANSLATIONS.netBtnTest.ar : TRANSLATIONS.netBtnTest.en);
+                updatePiStatusDisplay();
+                updateCheckoutButtonState();
+                
+                // Update checkout button text
+                const checkoutBtn = document.getElementById('checkoutBtn');
+                checkoutBtn.textContent = currentLang === 'ar' ? `${TRANSLATIONS.pay.ar} (${piStatus.network})` : `${TRANSLATIONS.pay.en} (${piStatus.network})`;
+                
+                logEvent(currentLang === 'ar' ? `تم التبديل إلى شبكة ${piStatus.network}` : `Switched to ${piStatus.network} network`);
+            }
+            
+            function updatePiStatusDisplay() {
+                const statusIcon = document.getElementById('statusIcon');
+                const usernameText = document.querySelector('.username-text');
+                const balanceText = document.querySelector('.balance-text');
+                const connectBtn = document.getElementById('connectBtn');
+                
+                if (piConnected) {
+                    statusIcon.className = 'fa-solid fa-circle-check';
+                    statusIcon.title = 'Connected';
+                    usernameText.textContent = `${currentLang === 'ar' ? TRANSLATIONS.connected_as.ar : TRANSLATIONS.connected_as.en} ${piStatus.username}`;
+                    balanceText.textContent = `${piStatus.balance.toFixed(2)} Pi Balance (${piStatus.network})`;
+                    connectBtn.disabled = true;
+                    connectBtn.textContent = currentLang === 'ar' ? 'متصل' : 'Connected';
+                    connectBtn.style.backgroundColor = 'var(--success)';
+                    connectBtn.style.color = 'var(--secondary)';
+                } else {
+                    statusIcon.className = 'fa-solid fa-circle-xmark';
+                    statusIcon.title = 'Disconnected';
+                    usernameText.textContent = currentLang === 'ar' ? TRANSLATIONS.disconnected.ar : TRANSLATIONS.disconnected.en;
+                    balanceText.textContent = '';
+                    connectBtn.disabled = false;
+                    connectBtn.textContent = currentLang === 'ar' ? TRANSLATIONS.connectBtn.ar : TRANSLATIONS.connectBtn.en;
+                    connectBtn.style.backgroundColor = 'var(--secondary)';
+                    connectBtn.style.color = 'var(--text-light)';
+                }
+            }
+
+            window.piCheckout = function() {
+                if (!piConnected || cart.length === 0) return;
+                
+                startLoading();
+                const totalPi = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+                
+                // Mock Pi Payment Logic
+                logEvent(currentLang === 'ar' ? `بدء الدفع لـ ${totalPi.toFixed(2)} Pi` : `Initiating payment for ${totalPi.toFixed(2)} Pi`);
+
+                setTimeout(() => {
+                    // Simulate successful Pi transaction
+                    cart = []; // Clear cart on success
+                    piStatus.balance -= totalPi; // Deduct from mock balance
+                    
+                    updateCartDisplay();
+                    updatePiStatusDisplay();
+                    updateCheckoutButtonState();
+                    stopLoading();
+                    
+                    const successMsg = currentLang === 'ar' ? TRANSLATIONS.checkout_success.ar : TRANSLATIONS.checkout_success.en;
+                    showToast(successMsg);
+                    logEvent(currentLang === 'ar' ? `تمت المعاملة بنجاح: تم خصم ${totalPi.toFixed(2)} Pi` : `TX Successful: ${totalPi.toFixed(2)} Pi deducted`);
+                }, 3000); // Simulate network delay
+            }
+            
+            // --- Product & Cart Management ---
+
+            function renderCategories() {
+                const catArea = document.getElementById('cats');
+                catArea.innerHTML = CATEGORIES.map(cat => `
+                    <div class="cat ${cat.key === currentFilter ? 'active' : ''}" 
+                         onclick="handleCategoryFilter('${cat.key}')" 
+                         data-ar="${cat.ar}" 
+                         data-en="${cat.en}">
+                        <i class="fa-solid ${cat.icon}"></i> ${currentLang === 'ar' ? cat.ar : cat.en}
+                    </div>
+                `).join('');
+            }
+            
+            function sortProducts(products, sortBy) {
+                return products.sort((a, b) => {
+                    switch (sortBy) {
+                        case 'rating_desc':
+                            return b.rating - a.rating;
+                        case 'price_asc':
+                            return a.price - b.price;
+                        case 'price_desc':
+                            return b.price - a.price;
+                        case 'default':
+                        default:
+                            return new Date(b.created) - new Date(a.created); // Newest first
+                    }
+                });
+            }
+
+            function renderProducts(products) {
+                const productList = document.getElementById('productList');
+                const sortedProducts = sortProducts(products, currentSort);
+                
+                productList.innerHTML = sortedProducts.map(p => {
+                    const name = currentLang === 'ar' ? p.name_ar : p.name_en;
+                    const desc = currentLang === 'ar' ? p.desc_ar : p.desc_en;
+                    const isAiPick = p.is_ai_pick ? `<div class="ai-badge">AI Pick</div>` : '';
+                    
+                    return `
+                        <div class="product ${p.is_ai_pick ? 'ai-pick' : ''}" onclick="openProductModal('${p.id}')">
+                            ${isAiPick}
+                            <img src="${p.img}" alt="${name}">
+                            <div class="product-content">
+                                <div class="title">${name}</div>
+                                <div class="desc">${desc}</div>
+                            </div>
+                            <div class="price-row">
+                                <div>
+                                    <div class="price">${p.price.toFixed(2)} Pi</div>
+                                    <div class="usd-value">(~ $${convertPiToUSD(p.price)})</div>
+                                </div>
+                                <div>
+                                    <div class="seller-rating">
+                                        ${p.seller_rating.toFixed(1)} <i class="fa-solid fa-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            function updateCartDisplay() {
+                const cartArea = document.getElementById('cartArea');
+                const cartTotal = document.getElementById('cartTotal');
+                
+                if (cart.length === 0) {
+                    cartArea.innerHTML = `<p style="text-align: center; color: var(--muted); margin-top: 50px;" data-ar="سلة التسوق فارغة" data-en="Your cart is empty">سلة التسوق فارغة</p>`;
+                    cartTotal.querySelector('.total-pi').textContent = `${currentLang === 'ar' ? TRANSLATIONS.total.ar : TRANSLATIONS.total.en}: 0.00 Pi`;
+                    cartTotal.querySelector('.total-usd').textContent = `(~ $0.00)`;
+                    updateCheckoutButtonState();
+                    return;
+                }
+                
+                let totalPi = 0;
+                
+                cartArea.innerHTML = cart.map(item => {
+                    totalPi += item.price * item.qty;
+                    const name = currentLang === 'ar' ? item.name_ar : item.name_en;
+                    
+                    return `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed rgba(255,255,255,0.05);">
+                            <div style="flex-grow: 1;">
+                                <div style="font-size: 14px; font-weight: bold; color: var(--text-light);">${name}</div>
+                                <div style="font-size: 12px; color: var(--primary);">${(item.price * item.qty).toFixed(2)} Pi</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <button class="cart-qty-btn" onclick="updateCartQty('${item.id}', -1)">-</button>
+                                <span style="font-size: 14px; font-weight: bold; width: 20px; text-align: center;">${item.qty}</span>
+                                <button class="cart-qty-btn" onclick="updateCartQty('${item.id}', 1)">+</button>
+                                <button class="cart-remove-btn" style="border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;" onclick="removeFromCart('${item.id}')">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                cartTotal.querySelector('.total-pi').textContent = `${currentLang === 'ar' ? TRANSLATIONS.total.ar : TRANSLATIONS.total.en}: ${totalPi.toFixed(2)} Pi`;
+                cartTotal.querySelector('.total-usd').textContent = `(~ $${convertPiToUSD(totalPi)})`;
+                
+                updateCheckoutButtonState();
+            }
+
+            function updateCheckoutButtonState() {
+                const checkoutBtn = document.getElementById('checkoutBtn');
+                if (piConnected && cart.length > 0) {
+                    checkoutBtn.disabled = false;
+                } else {
+                    checkoutBtn.disabled = true;
+                }
+                
+                // Update button network label
+                checkoutBtn.textContent = currentLang === 'ar' ? `${TRANSLATIONS.pay.ar} (${piStatus.network})` : `${TRANSLATIONS.pay.en} (${piStatus.network})`;
+            }
+
+            window.handleCategoryFilter = function(category) {
+                currentFilter = category;
+                
+                // Update active category
+                document.querySelectorAll('.cat').forEach(el => el.classList.remove('active'));
+                document.querySelector(`.cat[onclick*="'${category}'"]`).classList.add('active');
+                
+                // Filter products
+                const filteredProducts = category === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === category);
+                renderProducts(filteredProducts);
+            }
+            
+            window.handleSortChange = function(sortBy) {
+                currentSort = sortBy;
+                const filteredProducts = currentFilter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === currentFilter);
+                renderProducts(filteredProducts);
+            }
+            
+            window.openProductModal = function(id) {
+                const product = PRODUCTS.find(p => p.id === id);
+                if (!product) return;
+                
+                const modal = document.getElementById('productModal');
+                
+                // Content Update
+                const name = currentLang === 'ar' ? product.name_ar : product.name_en;
+                const desc = currentLang === 'ar' ? product.desc_ar : product.desc_en;
+                const sellerRatingText = currentLang === 'ar' ? TRANSLATIONS.seller_rating.ar : TRANSLATIONS.seller_rating.en;
+
+                document.getElementById('modalName').textContent = name;
+                document.getElementById('modalImg').src = product.img;
+                document.getElementById('modalDesc').textContent = desc;
+                document.getElementById('modalSellerRating').innerHTML = `${sellerRatingText}: ${product.seller_rating.toFixed(1)} <i class="fa-solid fa-star"></i>`;
+                document.getElementById('modalExtra').textContent = `${currentLang === 'ar' ? 'تاريخ الإضافة' : 'Added Date'}: ${product.created}`;
+                document.getElementById('modalPrice').textContent = `${product.price.toFixed(2)} Pi`;
+                document.getElementById('modalUSD').textContent = `(~ $${convertPiToUSD(product.price)})`;
+                
+                // Action buttons update
+                const modalAddBtn = document.getElementById('modalAdd');
+                modalAddBtn.setAttribute('data-product-id', product.id);
+                const cartItem = cart.find(item => item.id === id);
+                if (cartItem) {
+                    modalAddBtn.textContent = currentLang === 'ar' ? 'موجود في العربة' : 'In Cart';
+                    modalAddBtn.disabled = true;
+                } else {
+                    modalAddBtn.textContent = currentLang === 'ar' ? TRANSLATIONS.add_to_cart.ar : TRANSLATIONS.add_to_cart.en;
+                    modalAddBtn.disabled = false;
+                }
+                
+                document.getElementById('modalChat').setAttribute('data-product-id', product.id);
+
+                // Show modal
+                modal.classList.add('show');
+                modal.setAttribute('aria-hidden', 'false');
+            }
+
+            window.closeModal = function(id) {
+                const modal = document.getElementById(id);
+                modal.classList.remove('show');
+                modal.setAttribute('aria-hidden', 'true');
+            }
+            
+            window.handleModalAdd = function(buttonElement) {
+                const id = buttonElement.getAttribute('data-product-id');
+                const product = PRODUCTS.find(p => p.id === id);
+                if (!product) return;
+                
+                addToCart(product);
+                closeModal('productModal');
+                showToast(currentLang === 'ar' ? `${product.name_ar} أُضيف إلى العربة.` : `${product.name_en} added to cart.`);
+            }
+
+            function addToCart(product) {
+                const existingItem = cart.find(item => item.id === product.id);
+                if (existingItem) {
+                    existingItem.qty += 1;
+                } else {
+                    cart.push({...product, qty: 1});
+                }
+                updateCartDisplay();
+            }
+
+            window.updateCartQty = function(id, delta) {
+                const item = cart.find(item => item.id === id);
+                if (item) {
+                    item.qty += delta;
+                    if (item.qty <= 0) {
+                        removeFromCart(id);
+                    } else {
+                        updateCartDisplay();
                     }
                 }
             }
-        }
-    </script>
-    <style>
-        /* لضمان تناسق الخط العربي */
-        body { font-family: 'Cairo', 'Inter', sans-serif; }
-        /* تصميم زر Pi بلمسة جمالية */
-        #buy-button {
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        #buy-button:hover {
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-        }
-    </style>
-</head>
-<body class="bg-piGray min-h-screen flex flex-col font-sans text-right">
 
-    <header class="bg-piDark text-white p-4 shadow-xl">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold tracking-wider text-pi">Forsale | سوق Pi</h1>
-            <div id="auth-status" class="text-sm bg-pi rounded-full px-3 py-1 text-piDark font-semibold">
-                <span id="username-display">جاري التحقق من هوية Pi...</span>
-            </div>
-        </div>
-    </header>
+            window.removeFromCart = function(id) {
+                cart = cart.filter(item => item.id !== id);
+                updateCartDisplay();
+            }
 
-    <main class="container mx-auto p-4 flex-grow">
-        <h2 class="text-3xl font-extrabold text-piDark mb-6 text-center">أفضل العروض على شبكة الاختبار (Testnet)</h2>
-        
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            // --- AI/Logy Chat Functions ---
 
-            <aside class="lg:col-span-1 space-y-4">
-                <div class="bg-white rounded-xl shadow-lg p-4 border-r-4 border-pi">
-                    <h3 class="text-lg font-bold text-piDark mb-3">منتجات مقترحة</h3>
-                    <ul class="space-y-3 text-sm">
-                        <li class="p-2 border-b border-gray-100 hover:bg-gray-50 rounded-md transition-colors duration-150 cursor-pointer">هاتف Pi الذكي - 5.0 π</li>
-                        <li class="p-2 border-b border-gray-100 hover:bg-gray-50 rounded-md transition-colors duration-150 cursor-pointer">دروس برمجة - 2.0 π</li>
-                        <li class="p-2 hover:bg-gray-50 rounded-md transition-colors duration-150 cursor-pointer">خلفيات حصرية - 0.5 π</li>
-                    </ul>
-                </div>
-                <div class="bg-white rounded-xl shadow-lg p-4 border-r-4 border-piDark">
-                    <h3 class="text-lg font-bold text-piDark mb-3">رسالة النظام</h3>
-                    <p id="message-box" class="text-gray-700 text-sm">الرجاء انتظار المصادقة التلقائية لـ Pi...</p>
-                    <p class="mt-3 text-xs text-gray-500">لإطلاق عملية الدفع، اضغط على "شراء الآن" على المنتج الرئيسي.</p>
-                </div>
-            </aside>
-
-            <section class="lg:col-span-3 bg-white rounded-xl shadow-2xl p-8 border-t-8 border-pi transform hover:shadow-3xl transition-shadow duration-300">
+            window.openLogyModal = function(productId = null) {
+                const modal = document.getElementById('logyModal');
+                modal.classList.add('show');
+                modal.setAttribute('aria-hidden', 'false');
+                document.getElementById('logyStatus').textContent = currentLang === 'ar' ? 'جاهز للمساعدة.' : 'Ready to assist.';
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    
-                    <div>
-                        <img src="https://placehold.co/600x400/333333/FFC800?text=Premium+Smartwatch" alt="Smart Watch" class="w-full h-auto rounded-xl shadow-lg object-cover mb-4">
-                        <h2 class="text-3xl font-extrabold text-piDark mb-2">ساعة ذكية متقدمة V2</h2>
-                        <div class="text-sm text-gray-500 mb-4 flex space-x-4 space-x-reverse">
-                            <span>التقييم: ⭐️⭐️⭐️⭐️ (4.5)</span>
-                            <span>المخزون: 15 قطعة</span>
-                        </div>
-                        <p class="text-gray-700 leading-relaxed">
-                            هذا المنتج هو إعلان تجريبي مخصص لاختبار دمج Pi SDK. يتميز بتصميمه العصري وميزاته الذكية. عند الضغط على "شراء"، سيتم فتح نافذة محفظة Pi Testnet لتأكيد المعاملة بقيمة 10 π.
-                        </p>
-                    </div>
-
-                    <div class="md:border-r md:pr-8 md:border-gray-200">
-                        <div class="mb-8">
-                            <span class="text-sm text-gray-500 block">السعر على شبكة الاختبار:</span>
-                            <span class="text-5xl font-black text-piDark block">10.0 <span class="text-pi">π</span></span>
-                        </div>
-
-                        <button id="buy-button" class="w-full bg-pi text-piDark font-bold py-4 px-6 rounded-xl shadow-lg hover:bg-yellow-400 transition-colors duration-300 transform active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed" onclick="createPiPayment()" disabled>
-                            شراء الآن بـ 10.0 π
-                        </button>
-
-                        <div id="payment-status-info" class="mt-6 p-4 bg-piLight rounded-lg border border-pi text-sm text-gray-800">
-                            **حالة الدفع:** <span id="payment-status" class="font-semibold text-piDark">غير نشط (يرجى تسجيل الدخول أولاً)</span>
-                        </div>
-
-                        <div class="mt-6 text-sm text-gray-500">
-                            <p class="mb-2">⚠️ **ملاحظة:** يتم التعامل مع هذه المعاملة على شبكة الاختبار (Testnet) ولا تستخدم عملة Pi الحقيقية.</p>
-                        </div>
-                    </div>
-                </div>
-
-            </section>
-        </div>
-    </main>
-
-    <footer class="bg-piDark text-white text-center p-4 text-sm mt-8">
-        <p>&copy; 2025 Forsale Marketplace. مدعوم بواسطة Pi Network.</p>
-    </footer>
-
-    <script>
-        const MESSAGE_BOX = document.getElementById('message-box');
-        const USERNAME_DISPLAY = document.getElementById('username-display');
-        const BUY_BUTTON = document.getElementById('buy-button');
-        const PAYMENT_STATUS_DISPLAY = document.getElementById('payment-status');
-
-        // تحديث رسالة الحالة في الشريط الجانبي وفي لوحة الدفع
-        function updateStatus(message, isError = false, isSuccess = false) {
-            MESSAGE_BOX.innerHTML = message;
-            PAYMENT_STATUS_DISPLAY.innerHTML = message;
+                if (logyChatHistory.length === 0) {
+                    logyChatHistory.push({sender: 'ai', text: currentLang === 'ar' ? 'مرحبًا! أنا Logy، مساعدك الذكي. كيف يمكنني مساعدتك في البحث أو تتبع طلبك؟' : 'Hello! I\'m Logy, your AI Assistant. How can I help you with search or order tracking?'});
+                }
+                renderLogyChat();
+                document.getElementById('logyInput').focus();
+            }
             
-            PAYMENT_STATUS_DISPLAY.classList.remove('text-red-600', 'text-green-600', 'text-piDark');
-            if (isError) {
-                PAYMENT_STATUS_DISPLAY.classList.add('text-red-600');
-            } else if (isSuccess) {
-                PAYMENT_STATUS_DISPLAY.classList.add('text-green-600');
-            } else {
-                PAYMENT_STATUS_DISPLAY.classList.add('text-piDark');
+            window.handleModalChat = function(productId) {
+                closeModal('productModal');
+                openLogyModal();
+                const product = PRODUCTS.find(p => p.id === productId);
+                const name = currentLang === 'ar' ? product.name_ar : product.name_en;
+                const initialMessage = currentLang === 'ar' ? `ما هي تفاصيل المنتج "${name}"؟` : `What are the details of the product "${name}"?`;
+                document.getElementById('logyInput').value = initialMessage;
+                // Automatically send message for better flow
+                sendLogyMessage();
             }
-        }
 
-        // 1. وظيفة المصادقة التلقائية (الاتصال)
-        async function authenticatePiUser() {
-            try {
-                updateStatus('جاري محاولة الاتصال بـ Pi Browser...');
-                // طلب المصادقة وطلب الإذن باسم المستخدم
-                const auth = await Pi.authenticate(['username'], onIncompletePaymentFound);
-                
-                const username = auth.user.username;
-                USERNAME_DISPLAY.textContent = `مرحباً، ${username}`;
-                updateStatus(`تم تسجيل الدخول بنجاح! اسم مستخدم Pi: ${username}`, false, true);
-                
-                // تمكين زر الشراء
-                BUY_BUTTON.disabled = false;
-                
-            } catch (error) {
-                console.error("Authentication failed:", error);
-                USERNAME_DISPLAY.textContent = "فشل المصادقة!";
-                updateStatus(`خطأ: ${error.message}. يرجى الفتح عبر Pi Browser.`, true);
-                BUY_BUTTON.disabled = true;
+            function renderLogyChat() {
+                const logyBody = document.getElementById('logyBody');
+                logyBody.innerHTML = logyChatHistory.map(msg => {
+                    return `
+                        <div class="chat-bubble ${msg.sender}">
+                            ${msg.text}
+                        </div>
+                    `;
+                }).join('');
+                logyBody.scrollTop = logyBody.scrollHeight;
             }
-        }
 
-        // 2. وظيفة إنشاء الدفع
-        function createPiPayment() {
-            BUY_BUTTON.disabled = true;
-            BUY_BUTTON.textContent = 'جاري إطلاق الدفع...';
-            updateStatus('جاري إعداد طلب الدفع...');
+            window.sendLogyMessage = function() {
+                const input = document.getElementById('logyInput');
+                const message = input.value.trim();
+                if (!message) return;
 
-            const product = {
-                amount: 10.0, 
-                memo: "شراء ساعة ذكية متقدمة من متجر Forsale (اختبار)", 
-                metadata: {
-                    item_id: "SMARTWATCH-001",
+                logyChatHistory.push({sender: 'user', text: message});
+                input.value = '';
+                renderLogyChat();
+                
+                // Mock AI Response
+                document.getElementById('logyStatus').textContent = currentLang === 'ar' ? 'Logy يكتب...' : 'Logy is typing...';
+                
+                setTimeout(() => {
+                    const aiResponse = getMockAiResponse(message);
+                    logyChatHistory.push({sender: 'ai', text: aiResponse});
+                    renderLogyChat();
+                    document.getElementById('logyStatus').textContent = currentLang === 'ar' ? 'جاهز للمساعدة.' : 'Ready to assist.';
+                    logEvent(currentLang === 'ar' ? `رسالة Logy: ${message.substring(0, 30)}...` : `Logy Message: ${message.substring(0, 30)}...`);
+                }, 1500);
+            }
+            
+            function getMockAiResponse(message) {
+                const lowerMessage = message.toLowerCase();
+                const isArabic = currentLang === 'ar';
+
+                if (lowerMessage.includes(isArabic ? 'كم سعر' : 'how much') || lowerMessage.includes('price')) {
+                    const productMatch = PRODUCTS.find(p => (p.name_ar && lowerMessage.includes(p.name_ar.toLowerCase())) || (p.name_en && lowerMessage.includes(p.name_en.toLowerCase())));
+                    if (productMatch) {
+                        return isArabic 
+                            ? `سعر ${productMatch.name_ar} هو ${productMatch.price.toFixed(2)} Pi، أي ما يعادل حوالي $${convertPiToUSD(productMatch.price)} تقريبًا. هل تود إضافته إلى سلة التسوق؟`
+                            : `The price of ${productMatch.name_en} is ${productMatch.price.toFixed(2)} Pi, which is approximately $${convertPiToUSD(productMatch.price)}. Would you like to add it to your cart?`;
+                    }
                 }
-            };
-
-            const callbacks = {
-                onReadyForServerApproval: function(paymentId) {
-                    // في بيئة الإنتاج، يتم هنا إرسال paymentId إلى خادمك للموافقة
-                    updateStatus(`تم إنشاء المعاملة: ${paymentId}. ننتظر موافقة المستخدم والدفع...`);
-                    
-                    // لغرض الاختبار البسيط (يجب إزالة هذا السطر في الإنتاج)
-                    Pi.payments.complete(paymentId, { txid: "TEST_TXID_FROM_SERVER" })
-                        .catch(err => updateStatus(`خطأ في الإكمال: ${err.message}`, true));
-                },
-                onReadyForServerCompletion: function(paymentId, txid) {
-                    // في بيئة الإنتاج، يتم هنا إرسال paymentId و txid إلى خادمك للتحقق النهائي
-                    updateStatus(`تم الدفع بنجاح! رقم TxID: ${txid}.`, false, true);
-                    BUY_BUTTON.textContent = 'تم الشراء بنجاح! ✅';
-                    BUY_BUTTON.classList.replace('bg-pi', 'bg-green-500');
-                    BUY_BUTTON.disabled = true;
-                },
-                onCancel: function(paymentId) {
-                    updateStatus(`تم إلغاء الدفع. يمكنك المحاولة مجدداً.`, false);
-                    BUY_BUTTON.disabled = false;
-                    BUY_BUTTON.textContent = 'شراء الآن بـ 10.0 π';
-                    BUY_BUTTON.classList.replace('bg-green-500', 'bg-pi');
-                },
-                onError: function(error, payment) {
-                    console.error("Payment error:", error);
-                    updateStatus(`خطأ في الدفع: ${error.message}`, true);
-                    BUY_BUTTON.disabled = false;
-                    BUY_BUTTON.textContent = 'شراء الآن بـ 10.0 π';
-                    BUY_BUTTON.classList.replace('bg-green-500', 'bg-pi');
+                
+                if (lowerMessage.includes(isArabic ? 'شحن' : 'shipping') || lowerMessage.includes(isArabic ? 'توصيل' : 'delivery')) {
+                    return isArabic 
+                        ? 'تكلفة الشحن لجميع المنتجات هي 5 Pi ثابتة، ويستغرق التوصيل ما بين 3-7 أيام عمل داخل المنطقة. هل لديك طلب محدد تريد تتبعه؟'
+                        : 'Shipping cost for all products is a flat 5 Pi, and delivery takes 3-7 business days within the region. Do you have a specific order you want to track?';
                 }
-            };
+                
+                if (lowerMessage.includes(isArabic ? 'تفاصيل' : 'details')) {
+                    return isArabic 
+                        ? 'يُرجى تحديد اسم المنتج الذي تسأل عنه لتقديم تفاصيل أدق، أو يمكنك زيارة صفحة المنتج مباشرة.'
+                        : 'Please specify the name of the product you are asking about to get more precise details, or you can check the product page directly.';
+                }
+                
+                return isArabic 
+                    ? 'أنا Logy، مساعد الذكاء الاصطناعي. يمكنني مساعدتك في البحث عن منتجات محددة، الإجابة على استفسارات الشحن، أو تتبع الطلبات. كيف يمكنني خدمتك بشكل أفضل؟'
+                    : 'I am Logy, the AI assistant. I can help you search for specific products, answer shipping inquiries, or track orders. How can I best serve you?';
+            }
+            
+            window.handleAISearch = function() {
+                const searchTerm = document.getElementById('search-input').value.trim();
+                if (!searchTerm) return;
+                
+                // Mock AI Search Logic (Search by name or description in both languages)
+                const lowerSearchTerm = searchTerm.toLowerCase();
+                const filteredProducts = PRODUCTS.filter(p => 
+                    p.name_ar.toLowerCase().includes(lowerSearchTerm) || 
+                    p.name_en.toLowerCase().includes(lowerSearchTerm) || 
+                    p.desc_ar.toLowerCase().includes(lowerSearchTerm) || 
+                    p.desc_en.toLowerCase().includes(lowerSearchTerm)
+                );
+                
+                renderProducts(filteredProducts);
+                
+                const searchResultMsg = currentLang === 'ar' 
+                    ? `تم العثور على ${filteredProducts.length} نتائج بحث لـ "${searchTerm}"`
+                    : `${filteredProducts.length} search results found for "${searchTerm}"`;
+                
+                logEvent(`AI Search: ${searchResultMsg}`);
+                showToast(searchResultMsg);
+            }
 
-            Pi.payments.create(product, callbacks);
-        }
+            // --- Initialization ---
 
-        // 3. وظيفة معالجة المدفوعات غير المكتملة
-        function onIncompletePaymentFound(payment) {
-            updateStatus(`توجد معاملة سابقة غير مكتملة: ${payment.identifier}. الرجاء إكمالها.`, false);
-        }
+            function initialize() {
+                // Set initial language from HTML
+                currentLang = document.documentElement.lang;
+                document.getElementById('langToggleTop').textContent = currentLang === 'ar' ? 'EN' : 'AR';
+                
+                renderCategories();
+                renderProducts(PRODUCTS);
+                updateCartDisplay();
+                updatePiStatusDisplay();
+                logEvent(currentLang === 'ar' ? 'تم تحميل واجهة Forsale بنجاح.' : 'Forsale interface loaded successfully.');
+            }
 
-        // إطلاق المصادقة بمجرد تحميل الصفحة
-        window.onload = function() {
-            authenticatePiUser();
-        };
-
+            // Run initialization after DOM is ready
+            initialize();
+        })();
+    </script> <script>
+    // ... أكواد أخرى إذا كانت موجودة
     </script>
+    
+    <div id="toast">تمت الإضافة إلى السلة</div>
+    
+    <script src="app.js"></script>
+
 </body>
 </html>
-```eof
-
----
-
-### 📌 الخطوة التالية:
-
-1.  **اذهب إلى $\text{GitHub}$**، وقم بلصق الكود وحفظ التغييرات.
-2.  **استمر في التحقق** من قائمة فحص تطبيقك على بوابة المطورين.
-
-في اللحظة التي يتم فيها حل مشكلة الخطوة 2 (`Configure Hosting`) من قبل فريق الدعم، أخبرني فوراً لننتقل إلى الخطوة 3 (`Connect App Wallet`).

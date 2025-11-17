@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html langnode server.js="ar" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -65,6 +65,7 @@
             font-weight: bold;
             display: flex;
             align-items: center;
+            flex-shrink: 0; /* مهم لعدم انكماش الشعار */
         }
 
         .logo i {
@@ -75,6 +76,9 @@
             display: flex;
             align-items: center;
             gap: 10px; 
+            flex-shrink: 1; /* يسمح له بالانكماش عند ضيق المساحة */
+            min-width: 0; /* يسمح بتجاوب جيد */
+            justify-content: flex-end; /* دفع العناصر لليمين في وضع RTL */
         }
 
         .status-indicator {
@@ -89,10 +93,25 @@
         .status-indicator i {
             font-size: 15px;
             color: var(--danger);
+            flex-shrink: 0;
         }
 
         .status-indicator i.fa-circle-check {
             color: var(--success);
+        }
+        
+        /* دمج الاسم والرصيد في حاوية واحدة */
+        .status-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+            min-width: 0;
+            text-align: right; /* محاذاة الاسم والرصيد لليمين */
+        }
+        
+        .username-text, .balance-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .action-btn {
@@ -105,6 +124,7 @@
             color: var(--text-light);
             white-space: nowrap;
             font-size: 13px; 
+            flex-shrink: 0; /* مهم لضمان بقاء الأزرار واضحة */
         }
 
         .action-btn:hover:not(:disabled) {
@@ -146,7 +166,7 @@
             z-index: 1000;
         }
 
-        /* --- Search & Sort (لم تتغير) --- */
+        /* --- Search & Sort --- */
         .controls {
             display: flex;
             flex-wrap: wrap; 
@@ -205,7 +225,7 @@
             font-size: 14px;
         }
 
-        /* --- Main Layout, Category Bar, Product Grid (لم تتغير) --- */
+        /* --- Main Layout, Category Bar, Product Grid --- */
         .main-layout {
             display: grid;
             grid-template-columns: 3fr 1fr; 
@@ -242,7 +262,8 @@
         /* Product Grid */
         #productList {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+            /* التعديل لجعله عمود واحد على جميع الشاشات */
+            grid-template-columns: 1fr; 
             gap: 20px;
         }
 
@@ -356,9 +377,9 @@
             font-size: 16px;
         }
         
-        /* Transaction Log Clear Button - التعديل المطلوب هنا */
+        /* Transaction Log Clear Button */
         .log-controls #clearLogsBtn {
-            background-color: var(--danger-dark); /* تغيير اللون إلى الأحمر الداكن */
+            background-color: var(--danger-dark); 
             color: var(--text-light);
             padding: 7px 12px;
             border: none;
@@ -368,7 +389,7 @@
             transition: background-color 0.3s;
         }
 
-        /* --- Floating Logy Button (لم تتغير) --- */
+        /* --- Floating Logy Button --- */
         #logyFloatingBtn {
             position: fixed; 
             bottom: 20px;
@@ -388,7 +409,7 @@
             z-index: 100;
         }
 
-        /* --- Logy AI Modal Styles (لم تتغير) --- */
+        /* --- Logy AI Modal Styles --- */
         .logy-modal {
             position: fixed;
             top: 0;
@@ -607,7 +628,7 @@
             margin-top: 20px;
         }
         
-        /* منطقة التفاصيل الكاملة القابلة للتوسع (لم تتغير) */
+        /* منطقة التفاصيل الكاملة القابلة للتوسع */
         .full-details-toggle {
             cursor: pointer;
             color: var(--primary);
@@ -648,7 +669,7 @@
             transform: rotate(180deg);
         }
 
-        /* --- Media Queries for Responsiveness (لم تتغير) --- */
+        /* --- Media Queries for Responsiveness (التعديلات الجديدة) --- */
 
         @media (max-width: 992px) {
             .main-layout {
@@ -657,6 +678,53 @@
             .sidebar-panel {
                 position: static;
             }
+        }
+        
+        /* التعديل الجديد لضمان التجاوب المثالي للشريط العلوي على الجوال */
+        @media (max-width: 768px) {
+            .header {
+                flex-wrap: wrap; /* السماح بكسر السطر */
+                padding: 10px 10px 5px; /* تقليل الحشو قليلاً */
+            }
+            
+            .logo {
+                width: 100%; /* الشعار يأخذ عرض السطر بالكامل */
+                text-align: center;
+                margin-bottom: 8px; /* مسافة فاصلة بين الشعار وعناصر الحالة */
+            }
+
+            .status-bar {
+                width: 100%; /* شريط الحالة يأخذ عرض السطر بالكامل */
+                flex-wrap: wrap; /* السماح لعناصر الحالة بالانتقال إلى سطر جديد */
+                justify-content: space-between; /* توزيع العناصر بالتساوي */
+                gap: 5px; /* تقليل الفجوات */
+            }
+            
+            .status-indicator {
+                flex-grow: 1; /* للسماح لها بالتمدد قليلاً */
+                justify-content: flex-start; /* محاذاة لليسار */
+                order: -1; /* وضع مؤشر الحالة أولاً */
+                min-width: 120px;
+            }
+            
+            /* توزيع الأزرار بالتساوي في السطر الثاني */
+            #netBtn, #connectBtn, #langToggleTop {
+                flex-grow: 1; 
+                min-width: 70px; 
+                font-size: 12px;
+                padding: 6px 8px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-container {
+                width: 100%;
+            }
+            
+            /* تم إزالة override #productList هنا لضمان تطبيق العمود الواحد على الجوال أيضاً */
         }
         
         @media (max-width: 600px) {
@@ -673,7 +741,7 @@
             }
         }
         
-        /* --- RTL adjustments (لم تتغير) --- */
+        /* --- RTL adjustments --- */
         [dir="rtl"] #logyFloatingBtn {
             inset-inline-start: auto;
             inset-inline-end: 20px; 
@@ -930,7 +998,7 @@
             let currentLang = document.documentElement.lang;
             let currentFilter = 'all';
             let currentSort = 'default';
-            let currentProductId = null; // **متغير حالة عالمي**
+            let currentProductId = null; 
             let piStatus = {
                 network: 'Mainnet', 
                 username: 'غير متصل',
@@ -997,7 +1065,7 @@
                 logEvent(currentLang === 'ar' ? 'تم مسح السجل.' : 'Log cleared.');
             }
 
-            // --- Pi SDK Mock Functions (لم تتغير) ---
+            // --- Pi SDK Mock Functions ---
 
             function startLoading() {
                 document.getElementById('loadingBar').style.opacity = '1';
@@ -1131,7 +1199,7 @@
                  const product = PRODUCTS.find(p => p.id === id);
                  if (!product) return;
                  
-                 currentProductId = id; // **تحديث متغير الحالة هنا**
+                 currentProductId = id; 
 
                  const name = currentLang === 'ar' ? product.name_ar : product.name_en;
                  const desc = currentLang === 'ar' ? product.desc_ar : product.desc_en;
@@ -1174,7 +1242,7 @@
                 }
                 document.getElementById('productModal').style.display = 'none';
                 document.body.style.overflow = '';
-                currentProductId = null; // **تصفير معرف المنتج عند الإغلاق**
+                currentProductId = null; 
                 logEvent(currentLang === 'ar' ? 'تم إغلاق نافذة المنتج.' : 'Product modal closed.');
             }
             
@@ -1188,7 +1256,7 @@
                 }
             }
             
-            // --- Product & Cart Management (لم تتغير) ---
+            // --- Product & Cart Management ---
 
             function renderCategories() {
                 const catArea = document.getElementById('cats');
@@ -1351,7 +1419,7 @@
                 updateCartDisplay();
             }
             
-            // --- AI/Logy Chat Functions (التفعيل الأكيد هنا) ---
+            // --- AI/Logy Chat Functions ---
             
             window.openLogyModal = function(productId = null) {
                 // استخدام currentProductId المعين مسبقاً إذا لم يتم تمريره مباشرة

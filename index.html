@@ -2,1621 +2,527 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-ar="سوق Forsale (تجريبي)" data-en="Forsale Marketplace (Mock)">سوق Forsale (تجريبي)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Forsale AI - سوق المستقبل</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        /* تعريف الألوان والثوابت */
-        :root {
-            --primary: #FFD400;             /* ذهبي */
-            --secondary: #0D1B2A;           /* كحلي غامق - يستخدم كخلفية لبعض الأزرار */
-            --background: #08121a;          /* أسود / أزرق غامق جداً (الخلفية الرئيسية) */
-            --background-light: #1A2E44;    /* خلفية العناصر والألواح الجانبية */
-            --background-dark: #050b10;     /* خلفية الشريط العلوي والمحادثات */
-            --text-light: #FFF;             /* نص أبيض */
-            --text-muted: #99AAB5;          /* نص ثانوي (رمادي باهت) */
-            --success: #2ECC71;             /* أخضر (تطعيمات النجاح والتوثيق) */
-            --danger: #E74C3C;              /* أحمر (تنبيهات وأزرار الخروج) */
-            --danger-dark: #B92F2F;
-            --accent: #4A90E2;              /* أزرق (تستخدم كتمييز ثانوي) */
-            --radius: 8px;
-        }
-
-        body {
-            background: var(--background);
-            color: var(--text-muted);
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            transition: all 0.3s ease;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: auto;
-            padding: 10px;
-        }
-
-        /* تنسيق الشريط العلوي */
-        .header {
-            background: var(--background-dark);
-            padding: 10px 6px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 2px solid var(--background-light);
-        }
-
-        .logo {
-            color: var(--primary);
-            font-size: 21px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-        }
-
-        .logo i {
-            margin-inline-end: 9px;
-        }
-
-        .status-bar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            color: var(--text-light);
-        }
-
-        .status-indicator i.fa-circle-check {
-            color: var(--success); /* أخضر النجاح */
-        }
-
-        .status-indicator i.fa-circle-xmark {
-            color: var(--danger);
-        }
-
-        .status-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.1;
-        }
-
-        /* تنسيق الأزرار العامة */
-        .action-btn {
-            padding: 7px 14px;
-            border: none;
-            border-radius: var(--radius);
-            font-weight: bold;
-            cursor: pointer;
-            transition: background .2s;
-            color: var(--text-light);
-            background: var(--background-light);
-        }
-
-        .action-btn:hover:not(:disabled) {
-            opacity: .9;
-        }
-
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        #connectBtn { background: var(--secondary); }
-        #netBtn { background: var(--primary); color: var(--secondary); } /* ذهبي مع كتابة كحلية */
-        #logoutBtn { background: var(--danger-dark); margin-inline-end: 4px; }
-        #langToggleTop { background: var(--accent); }
-        #verifyBtn { background: var(--success); }
-        #sellBtn { background: var(--accent); }
-        #ordersBtn { background: var(--primary); color: var(--secondary); }
-
-
-        /* شريط التحكم والبحث */
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin: 14px 0;
-        }
-
-        .search-container {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            background: var(--background-light);
-            border-radius: var(--radius);
-            padding: 6px;
-        }
-
-        .search-container input {
-            flex-grow: 1;
-            padding: 8px;
-            background: none;
-            border: none;
-            color: var(--text-light);
-        }
-
-        .search-container input:focus {
-            outline: none;
-        }
-
-        .search-container button {
-            background: var(--primary);
-            color: var(--secondary);
-            padding: 7px 12px;
-            border-radius: var(--radius);
-            border: none;
-            cursor: pointer;
-        }
-
-        .sort-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        /* التخطيط الرئيسي */
-        .main-layout {
-            display: grid;
-            grid-template-columns: 2.5fr 1fr;
-            gap: 16px;
-        }
-
-        /* شريط التصنيفات */
-        .category-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-
-        .cat {
-            background: var(--background-light); /* تغيير اللون الأساسي ليتناسب مع الخلفية الداكنة */
-            color: var(--text-light);
-            padding: 6px 12px;
-            border-radius: var(--radius);
-            margin-bottom: 4px;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-        }
-
-        .cat:hover, .cat.active {
-            background: var(--primary); /* ذهبي عند التفعيل */
-            color: var(--secondary);
-        }
-
-        /* قائمة المنتجات */
-        #productList {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* عرض منتجين في الصف */
-            gap: 15px;
-        }
-        
-        @media (min-width: 900px) {
-            #productList {
-                grid-template-columns: 1fr 1fr 1fr; /* 3 منتجات في الصف للشاشات الكبيرة */
-            }
-        }
-
-        /* بطاقة المنتج */
-        .product {
-            background: var(--background-light);
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            position: relative;
-            transition: transform 0.2s;
-        }
-        
-        .product:hover {
-            transform: translateY(-3px);
-        }
-
-        .product img {
-            width: 100%;
-            height: 125px;
-            object-fit: cover;
-            cursor: pointer;
-        }
-
-        .product-content {
-            padding: 10px;
-        }
-
-        .product .title {
-            color: var(--primary);
-            font-size: 15px;
-            font-weight: bold;
-        }
-
-        .product .desc {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .price-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 7px;
-        }
-
-        .price {
-            color: var(--primary);
-            font-size: 15px;
-            font-weight: bold;
-        }
-
-        .seller-rating {
-            color: var(--success);
-            font-size: 13px;
-        }
-
-        .ai-badge {
-            position: absolute;
-            top: 9px;
-            left: 9px;
-            background: var(--success);
-            color: var(--secondary);
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .verified-badge {
-            position: absolute;
-            top: 9px;
-            right: 9px;
-            background: var(--primary); /* استخدام الذهبي هنا لتمييز التوثيق */
-            color: var(--secondary);
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        /* الشريط الجانبي */
-        .sidebar-area {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .sidebar-panel {
-            background: var(--background-light);
-            border-radius: var(--radius);
-            padding: 12px;
-            margin-bottom: 11px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        }
-
-        .sidebar-panel h3 {
-            color: var(--primary);
-            font-size: 16px;
-            margin-bottom: 7px;
-        }
-
-        #cartTotal .total-pi {
-            color: var(--primary);
-        }
-        
-        .log-controls button {
-            width: 100%;
-            margin-top: 10px;
-            background: var(--background-dark);
-            border: 1px solid var(--text-muted);
-        }
-        
-        /* الأزرار العائمة */
-        #logyFloatingBtn, #disputeFloatingBtn {
-            position: fixed;
-            bottom: 22px;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 25px;
-            z-index: 1000;
-            cursor: pointer;
-        }
-
-        #logyFloatingBtn {
-            left: 17px;
-            background: var(--success);
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4);
-        }
-
-        #disputeFloatingBtn {
-            right: 17px;
-            background: var(--primary); /* ذهبي للنزاعات */
-            color: var(--secondary);
-            box-shadow: 0 4px 12px rgba(255, 212, 0, 0.4);
-        }
-        
-        .cart-row {
-            margin-bottom: 6px;
-            border-bottom: 1px dashed #222;
-            display: flex;
-            align-items: center;
-            padding: 5px 0;
-        }
-
-        .cart-qty {
-            padding: 3px 7px;
-            font-weight: bold;
-        }
-
-        /* النوافذ المنبثقة (Modal) */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(18, 25, 35, .9);
-            z-index: 5000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: var(--background-light);
-            padding: 18px;
-            border-radius: var(--radius);
-            max-width: 500px;
-            width: 93vw;
-            position: relative;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 26px;
-            background: none;
-            border: none;
-            color: var(--danger);
-            cursor: pointer;
-        }
-        
-        /* نماذج الإدخال */
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            color: var(--text-light);
-            margin-bottom: 5px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 10px;
-            background: var(--background-dark);
-            border: 1px solid var(--accent);
-            border-radius: var(--radius);
-            color: var(--text-light);
-        }
-
-        .form-group textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-        
-        /* خطوات التوثيق */
-        .verification-steps {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 15px 0;
-        }
-
-        .verification-step {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: var(--background-dark);
-            border-radius: var(--radius);
-        }
-
-        .verification-step.completed {
-            border-left: 3px solid var(--success);
-        }
-
-        .step-number {
-            width: 35px;
-            height: 35px;
-            background: var(--accent);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            flex-shrink: 0;
-        }
-
-        .step-number.completed {
-            background: var(--success);
-        }
-
-        /* لوحة الشحن والنزاعات */
-        .tracking-status, .analyzer-result {
-            margin-top: 10px;
-            padding: 10px;
-            background: var(--background-dark);
-            border-radius: var(--radius);
-            color: var(--text-light);
-            font-size: 14px;
-        }
-
-        .analyzer-result.fail {
-            border-left: 3px solid var(--danger);
-        }
-
-        .dispute-item {
-            padding: 8px;
-            margin-bottom: 8px;
-            border-bottom: 1px solid #333;
-            font-size: 14px;
-        }
-
-        .dispute-status {
-            font-weight: bold;
-            color: var(--danger);
-        }
-
-        .dispute-status.resolved {
-            color: var(--success);
-        }
-        
-        .seller-metric {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 0;
-            border-bottom: 1px dotted #333;
-        }
-
-        .order-card {
-            background: var(--background-dark);
-            padding: 12px;
-            border-radius: var(--radius);
-            margin-bottom: 10px;
-            border-left: 4px solid var(--accent);
-        }
-        .order-card h4 {
-            color: var(--primary);
-            margin-top: 0;
-            margin-bottom: 5px;
-        }
-        .order-status {
-            font-weight: bold;
-            color: var(--success);
-        }
-
-        /* Product Modal Enhancements */
-        #productModal .modal-content {
-            max-width: 750px; /* Wider modal for two columns */
-        }
-
-        .product-modal-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            align-items: flex-start;
-        }
-
-        .product-modal-image-col img {
-            width: 100%;
-            height: auto;
-            max-height: 300px;
-            object-fit: cover;
-            border-radius: var(--radius);
-        }
-
-        .product-modal-details-col {
-            display: flex;
-            flex-direction: column;
-        }
-
-        #modalTitle {
-            color: var(--primary);
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        #modalRating {
-            color: var(--success);
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
-
-        #modalDesc {
-            margin-bottom: 15px;
-            font-size: 15px;
-            line-height: 1.6;
-        }
-
-        #modalPrice {
-            color: var(--primary);
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .add-to-cart-btn {
-            width: 100%;
-            background: var(--success);
-            padding: 12px;
-            font-size: 16px;
-        }
-
-        /* استجابة الشاشات الصغيرة */
-        @media (max-width: 800px) {
-            .main-layout {
-                grid-template-columns: 1fr;
-            }
-            .sidebar-area {
-                width: 100%;
-            }
-            #productList {
-                grid-template-columns: 1fr;
-            }
-            .product-modal-layout {
-                grid-template-columns: 1fr; /* Stack on mobile */
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="header">
-    <div class="logo"><i class="fa-solid fa-store"></i> <span id="titleText">Forsale</span></div>
-    <div class="status-bar">
-        <div class="status-indicator">
-            <i id="statusIcon" class="fa-solid fa-circle-xmark"></i>
-            <div class="status-text">
-                <div class="username-text" id="usernameText" data-ar="غير متصل" data-en="Disconnected">غير متصل</div>
-                <div class="balance-text" id="balanceText"></div>
-            </div>
+
+<div id="auth-container">
+    <div class="auth-logo">
+        <span style="background:var(--accent);color:black;font-size:14px;padding:2px 8px;border-radius:6px">AI</span> 
+        Forsale
+    </div>
+    <p style="color:var(--text-muted);margin-bottom:30px;text-align:center">منصة المستقبل الذكية - مدعومة بـ Pi Network</p>
+
+    <div class="auth-card">
+        <h2 style="margin-bottom:20px">تسجيل الدخول الآمن</h2>
+        
+        <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" placeholder="البريد الإلكتروني" id="login-email">
         </div>
-        <button id="netBtn" class="action-btn" onclick="toggleNetwork()" data-ar="اختر شبكة" data-en="Select Network">Testnet</button>
-        <button id="connectBtn" class="action-btn" onclick="piConnect()" data-ar="اتصال" data-en="Connect">اتصال</button>
-        <button id="ordersBtn" class="action-btn" style="display:none;" onclick="openOrdersModal()" data-ar="طلباتي" data-en="My Orders">
-            <i class="fa-solid fa-list-check"></i> طلباتي
+        
+        <div class="input-group">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" placeholder="كلمة المرور" id="login-password">
+        </div>
+
+        <button class="main-btn" id="login-btn">
+            دخول آمن <i class="fa-solid fa-arrow-left"></i>
         </button>
-        <button id="verifyBtn" class="action-btn" style="display:none;" onclick="openVerificationModal()" data-ar="توثيق الحساب" data-en="Verify Account">
-            <i class="fa-solid fa-shield-halved"></i> توثيق
+
+        <div style="margin-top:20px; cursor:pointer;" id="fingerprint-login-btn">
+            <i class="fa-solid fa-fingerprint fingerprint-scan"></i>
+            <p style="font-size:14px; color:var(--accent); font-weight:bold;">أو استخدم بصمة Pi Network</p>
+        </div>
+
+        <button class="main-btn pi-btn" id="pi-login-btn" style="margin-top:10px;">
+            <i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi Browser
         </button>
-        <button id="sellBtn" class="action-btn" style="display:none;" onclick="openAddProductModal()" data-ar="إضافة منتج" data-en="Add Product">
-            <i class="fa-solid fa-plus"></i> إضافة منتج
-        </button>
-        <button id="logoutBtn" class="action-btn" style="display:none;" onclick="piLogout()" data-ar="خروج" data-en="Logout">خروج</button>
-        <button id="langToggleTop" class="action-btn" onclick="toggleLanguage()">EN</button>
+
+        <div class="auth-footer">
+            <p>ليس لديك حساب؟ <a href="#" onclick="showRegister()">سجل الآن</a></p>
+        </div>
     </div>
 </div>
 
-<div class="container">
-    <div class="controls">
-        <div class="search-container">
-            <input type="text" id="search-input" data-ar="ابحث بذكاء..." data-en="Search smart..." placeholder="ابحث بذكاء...">
-            <button class="action-btn" onclick="handleAISearch()" data-ar="بحث" data-en="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
-        </div>
-        <div class="sort-container">
-            <label data-ar="ترتيب حسب:" data-en="Sort By:">ترتيب حسب:</label>
-            <select id="sortSelect" onchange="handleSortChange(this.value)">
-                <option value="default" data-ar="الأحدث أولاً" data-en="Newest First">الأحدث أولاً</option>
-                <option value="rating_desc" data-ar="الأعلى تقييماً" data-en="Top Rated">الأعلى تقييماً</option>
-                <option value="price_asc" data-ar="الأقل سعراً" data-en="Lowest Price">الأقل سعراً</option>
-                <option value="price_desc" data-ar="الأعلى سعراً" data-en="Highest Price">الأعلى سعراً</option>
-            </select>
+<div id="app-container">
+    <div class="fixed-header-wrapper">
+        <div class="header" id="main-header">
+            <div class="content-wrapper">
+                <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-store"></i> Forsale</div>
+                <div style="display:flex; gap:10px;">
+                    <div class="icon-btn primary" onclick="openAiUploadModal()"><i class="fa-solid fa-plus"></i></div>
+                    <div class="notification-icon-container">
+                        <div class="notification-dot" id="notification-dot"></div>
+                        <div class="icon-btn" onclick="openNotificationsModal()"><i class="fa-solid fa-bell"></i></div>
+                    </div>
+                    <div class="icon-btn" onclick="openSettingsModal()"><i class="fa-solid fa-gear"></i></div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="main-layout">
-        <div class="products-area">
-            <div id="cats" class="category-bar"></div>
-            <div id="productList"></div>
-        </div>
-        <div class="sidebar-area">
-            <div class="sidebar-panel">
-                <h3 data-ar="سلة التسوق" data-en="Shopping Cart">سلة التسوق</h3>
-                <div id="cartArea"></div>
-                <div id="cartTotal">
-                    <div class="total-pi" data-ar="المجموع: 0.00 Pi" data-en="Total: 0.00 Pi">المجموع: 0.00 Pi</div>
-                    <div class="total-usd" data-ar="(~ $0.00)" data-en="(~ $0.00)">(~ $0.00)</div>
-                </div>
-                <button id="checkoutBtn" class="action-btn" onclick="piCheckout()" disabled data-ar="دفع (Testnet)" data-en="Pay (Testnet)">دفع (Testnet)</button>
+
+    <div class="container">
+        <div class="content-wrapper">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" placeholder="ابحث بذكاء اصطناعي أو صف منتج أحلامك...">
             </div>
             
-            <div class="sidebar-panel" id="sellerAnalyzerPanel" style="display:none;">
-                <h3 data-ar="⭐ محلل أداء البائع" data-en="⭐ Seller Performance Analyzer">⭐ محلل أداء البائع</h3>
-                <div id="sellerAnalysisResult" class="analyzer-result">
-                    <i class="fa-solid fa-spinner fa-spin"></i> <span data-ar="جاري تحليل السجل..." data-en="Analyzing history...">جاري تحليل السجل...</span>
-                </div>
+            <div class="cats-scroll" id="level1-scroll"></div>
+
+            <div class="dynamic-filters glass-panel" id="filter-panel">
+                <div class="sub-chips" id="level2-chips"> </div>
+                <div id="level3-area"> </div>
             </div>
 
-            <div class="sidebar-panel">
-                <h3 data-ar="📦 مدير الشحن الذكي" data-en="📦 Smart Shipping Manager">📦 مدير الشحن الذكي</h3>
-                <div class="form-group">
-                    <label for="trackingInput" data-ar="رقم تتبع الشحنة:" data-en="Tracking Number:">رقم تتبع الشحنة:</label>
-                    <input type="text" id="trackingInput" value="TRK-9001" placeholder="أدخل رقم التتبع">
+            <h2 style="font-size: 20px; color: var(--text-main); margin: 0 0 15px;">اقتراحات Logy AI</h2>
+            
+            <div class="products-grid" id="products-grid"> </div>
+        </div>
+    </div>
+
+    <div id="product-detail-modal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-eye"></i> تفاصيل المنتج</div>
+            <div class="icon-btn" onclick="closeProductDetailModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <img id="detail-img" class="detail-img" src="" alt="صورة المنتج">
+            <div class="detail-title" id="detail-title"></div>
+            <div class="detail-price" id="detail-price"></div>
+
+            <h3 class="ai-section-title"><i class="fa-solid fa-microchip"></i> تحليل Logy AI للسعر</h3>
+            <div class="glass-panel ai-price-card">
+                <div class="stat-box" id="ai-score-box">
+                    <div class="value" id="ai-score">0.0</div>
+                    <div class="label">نقطة قوة العرض (10 هي الأفضل)</div>
                 </div>
-                <button class="action-btn" onclick="startSmartShipping()" style="width:100%;background:var(--accent);" data-ar="احسب وتتبع" data-en="Calculate & Track">احسب وتتبع</button>
-                <div id="shippingResult" class="tracking-status">
-                    <span data-ar="أدخل رقم التتبع لحساب أفضل شركة شحن" data-en="Enter tracking number to calculate best carrier">أدخل رقم التتبع لحساب أفضل شركة شحن</span>
+                <div class="stat-box">
+                    <div class="value" id="ai-market-price">0 Pi</div>
+                    <div class="label">متوسط السعر السوقي (AI)</div>
+                </div>
+            </div>
+            <div class="price-chart-mock"><div class="chart-line"></div></div>
+            <p id="ai-summary" style="font-size: 13px; color: var(--text-muted); margin-top: 10px; padding: 0 15px;"></p>
+
+            <h3 class="ai-section-title"><i class="fa-solid fa-truck-fast"></i> لوجستيات الشحن (AI Secured)</h3>
+            <div class="glass-panel ai-logistics-card">
+                <div class="step">
+                    <div class="step-icon"><i class="fa-solid fa-calendar-alt"></i></div>
+                    <div class="step-text">زمن التوصيل المقدر: <span id="shipping-eta" style="font-weight: bold; color:var(--accent);">3-5 أيام</span></div>
+                </div>
+                <div class="step">
+                    <div class="step-icon"><i class="fa-solid fa-shield-alt"></i></div>
+                    <div class="step-text">إدارة المشاكل: <span id="shipping-problem" style="color:var(--text-main);">مراقبة شحن مدارة بالذكاء الاصطناعي</span></div>
+                </div>
+                <div class="step">
+                    <div class="step-icon"><i class="fa-solid fa-box"></i></div>
+                    <div class="step-text">الناقل: <span id="shipping-carrier" style="font-weight: bold; color:var(--primary);">Logy AI Express</span></div>
                 </div>
             </div>
             
-            <div class="sidebar-panel">
-                <h3 data-ar="سجل العمليات" data-en="Transaction Log">سجل العمليات</h3>
-                <div id="txLog"></div>
-                <div class="log-controls">
-                    <button id="clearLogsBtn" class="action-btn" onclick="clearLogs()"><i class="fa-solid fa-broom"></i> <span data-ar="مسح السجل" data-en="Clear Log">مسح السجل</span></button>
+            <div class="detail-tabs-container glass-panel">
+                <div class="detail-tabs-scroll">
+                    <div class="detail-tab-item active" data-tab="description" onclick="showDetailTab('description', this)">
+                        <i class="fa-solid fa-file-alt"></i> الوصف والتفاصيل 
+                    </div>
+                    <div class="detail-tab-item" data-tab="specs" onclick="showDetailTab('specs', this)">
+                        <i class="fa-solid fa-cogs"></i> المواصفات الفنية 
+                    </div>
+                    <div class="detail-tab-item" data-tab="reviews" onclick="showDetailTab('reviews', this)">
+                        <i class="fa-solid fa-comments"></i> آراء المشترين 
+                    </div>
+                </div>
+                <div class="detail-tab-content" id="detail-description">
+                    <p id="detail-desc" style="line-height: 1.8; color: var(--text-main); font-size: 14px;"></p>
+                </div>
+                <div class="detail-tab-content" id="detail-specs" style="display:none;">
+                    <ul id="specs-list" style="list-style: none; padding: 0; margin: 0;"></ul>
+                </div>
+                <div class="detail-tab-content" id="detail-reviews" style="display:none;">
+                    <p style="color:var(--text-muted);">نظام المراجعات قريباً. Logy AI يحلل المشترين لضمان المصداقية.</p>
+                </div>
+            </div>
+
+            <h3 class="ai-section-title"><i class="fa-solid fa-lock"></i> نظام الضمان والمدفوعات الآمنة (Escrow)</h3>
+            <div class="glass-panel" style="padding: 15px;">
+                <div class="escrow-step active">
+                    <div class="escrow-step-icon"><i class="fa-solid fa-wallet"></i></div>
+                    <div class="escrow-step-text"><strong>1. الدفع والاحتجاز:</strong> يتم حجز (Escrow) قيمة المنتج في محفظة مؤمنة بالذكاء الاصطناعي.</div>
+                </div>
+                <div class="escrow-step">
+                    <div class="escrow-step-icon"><i class="fa-solid fa-box"></i></div>
+                    <div class="escrow-step-text"><strong>2. الشحن والتتبع:</strong> البائع يشحن المنتج، ويراقب Logy AI كل مرحلة.</div>
+                </div>
+                <div class="escrow-step">
+                    <div class="escrow-step-icon"><i class="fa-solid fa-check"></i></div>
+                    <div class="escrow-step-text"><strong>3. التأكيد والتحرير:</strong> عند تأكيد الاستلام، يتم تحرير دفعة Pi للبائع.</div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
-<div id="logyFloatingBtn" onclick="openLogyModal()" title="Smart Messaging System"><i class="fa-solid fa-comments"></i></div>
-<div id="disputeFloatingBtn" onclick="openDisputeModal()" title="Dispute Center"><i class="fa-solid fa-scale-balanced"></i></div>
-
-
-<div id="logyModal" class="modal">
-  <div class="modal-content" style="max-width:600px;height:80vh;display:flex;flex-direction:column;padding:22px;">
-    <button class="modal-close" onclick="closeLogyModal()">&times;</button>
-    <div style="font-size:22px;color:var(--primary);margin-bottom:9px;">
-      <i class="fa-solid fa-comments"></i> <span data-ar="💬 نظام المراسلة الذكي" data-en="💬 Smart Messaging System">💬 نظام المراسلة الذكي</span>
-    </div>
-    <div id="logyAiChat" style="background:var(--background);color:var(--text-light);flex:1;overflow-y:auto;padding:15px 10px;font-size:18px;border-radius:var(--radius);margin-bottom:7px;"></div>
-    <div style="display:flex;gap:10px;">
-      <input type="text" id="logyInput" data-ar="اسأل سؤالاً، أو اطلب 'الدعم البشري' أو 'ترجم'" data-en="Ask a question, or ask for 'Human Support' or 'Translate'" placeholder="اسأل سؤالاً، أو اطلب 'الدعم البشري' أو 'ترجم'" style="flex:1;padding:11px 8px;border-radius:var(--radius);border:1px solid var(--secondary);font-size:17px;background:var(--background-dark);color:white;">
-      <button id="logySend" onclick="sendLogyMessage()" style="padding:10px 16px;background:var(--success);color:#fff;border-radius:var(--radius);border:none;cursor:pointer;font-size:16px;"><i class="fa-solid fa-paper-plane"></i></button>
-    </div>
-  </div>
-</div>
-
-<div id="ordersModal" class="modal">
-    <div class="modal-content" style="max-width:650px;">
-        <button class="modal-close" onclick="closeOrdersModal()">&times;</button>
-        <h2 style="color:var(--primary);margin-bottom:15px;"><i class="fa-solid fa-list-check"></i> <span data-ar="📋 مدير الطلبات الذكي - طلباتي" data-en="📋 Smart Order Manager - My Orders">📋 مدير الطلبات الذكي - طلباتي</span></h2>
-        
-        <div id="ordersList" style="max-height: 400px; overflow-y: auto; padding-right: 5px;">
+        <div class="buy-fixed-bar">
+            <div class="content-wrapper">
+                <button class="buy-btn" id="buy-btn" onclick="openCheckoutModal()"><i class="fa-solid fa-shopping-cart"></i> شراء المنتج الآن</button>
             </div>
-        <div id="noOrdersMessage" style="text-align:center;color:var(--text-muted);margin-top:20px;display:none;">
-            <span data-ar="لا يوجد طلبات حالياً." data-en="No current orders.">لا يوجد طلبات حالياً.</span>
         </div>
     </div>
-</div>
 
-<div id="disputeModal" class="modal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeDisputeModal()">&times;</button>
-        <h2 style="color:var(--primary);margin-bottom:15px;"><i class="fa-solid fa-scale-balanced"></i> <span data-ar="⚖️ مركز حل النزاعات التلقائي" data-en="⚖️ Auto Dispute Resolution Center">⚖️ مركز حل النزاعات التلقائي</span></h2>
-        
-        <h4 style="color:var(--text-light);" data-ar="سجل النزاعات الحالية" data-en="Current Dispute Log">سجل النزاعات الحالية</h4>
-        <div id="disputeList" style="max-height: 150px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #333; border-radius: 4px;"></div>
-        
-        <h4 style="color:var(--text-light);margin-top:20px;" data-ar="تقديم شكوى جديدة" data-en="Submit New Complaint">تقديم شكوى جديدة</h4>
-        <form id="disputeForm" onsubmit="submitDispute(event)">
-            <div class="form-group">
-                <label data-ar="رقم الطلب (مثال: ORD-100)" data-en="Order ID (e.g. ORD-100)">رقم الطلب (مثال: ORD-100)</label>
-                <input type="text" id="disputeOrderId" required value="ORD-101">
+    <div id="ai-upload-modal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-microchip"></i> إدراج منتج جديد</div>
+            <div class="icon-btn" onclick="closeAiUploadModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 20px; color: var(--accent); margin: 15px 0;">أطلق منتجك إلى العالم بواسطة Logy AI</h2>
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-image"></i> تحميل الصور</h4>
+                <p>قم بتحميل 3-5 صور واضحة لمنتجك. Logy AI سيقوم بتحليل الجودة، والمواصفات، والحالة.</p>
+                <input type="file" id="product-images" accept="image/*" multiple style="display: none;">
+                <button class="primary" onclick="document.getElementById('product-images').click()" style="background: var(--primary); color: black;">
+                    <i class="fa-solid fa-cloud-upload-alt"></i> اختر ملفات الصور
+                </button>
+                <p id="image-count-label" style="margin-top: 10px; font-size: 12px; color: var(--accent);">لم يتم اختيار أي ملفات.</p>
             </div>
-            <div class="form-group">
-                <label data-ar="ملخص الشكوى" data-en="Complaint Summary">ملخص الشكوى</label>
-                <textarea id="disputeComplaint" required placeholder="تلقيت المنتج تالفاً..."></textarea>
+            
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-keyboard"></i> معلومات أساسية</h4>
+                <div class="filter-group">
+                    <label for="manual-desc">وصف مختصر للمنتج (بالكلمات):</label>
+                    <textarea id="manual-desc" rows="3" placeholder="مثال: آيفون 15 برو مستعمل، لون أبيض، سعة 256 جيجا" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:var(--text-main); font-size:14px;"></textarea>
+                </div>
+                <div class="filter-group" style="margin-top: 15px;">
+                    <label>السعر الذي تقترحه (اختياري):</label>
+                    <input type="number" id="manual-price" placeholder="Pi" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:var(--text-main); font-size:14px;">
+                </div>
             </div>
-            <button type="submit" class="action-btn" style="width:100%;padding:12px;background:var(--danger);" data-ar="تحليل وحل النزاع" data-en="Analyze & Resolve Dispute">
-                <i class="fa-solid fa-gavel"></i> تحليل وحل النزاع
+            
+            <button class="buy-btn" onclick="startAiAnalysis()" id="start-analysis-btn" style="margin-top: 20px;" disabled>
+                <i class="fa-solid fa-microchip"></i> تحليل وإدراج المنتج الآن بواسطة AI
             </button>
-        </form>
+        </div>
     </div>
-</div>
-<div id="verificationModal" class="modal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeVerificationModal()">&times;</button>
-        <h2 style="color:var(--primary);margin-bottom:15px;"><i class="fa-solid fa-shield-halved"></i> <span data-ar="توثيق حسابك" data-en="Verify Your Account">توثيق حسابك</span></h2>
-        
-        <div style="background:var(--accent);color:white;padding:12px;border-radius:var(--radius);margin-bottom:15px;font-size:14px;">
-            <span data-ar="⚠️ يجب التوثيق من Pi Network لإضافة منتجات" data-en="⚠️ Must be verified by Pi Network to add products">⚠️ يجب التوثيق من Pi Network لإضافة منتجات</span>
-        </div>
-        
-        <div class="verification-steps">
-            <div class="verification-step" id="step1">
-                <div class="step-number">1</div>
-                <div>
-                    <h4 style="color:var(--primary);margin-bottom:3px;" data-ar="اتصال Pi Network" data-en="Pi Network Connection">اتصال Pi Network</h4>
-                    <p style="color:var(--text-muted);font-size:13px;" data-ar="الاتصال بحسابك" data-en="Connect your account">الاتصال بحسابك</p>
-                </div>
-            </div>
-            
-            <div class="verification-step" id="step2">
-                <div class="step-number">2</div>
-                <div>
-                    <h4 style="color:var(--primary);margin-bottom:3px;" data-ar="التحقق KYC" data-en="KYC Verification">التحقق KYC</h4>
-                    <p style="color:var(--text-muted);font-size:13px;" data-ar="التحقق من هويتك" data-en="Verify your identity">التحقق من هويتك</p>
-                </div>
-            </div>
-            
-            <div class="verification-step" id="step3">
-                <div class="step-number">3</div>
-                <div>
-                    <h4 style="color:var(--primary);margin-bottom:3px;" data-ar="مراجعة AI" data-en="AI Review">مراجعة AI</h4>
-                    <p style="color:var(--text-muted);font-size:13px;" data-ar="فحص تلقائي" data-en="Auto check">فحص تلقائي</p>
-                </div>
-            </div>
-            
-            <div class="verification-step" id="step4">
-                <div class="step-number">4</div>
-                <div>
-                    <h4 style="color:var(--primary);margin-bottom:3px;" data-ar="موافقة" data-en="Approval">موافقة</h4>
-                    <p style="color:var(--text-muted);font-size:13px;" data-ar="حساب موثق" data-en="Verified account">حساب موثق</p>
-                </div>
-            </div>
-        </div>
-        
-        <button id="startVerificationBtn" class="action-btn" onclick="startVerification()" style="width:100%;margin-top:15px;padding:12px;background:var(--success);" data-ar="ابدأ التوثيق" data-en="Start Verification">
-            <i class="fa-solid fa-shield-halved"></i> ابدأ التوثيق
-        </button>
-    </div>
-</div>
-<div id="addProductModal" class="modal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeAddProductModal()">&times;</button>
-        <h2 style="color:var(--primary);margin-bottom:15px;" data-ar="إضافة منتج جديد" data-en="Add New Product">إضافة منتج جديد</h2>
-        
-        <div id="productAnalysisStatus" class="analyzer-result" style="display:none;margin-bottom:15px;padding:10px;border-left:3px solid var(--accent);">
-            <i class="fa-solid fa-flask"></i> <span data-ar="جاري تحليل مواصفات المنتج..." data-en="Analyzing product specs...">جاري تحليل مواصفات المنتج...</span>
-        </div>
 
-        <form id="productForm" onsubmit="submitProduct(event)">
-            <div class="form-group">
-                <label data-ar="اسم المنتج (عربي) *" data-en="Product Name (Arabic) *">اسم المنتج (عربي) *</label>
-                <input type="text" id="productNameAr" required>
+    <div id="settingsModal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-gear"></i> الإعدادات</div>
+            <div class="icon-btn" onclick="closeSettingsModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">إعدادات الحساب والتطبيق</h2>
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-user-circle"></i> الحساب العام</h4>
+                <p>إدارة ملفك الشخصي وإعدادات الأمان.</p>
+                <button class="primary" onclick="alert('جاري التوجه لصفحة إدارة الملف الشخصي')">تعديل الملف الشخصي</button>
+                <button class="accent" onclick="openSellerDashboardModal()" style="margin-top: 15px;"><i class="fa-solid fa-chart-line"></i> لوحة تحكم البائع</button>
+            </div>
+
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-lock"></i> الأمان والخصوصية</h4>
+                <p>إعدادات المصادقة الثنائية وتفضيلات البيانات.</p>
+                <button class="accent" onclick="alert('تم تفعيل المصادقة الثنائية بواسطة Logy AI.')">تفعيل المصادقة الثنائية</button>
+            </div>
+
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-network-wired"></i> تكامل Pi Network</h4>
+                <p>مراجعة حالة التوثيق (KYC) وحالة الانتقال للشبكة الرئيسية.</p>
+                <button class="primary" onclick="simulateMainnetTransition()">مراجعة حالة Mainnet</button>
             </div>
             
-            <div class="form-group">
-                <label data-ar="اسم المنتج (English) *" data-en="Product Name (English) *">اسم المنتج (English) *</label>
-                <input type="text" id="productNameEn" required>
-            </div>
-            
-            <div class="form-group">
-                <label data-ar="الفئة *" data-en="Category *">الفئة *</label>
-                <select id="productCategory" required>
-                    <option value="">اختر الفئة</option>
-                    <option value="cars" data-ar="سيارات" data-en="Cars">سيارات</option>
-                    <option value="real" data-ar="عقارات" data-en="Real Estate">عقارات</option>
-                    <option value="electronics" data-ar="إلكترونيات" data-en="Electronics">إلكترونيات</option>
-                    <option value="fashion" data-ar="أزياء" data-en="Fashion">أزياء</option>
-                    <option value="home" data-ar="منزل" data-en="Home">منزل</option>
-                    <option value="services" data-ar="خدمات" data-en="Services">خدمات</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label data-ar="السعر المقترح (Pi) *" data-en="Suggested Price (Pi) *">السعر المقترح (Pi) *</label>
-                <input type="number" id="productPrice" step="0.01" min="0.01" required>
-            </div>
-            
-            <div class="form-group">
-                <label data-ar="الوصف (عربي) *" data-en="Description (Arabic) *">الوصف (عربي) *</label>
-                <textarea id="productDescAr" required></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label data-ar="الوصف (English) *" data-en="Description (English) *">الوصف (English) *</label>
-                <textarea id="productDescEn" required></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label data-ar="رابط الصورة" data-en="Image URL">رابط الصورة</label>
-                <input type="url" id="productImage" placeholder="https://example.com/image.jpg" value="https://placehold.co/350x120/1A2E44/FFD400?text=New+Item">
-            </div>
-            
-            <button type="submit" class="action-btn" id="submitProductBtn" style="width:100%;padding:12px;background:var(--success);" data-ar="إضافة المنتج" data-en="Add Product">
-                <i class="fa-solid fa-check"></i> إضافة المنتج
+            <button class="buy-btn" style="background:var(--danger); margin-top: 30px;" onclick="alert('تم تسجيل الخروج بنجاح. سنفتقدك!')">
+                <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
             </button>
-        </form>
+        </div>
     </div>
-</div>
-<div id="productModal" class="modal">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeProductModal()">&times;</button>
-        <div class="product-modal-layout">
-            <div class="product-modal-image-col" id="modalImage">
-                <!-- Image will be inserted here by JS -->
+    
+    <div id="checkoutModal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-credit-card"></i> تأكيد الدفع</div>
+            <div class="icon-btn" onclick="closeCheckoutModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">ملخص عملية الشراء</h2>
+            
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-box"></i> المنتج</h4>
+                <p id="checkout-product-name" style="font-weight: bold; font-size: 15px; margin-bottom: 5px;">iPhone 15 Pro (Titanium)</p>
+                <p>السعر: <span id="checkout-product-price" style="font-weight: bold; color:var(--primary);">105,000 Pi</span></p>
             </div>
-            <div class="product-modal-details-col">
-                <div id="modalTitle"></div>
-                <div id="modalRating"></div>
-                <div id="modalDesc"></div>
-                <div id="modalPrice"></div>
-                <button class="action-btn add-to-cart-btn" onclick="addModalToCart()">
-                    <i class="fa-solid fa-cart-plus"></i> 
-                    <span data-ar="أضف للسلة" data-en="Add to Cart">أضف للسلة</span>
+            
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-map-location-dot"></i> عنوان الشحن</h4>
+                <p>الاسم: <span style="font-weight: bold;">خالد علي</span></p>
+                <p>العنوان: الرياض، شارع الأمير محمد بن سلمان، فيلا رقم 5</p>
+                <button class="accent" style="margin-top: 15px;">تغيير العنوان</button>
+            </div>
+            
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-shield-alt"></i> حماية المشتري (Logy AI Escrow)</h4>
+                <p style="color:var(--success-color); font-weight: bold;">أمنة: سيتم حجز (Escrow) المبلغ حتى تستلم المنتج وتؤكد مطابقته للمواصفات.</p>
+            </div>
+
+            <div class="buy-fixed-bar">
+                <div class="content-wrapper">
+                    <button class="buy-btn" style="background:var(--success-color); color:black;" onclick="checkout()"><i class="fa-solid fa-wallet"></i> تأكيد ودفع 105,000 Pi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="ordersModal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-cart-shopping"></i> Logy AI Orders</div>
+            <div class="icon-btn" onclick="closeOrdersModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">الطلبات المدارة بالذكاء الاصطناعي</h2>
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-check-circle" style="color:var(--success-color);"></i> طلب #LOGY901 (iPhone 15 Pro)</h4>
+                <p>الحالة: <span style="font-weight: bold; color:var(--success-color);">تم الاستلام وتحرير Pi</span></p>
+                <p style="font-size: 12px; color: var(--text-muted);">الشحن: Logy AI Express، تم التوصيل في زمن قياسي.</p>
+            </div>
+            <div class="settings-group" style="border-color: red;">
+                <h4><i class="fa-solid fa-gavel" style="color:red;"></i> طلب #LOGY902 (Vintage Watch)</h4>
+                <p>الحالة: <span style="font-weight: bold; color:red;">نزاع قيد التحكيم الآلي</span></p>
+                <p style="font-size: 13px; color: var(--text-main); margin-top: 10px;"> قرار Logy AI: الذكاء الاصطناعي يراجع الآن أدلة المشتري (صور الضرر) وسجلات تتبع الشحن. </p>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;"> النتيجة المتوقعة: Logy AI يميل إلى... </p>
+                <button class="buy-btn" style="background:red; margin-top: 15px;" onclick="openEvidenceUploadModal()">رفع أدلة جديدة (بصفتك المشتري)</button>
+            </div>
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-truck-ramp-box" style="color:var(--primary);"></i> طلب #LOGY903 (MacBook Air)</h4>
+                <p>الحالة: <span style="font-weight: bold; color:var(--primary);">قيد الشحن - Logy AI Express</span></p>
+                <p style="font-size: 12px; color: var(--text-muted);">تاريخ التوصيل المتوقع: 2025-12-05</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="walletModal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-wallet"></i> Pi Wallet</div>
+            <div class="icon-btn" onclick="closeWalletModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0 10px;">رصيد Pi الحالي</h2>
+            <div class="glass-panel" style="padding: 25px; text-align: center; border-color: var(--pi-purple);">
+                <div style="font-size: 14px; color: var(--text-muted);">الرصيد الكلي</div>
+                <div style="font-size: 40px; font-weight: 900; color: var(--pi-purple); margin-top: 5px;">
+                    120,500 Pi
+                </div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">(مدار بواسطة Logy AI)</p>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; margin-top: 20px;">
+                <button class="buy-btn" style="background: var(--success-color); flex: 1;" onclick="deposit()"><i class="fa-solid fa-money-bill-transfer"></i> إيداع Pi</button>
+                <button class="buy-btn" style="background: var(--primary); flex: 1;" onclick="withdraw()"><i class="fa-solid fa-hand-holding-dollar"></i> سحب Pi</button>
+            </div>
+            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0 10px;">سجل المعاملات (AI Secured)</h2>
+            <div id="transactions-history">
+                <div class="settings-group" style="border-left: 4px solid var(--success-color);">
+                    <h4><i class="fa-solid fa-arrow-down" style="color:var(--success-color);"></i> إيداع Pi (من المحفظة الخارجية)</h4>
+                    <p style="font-size: 13px; color: var(--text-main);">المبلغ: <span style="font-weight: bold; color:var(--success-color);">+50,000 Pi</span></p>
+                    <p style="font-size: 12px; color: var(--text-muted);">التاريخ: 2025-11-20 | الحالة: مكتملة</p>
+                </div>
+                <div class="settings-group" style="border-left: 4px solid var(--primary);">
+                    <h4><i class="fa-solid fa-arrow-up" style="color:var(--primary);"></i> شراء: آيفون 15 برو (#P2)</h4>
+                    <p style="font-size: 13px; color: var(--text-main);">المبلغ: <span style="font-weight: bold; color:var(--primary);">-105,000 Pi</span></p>
+                    <p style="font-size: 12px; color: var(--text-muted);">التاريخ: 2025-11-21 | الحالة: <span style="color:var(--success-color);">محرر للبائع</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="evidenceUploadModal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-gavel"></i> رفع أدلة للنزاع #LOGY902</div>
+            <div class="icon-btn" onclick="closeEvidenceUploadModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 20px; color: red; margin: 15px 0;">أرسل أدلتك لـ Logy AI للتحكيم</h2>
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-file-upload"></i> تحميل الملفات (صور، فيديو، مستندات)</h4>
+                <p>يرجى تحميل صور واضحة توضح الضرر أو الاختلاف عن الوصف. Logy AI سيتولى تحليل الأدلة.</p>
+                <input type="file" id="evidence-files" accept="image/*, application/pdf, video/*" multiple style="display: none;">
+                <button class="primary" style="background: var(--accent); color: black;" onclick="document.getElementById('evidence-files').click()">
+                    <i class="fa-solid fa-cloud-upload-alt"></i> اختر ملفات الأدلة
+                </button>
+                <p id="file-count-label" style="margin-top: 10px; font-size: 12px; color: var(--accent);">لم يتم اختيار أي ملفات.</p>
+            </div>
+            
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-keyboard"></i> وصف المشكلة</h4>
+                <div class="filter-group">
+                    <label for="evidence-description">وصف مفصل للمشكلة:</label>
+                    <textarea id="evidence-description" rows="5" placeholder="مثال: الساعة وصلت بخدش عميق في الزجاج، ولم يتم ذكره في الوصف." style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:var(--text-main); font-size:14px;"></textarea>
+                </div>
+            </div>
+            
+            <button class="buy-btn" onclick="submitEvidence()" id="submit-evidence-btn" style="background:var(--danger); margin-top: 20px;" disabled>
+                <i class="fa-solid fa-paper-plane"></i> إرسال الأدلة للتحكيم الآلي
+            </button>
+        </div>
+    </div>
+
+    <div id="notificationsModal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-bell"></i> إشعارات Logy AI</div>
+            <div class="icon-btn" onclick="closeNotificationsModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">أحدث التنبيهات المدارة بالذكاء الاصطناعي</h2>
+            <div class="glass-panel" style="padding: 10px;">
+                <div class="notification-item unread">
+                    <div class="notification-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                    <div class="notification-content">
+                        <div class="notification-title">تم تحرير الأرباح!</div>
+                        <div class="notification-text">تم تحرير مبلغ 105,000 Pi من عملية بيع iPhone 15 Pro. يمكنك سحبها الآن.</div>
+                        <div class="notification-time">منذ 5 دقائق</div>
+                    </div>
+                </div>
+                <div class="notification-item unread">
+                    <div class="notification-icon" style="background:var(--danger);"><i class="fa-solid fa-gavel"></i></div>
+                    <div class="notification-content">
+                        <div class="notification-title">نزاع جديد قيد المراجعة</div>
+                        <div class="notification-text">المشتري (Logy902) فتح نزاع على ساعة اليد الكلاسيكية. Logy AI بدأ التحكيم.</div>
+                        <div class="notification-time">منذ ساعة</div>
+                    </div>
+                </div>
+                <div class="notification-item">
+                    <div class="notification-icon" style="background:var(--primary);"><i class="fa-solid fa-bolt"></i></div>
+                    <div class="notification-content">
+                        <div class="notification-title">تحديث على سعر منتجك</div>
+                        <div class="notification-text">Logy AI يوصي بتخفيض سعر الفيلا في الرياض بنسبة 3% لزيادة احتمالية البيع الفوري.</div>
+                        <div class="notification-time">منذ يوم</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="sellerDashboardModal">
+        <div class="detail-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-chart-line"></i> لوحة تحكم البائع</div>
+            <div class="icon-btn" onclick="closeSellerDashboardModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="content-wrapper">
+            <h2 style="font-size: 22px; color: var(--primary); margin: 15px 0;">ملخص الأداء (Logy AI)</h2>
+            
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="value" id="total-sales">245,000 Pi</div>
+                    <div class="label">إجمالي المبيعات</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="value" id="active-listings">12</div>
+                    <div class="label">منتجات نشطة</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="value" id="pending-orders">3</div>
+                    <div class="label">طلبات قيد الشحن</div>
+                </div>
+                <div class="kpi-card" style="border-color: var(--success-color);">
+                    <div class="value" id="seller-score">9.5</div>
+                    <div class="label">تقييم البائع (AI)</div>
+                </div>
+            </div>
+            
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-list-check"></i> إدارة المنتجات</h4>
+                <p style="margin-bottom: 10px;">إدارة قائمة منتجاتك، تعديل الأسعار، ومراجعة تحليل Logy AI لكل منتج.</p>
+                <div class="dashboard-list">
+                    <div class="dashboard-list-item" onclick="viewListingDetails('P1')">
+                        <div class="list-item-info">
+                            <div class="list-item-title">iPhone 15 Pro (Titanium)</div>
+                            <div class="list-item-meta">السعر: 105,000 Pi | AI Score: 9.2</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-left" style="color: var(--text-muted);"></i>
+                    </div>
+                    <div class="dashboard-list-item" onclick="viewListingDetails('P4')">
+                        <div class="list-item-info">
+                            <div class="list-item-title">ساعة يد كلاسيكية (نزاع)</div>
+                            <div class="list-item-meta">السعر: 15,000 Pi | الحالة: نزاع قيد المراجعة</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-left" style="color: var(--danger);"></i>
+                    </div>
+                </div>
+                <button class="main-btn" onclick="openAiUploadModal()" style="background: var(--accent); color: black; margin-top: 15px;">
+                    <i class="fa-solid fa-plus"></i> إدراج منتج جديد بواسطة AI
+                </button>
+            </div>
+
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-box-open"></i> الطلبات والشحن</h4>
+                <p style="margin-bottom: 10px;">تتبع طلباتك، توليد بوليصات شحن Logy AI، وتحديث حالة التوصيل.</p>
+                <div class="dashboard-list">
+                    <div class="dashboard-list-item" onclick="viewOrderShipment('O789')">
+                        <div class="list-item-info">
+                            <div class="list-item-title">طلب #LOGY789 (MacBook Pro)</div>
+                            <div class="list-item-meta">الحالة: <span style="color:var(--primary); font-weight: bold;">بانتظار الشحن</span> | المشتري: أحمد</div>
+                        </div>
+                        <i class="fa-solid fa-truck-ramp-box" style="color: var(--primary);"></i>
+                    </div>
+                    <div class="dashboard-list-item" onclick="viewOrderShipment('O900')">
+                        <div class="list-item-info">
+                            <div class="list-item-title">طلب #LOGY900 (عطر فرنسي)</div>
+                            <div class="list-item-meta">الحالة: <span style="color:var(--success-color); font-weight: bold;">تم التوصيل</span> | الأرباح مُحررة</div>
+                        </div>
+                        <i class="fa-solid fa-check" style="color: var(--success-color);"></i>
+                    </div>
+                </div>
+                <button class="main-btn" onclick="alert('جاري محاكاة توليد بوليصة شحن Logy AI...')" style="margin-top: 15px;">
+                    <i class="fa-solid fa-truck-fast"></i> توليد بوليصة شحن
+                </button>
+            </div>
+
+            <div class="settings-group">
+                <h4><i class="fa-solid fa-sack-dollar"></i> الأرباح والسحب</h4>
+                <p style="margin-bottom: 10px;">إجمالي الأرصدة المتاحة للسحب.</p>
+                <div class="kpi-card" style="margin-bottom: 15px;">
+                    <div class="value" style="color: var(--success-color);" id="available-earnings">112,000 Pi</div>
+                    <div class="label">أرباح متاحة للسحب الفوري</div>
+                </div>
+                <button class="main-btn" onclick="withdraw()" style="background: var(--success-color); color: black;">
+                    <i class="fa-solid fa-hand-holding-dollar"></i> سحب الأرباح الآن
                 </button>
             </div>
         </div>
     </div>
+    
+    <div id="logyAiModal">
+        <div class="logy-chat-header">
+            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-robot"></i> Logy AI Chat</div>
+            <div class="icon-btn" onclick="closeLogyAiModal()"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="logy-chat-area" id="logy-chat-area">
+            </div>
+        <div class="logy-input-bar">
+            <input type="text" id="logy-input" placeholder="اطلب من Logy AI مساعدتك في أي شيء..." autofocus>
+            <div class="logy-send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></div>
+        </div>
+    </div>
+
+    <div class="footer-nav">
+        <div class="nav-item active" onclick="showApp('home')">
+            <i class="fa-solid fa-house"></i>
+            <span>الرئيسية</span>
+        </div>
+        <div class="nav-item" onclick="openLogyAiModal()">
+            <i class="fa-solid fa-robot"></i>
+            <span>Logy AI</span>
+        </div>
+        <div class="nav-item" onclick="openOrdersModal()">
+            <i class="fa-solid fa-box"></i>
+            <span>الطلبات</span>
+        </div>
+        <div class="nav-item" onclick="openWalletModal()">
+            <i class="fa-solid fa-wallet"></i>
+            <span>المحفظة</span>
+        </div>
+    </div>
 </div>
 
-<script>
-// ============================================
-// البيانات (DATA)
-// ============================================
-const PRODUCTS = [
-    {id:'p1',cat:'cars', name_ar:'تويوتا كورولا 2018', name_en:'Toyota Corolla 2018', desc_ar:'حالة ممتازة • 120 ألف كم', desc_en:'Excellent condition • 120k km', price:120000, img:'https://placehold.co/350x120/FFD400/0D1B2A?text=Corolla', rating:4.3, verified:true},
-    {id:'p2',cat:'electronics', name_ar:'هاتف Pi الذكي', name_en:'Pi Smart Phone', desc_ar:'5G • شاشة OLED • كاميرا AI', desc_en:'5G • OLED Display • AI Camera', price:85.5, img:'https://placehold.co/350x120/0D1B2A/FFD400?text=Phone', rating:4.7, is_ai_pick:true, verified:true},
-    {id:'p3',cat:'electronics', name_ar:'ساعة Pi', name_en:'Pi Smart Watch', desc_ar:'لياقة • 7 أيام بطارية', desc_en:'Fitness tracker • 7-day battery', price:12.75, img:'https://placehold.co/350x120/1A2E44/FFD400?text=Watch', rating:4.1, verified:true},
-    {id:'p4',cat:'real', name_ar:'شقة 120م بالزمالك', name_en:'120m Apartment in Zamalek', desc_ar:'مفروشة • موقع مميز', desc_en:'Fully Furnished • Prime location', price:21000, img:'https://placehold.co/350x120/08121a/FFD400?text=Apartment', rating:4.6, verified:true},
-    {id:'p5',cat:'fashion', name_ar:'جاكيت جلد', name_en:'Leather Jacket', desc_ar:'جلد طبيعي • جديد', desc_en:'Genuine leather • Brand New', price:120, img:'https://placehold.co/350x120/1A2E44/FFD400?text=Jacket', rating:4.0, verified:true},
-    {id:'p6',cat:'home', name_ar:'طقم كنبة 3 مقاعد', name_en:'3-Seater Sofa Set', desc_ar:'قماش فاخر • ضمان سنة', desc_en:'Premium fabric • 1yr warranty', price:450, img:'https://placehold.co/350x120/0D1B2A/FFD400?text=Sofa', rating:4.2, verified:true},
-    {id:'p7',cat:'services', name_ar:'تصميم موقع إلكتروني', name_en:'Web Design Service', desc_ar:'تصميم كامل • سنة دعم مجانية', desc_en:'Full design • 1yr free support', price:1500, img:'https://placehold.co/350x120/FFD400/0D1B2F?text=Web+Design', rating:4.9, is_ai_pick:true, verified:true},
-    {id:'p8',cat:'cars', name_ar:'دراجة نارية رياضية', name_en:'Sport Motorcycle', desc_ar:'2023 • 1500 كم', desc_en:'2023 Model • 1500 km', price:9500, img:'https://placehold.co/350x120/1A2E44/FFD400?text=Bike', rating:4.4, verified:true},
-    {id:'p9',cat:'electronics', name_ar:'شاشة 4K ذكية', name_en:'4K Smart TV', desc_ar:'55 بوصة • أندرويد', desc_en:'55 inch • Android OS', price:320, img:'https://placehold.co/350x120/0D1B2A/FFD400?text=Smart+TV', rating:4.5, verified:true},
-    {id:'p10',cat:'real', name_ar:'فيلا في التجمع الخامس', name_en:'Villa in New Cairo', desc_ar:'مساحة 500م • تشطيب فاخر', desc_en:'500m area • Luxury finish', price:550000, img:'https://placehold.co/350x120/08121a/FFD400?text=Villa', rating:4.8, verified:true}
-];
+<script src="script.js"></script>
 
-// بيانات النزاعات الوهمية 
-let MOCK_DISPUTES = [
-    {id:'D001', orderId:'ORD-100', complaint:'تأخر المنتج لمدة 3 أيام', status:'قيد التحليل', result:null, resolved:false},
-    {id:'D002', orderId:'ORD-99', complaint:'لم يصل المنتج بعد', status:'مرفوض', result:'Seller provided valid tracking', resolved:true}
-];
-
-// بيانات الطلبات الوهمية الجديدة
-let MOCK_ORDERS = [
-    {id:'ORD-100', total: 85.5, status_ar:'تم التوصيل', status_en:'Delivered', date: new Date(Date.now() - 50000000).toLocaleString(), items:[{name:'هاتف Pi الذكي', qty:1, price: 85.5}]}
-];
-const ORDER_STATUSES_AR = ['قيد المراجعة', 'قيد التجهيز', 'تم الشحن', 'تم التوصيل'];
-const ORDER_STATUSES_EN = ['Pending', 'Processing', 'Shipped', 'Delivered'];
-
-let MOCK_SELLER_HISTORY = {
-    transactions: 25,
-    successful_rate: 0.96,
-    disputes_resolved: 5,
-    ai_rating: 4.85,
-    status_ar: 'البائع موصى به',
-    status_en: 'Recommended Seller'
-};
-
-const CATEGORIES = [
-    {key:'all',icon:'fa-th-large',ar:'الكل',en:'All'},
-    {key:'cars',icon:'fa-car-side',ar:'سيارات',en:'Cars'},
-    {key:'real',icon:'fa-building',ar:'عقارات',en:'Real Estate'},
-    {key:'electronics',icon:'fa-microchip',ar:'إلكترونيات',en:'Electronics'},
-    {key:'fashion',icon:'fa-tshirt',ar:'أزياء',en:'Fashion'},
-    {key:'home',icon:'fa-house-chimney',ar:'منزل',en:'Home'},
-    {key:'services',icon:'fa-hands',ar:'خدمات',en:'Services'}
-];
-
-let currentFilter = 'all';
-let currentSort = 'default';
-let cart = [];
-let lang = 'ar';
-let piConnected = false;
-let userVerified = false;
-let network = 'Testnet';
-let currentProductId = null;
-let logyConversation = [];
-
-// ============================================
-// التحكم باللغة (TRANSLATE)
-// ============================================
-function translateUI() {
-    document.querySelectorAll('[data-ar],[data-en]').forEach(el => {
-        let txt = lang === 'ar' ? el.getAttribute('data-ar') : el.getAttribute('data-en');
-        if (!txt) return;
-        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = txt;
-        else if (el.tagName === 'OPTION' || el.tagName === 'LABEL' || el.tagName === 'BUTTON' || el.tagName === 'SPAN' || el.tagName === 'H2' || el.tagName === 'H3' || el.tagName === 'H4' || el.tagName === 'P') el.textContent = txt;
-    });
-}
-
-window.toggleLanguage = function() {
-    lang = lang === 'ar' ? 'en' : 'ar';
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-    translateUI();
-    updateUserBar();
-    renderCategories();
-    renderProducts(currentFilter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === currentFilter));
-    renderCart();
-    renderDisputes();
-    analyzeSeller(); // تحديث لوحة البائع
-    logEvent(lang === 'ar' ? 'تم تغيير اللغة لـ العربية' : 'Language changed to English');
-}
-
-// ============================================
-// شريط حالة المستخدم (USER BAR)
-// ============================================
-function updateUserBar() {
-    document.getElementById('usernameText').textContent = piConnected ? (lang === 'ar' ? 'مستخدم متصل' : 'User Connected') : (lang === 'ar' ? 'غير متصل' : 'Disconnected');
-    document.getElementById('statusIcon').className = 'fa-solid ' + (piConnected ? 'fa-circle-check' : 'fa-circle-xmark');
-    document.getElementById('balanceText').textContent = piConnected ? (lang === 'ar' ? 'الرصيد: ' : 'Balance: ') + '1000 Pi' : '';
-    document.getElementById('connectBtn').style.display = piConnected ? 'none' : 'inline-block';
-    document.getElementById('logoutBtn').style.display = piConnected ? 'inline-block' : 'none';
-    document.getElementById('verifyBtn').style.display = (piConnected && !userVerified) ? 'inline-block' : 'none';
-    document.getElementById('sellBtn').style.display = (piConnected && userVerified) ? 'inline-block' : 'none';
-    document.getElementById('ordersBtn').style.display = piConnected ? 'inline-block' : 'none'; // زر الطلبات
-    document.getElementById('netBtn').textContent = network;
-    
-    // إظهار لوحة محلل البائعين إذا كان متصلاً وموثقاً
-    document.getElementById('sellerAnalyzerPanel').style.display = (piConnected && userVerified) ? 'block' : 'none';
-    if (piConnected && userVerified) {
-        analyzeSeller();
-    }
-}
-
-// ============================================
-// التصنيفات والبحث والفرز (CATEGORIES & SORT)
-// ============================================
-function renderCategories() {
-    document.getElementById('cats').innerHTML = CATEGORIES.map(cat =>
-        `<div class="cat${cat.key === currentFilter ? ' active' : ''}" onclick="handleCategoryFilter('${cat.key}')"><i class="fa-solid ${cat.icon}"></i> ${lang === 'ar' ? cat.ar : cat.en}</div>`
-    ).join('');
-}
-
-window.handleCategoryFilter = function(category) {
-    currentFilter = category;
-    renderCategories();
-    renderProducts(category === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === category));
-    logEvent((lang === 'ar' ? 'تغيير التصنيف إلى: ' : 'Filter: ') + (lang === 'ar' ? CATEGORIES.find(c => c.key === category).ar : CATEGORIES.find(c => c.key === category).en));
-}
-
-window.handleSortChange = function(sortBy) {
-    currentSort = sortBy;
-    const filtered = currentFilter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === currentFilter);
-    renderProducts(filtered);
-}
-
-window.handleAISearch = function() {
-    const term = document.getElementById('search-input').value.trim();
-    if (!term) {
-        renderProducts(currentFilter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === currentFilter));
-        logEvent(lang === 'ar' ? 'بحث فارغ' : 'Empty search');
-        return;
-    }
-    const filtered = PRODUCTS.filter(p =>
-        (lang === 'ar' ? p.name_ar : p.name_en).toLowerCase().includes(term.toLowerCase()) ||
-        (lang === 'ar' ? p.desc_ar : p.desc_en).toLowerCase().includes(term.toLowerCase())
-    );
-    renderProducts(filtered);
-    logEvent((lang === 'ar' ? 'بحث عن: ' : 'Search for: ') + term);
-}
-
-function sortProducts(products, sortBy) {
-    return products.slice().sort((a, b) => {
-        switch (sortBy) {
-            case 'rating_desc': return b.rating - a.rating;
-            case 'price_asc': return a.price - b.price;
-            case 'price_desc': return b.price - a.price;
-            default: return b.id.localeCompare(a.id);
-        }
-    });
-}
-
-// ============================================
-// عرض المنتجات وتفاصيلها (PRODUCTS & MODAL)
-// ============================================
-function renderProducts(products) {
-    const productList = document.getElementById('productList');
-    if (products.length === 0) {
-        productList.innerHTML = '<div style="text-align:center;color:#FFD400;margin:14px">' + (lang === 'ar' ? 'لا يوجد منتجات' : 'No products found') + '</div>';
-        return;
-    }
-    productList.innerHTML = sortProducts(products, currentSort).map(p => `
-        <div class="product">
-            ${p.verified ? '<div class="verified-badge"><i class="fa-solid fa-shield-halved"></i></div>' : ''}
-            ${p.is_ai_pick ? '<div class="ai-badge">AI Pick</div>' : ''}
-            <img src="${p.img}" alt="${lang === 'ar' ? p.name_ar : p.name_en}" onclick="openProductModal('${p.id}')">
-            <div class="product-content">
-                <div class="title">${lang === 'ar' ? p.name_ar : p.name_en}</div>
-                <div class="desc">${lang === 'ar' ? p.desc_ar : p.desc_en}</div>
-                <div class="price-row">
-                    <div class="price">${p.price.toLocaleString()} Pi</div>
-                    <div class="seller-rating">${p.rating} <i class="fa-solid fa-star"></i></div>
-                </div>
-                <button class="action-btn" onclick="addToCart('${p.id}')" style="width:100%;background:var(--success);margin-top:5px;"><i class="fa-solid fa-cart-plus"></i> ${(lang === 'ar' ? 'إضافة للسلة' : 'Add to Cart')}</button>
-            </div>
-        </div>`).join('');
-}
-
-window.openProductModal = function(id) {
-    document.getElementById('productModal').style.display = 'flex';
-    currentProductId = id;
-    const prod = PRODUCTS.find(p => p.id === id);
-    document.getElementById('modalImage').innerHTML = `<img src="${prod.img}" alt="${lang === 'ar' ? prod.name_ar : prod.name_en}">`;
-    document.getElementById('modalTitle').textContent = lang === 'ar' ? prod.name_ar : prod.name_en;
-    document.getElementById('modalDesc').textContent = lang === 'ar' ? prod.desc_ar : prod.desc_en;
-    document.getElementById('modalPrice').textContent = prod.price.toLocaleString() + ' Pi';
-    document.getElementById('modalRating').innerHTML = prod.rating + ' <i class="fa-solid fa-star"></i>';
-}
-
-window.closeProductModal = function() { document.getElementById('productModal').style.display = 'none'; currentProductId = null; }
-window.addModalToCart = function() { if (currentProductId) { addToCart(currentProductId); closeProductModal(); } }
-
-// ============================================
-// سلة التسوق والدفع (CART & CHECKOUT)
-// ============================================
-function addToCart(id) {
-    const prod = PRODUCTS.find(p => p.id === id);
-    if (!prod) return;
-    const exists = cart.find(item => item.id === id);
-    if (exists) {
-        exists.qty += 1;
-    } else {
-        cart.push({ ...prod, qty: 1 });
-    }
-    renderCart();
-    logEvent((lang === 'ar' ? 'إضافة للسلة: ' : 'Added to cart: ') + (lang === 'ar' ? prod.name_ar : prod.name_en));
-}
-
-function renderCart() {
-    const area = document.getElementById('cartArea');
-    let total = 0;
-    if (cart.length === 0) {
-        area.innerHTML = '<div style="text-align:center;color:#FFD400;">' + (lang === 'ar' ? 'سلتك فارغة' : 'Your cart is empty') + '</div>';
-    } else {
-        area.innerHTML = cart.map(item => `
-            <div class="cart-row">
-                <span style="flex-grow:1">${lang === 'ar' ? item.name_ar : item.name_en} <span class="cart-qty">(${item.qty})</span></span>
-                <span style="color:var(--success);margin-inline-end:10px;">${(item.price * item.qty).toLocaleString()} Pi</span>
-                <button class="action-btn" style="padding:3px 8px;" onclick="updateCartQty('${item.id}',-1)">-</button>
-                <button class="action-btn" style="padding:3px 8px;" onclick="updateCartQty('${item.id}',1)">+</button>
-                <button class="action-btn" style="background:var(--danger-dark);padding:3px 8px;" onclick="removeCartItem('${item.id}')"><i class="fa-solid fa-trash"></i></button>
-            </div>
-        `).join('');
-        total = cart.reduce((sum, it) => sum + it.price * it.qty, 0);
-    }
-    document.querySelector('#cartTotal .total-pi').textContent = (lang === 'ar' ? 'المجموع: ' : 'Total: ') + total.toLocaleString() + ' Pi';
-    document.querySelector('#cartTotal .total-usd').textContent = "(~ $" + (total * 0.00025).toFixed(2) + ")";
-    document.getElementById('checkoutBtn').disabled = cart.length === 0;
-}
-
-window.updateCartQty = function(id, delta) {
-    const item = cart.find(i => i.id === id);
-    if (item) {
-        item.qty += delta;
-        if (item.qty <= 0) {
-            removeCartItem(id);
-        }
-        renderCart();
-    }
-}
-
-window.removeCartItem = function(id) {
-    cart = cart.filter(i => i.id !== id);
-    renderCart();
-}
-
-// ============================================
-// 📋 مدير الطلبات الذكي (SMART ORDER MANAGER - NEW)
-// ============================================
-
-function createOrder(cartItems, totalPi) {
-    const orderId = 'ORD-' + (MOCK_ORDERS.length + 101);
-    const orderItems = cartItems.map(item => ({
-        name: lang === 'ar' ? item.name_ar : item.name_en,
-        qty: item.qty,
-        price: item.price
-    }));
-
-    const newOrder = {
-        id: orderId,
-        total: totalPi,
-        status_ar: ORDER_STATUSES_AR[0],
-        status_en: ORDER_STATUSES_EN[0],
-        date: new Date().toLocaleString(lang === 'ar' ? 'ar-EG' : 'en-US'),
-        items: orderItems,
-        status_index: 0
-    };
-
-    MOCK_ORDERS.unshift(newOrder);
-    logEvent((lang === 'ar' ? 'إنشاء طلب جديد: ' : 'New Order Created: ') + orderId);
-
-    // بدء دورة حياة الطلب
-    simulateOrderLifecycle(orderId);
-}
-
-function simulateOrderLifecycle(orderId) {
-    let order = MOCK_ORDERS.find(o => o.id === orderId);
-    if (!order) return;
-
-    let currentStep = order.status_index + 1;
-
-    // محاكاة التقدم في حالة الطلب كل 5 ثوانٍ
-    const interval = setInterval(() => {
-        if (currentStep < ORDER_STATUSES_AR.length) {
-            order.status_ar = ORDER_STATUSES_AR[currentStep];
-            order.status_en = ORDER_STATUSES_EN[currentStep];
-            order.status_index = currentStep;
-            logEvent((lang === 'ar' ? 'تحديث حالة الطلب ' : 'Order Status Update ') + orderId + ': ' + (lang === 'ar' ? order.status_ar : order.status_en));
-            
-            // إرسال إشعار تلقائي
-            if (currentStep > 0) {
-                 alert((lang === 'ar' ? 'إشعار الطلب ' : 'Order Notification ') + orderId + ': ' + (lang === 'ar' ? order.status_ar : order.status_en));
-            }
-
-            if (document.getElementById('ordersModal').style.display === 'flex') {
-                renderOrders(); // تحديث القائمة إذا كانت مفتوحة
-            }
-            currentStep++;
-        } else {
-            clearInterval(interval);
-        }
-    }, 5000); // 5 ثواني لكل خطوة
-}
-
-window.piCheckout = function() {
-    if (cart.length === 0 || !piConnected) return;
-
-    let total = cart.reduce((sum, it) => sum + it.price * it.qty, 0);
-
-    // 1. إنشاء الطلب وبدء دورة الحياة
-    createOrder(cart, total);
-
-    // 2. مسح السلة
-    cart = [];
-    renderCart();
-
-    // 3. تسجيل الحدث
-    logEvent((lang === 'ar' ? 'تم دفع ' : 'Paid: ') + total.toLocaleString() + ' Pi ' + (lang === 'ar' ? 'عبر ' : 'via ') + network);
-}
-
-window.openOrdersModal = function() {
-    document.getElementById('ordersModal').style.display = 'flex';
-    renderOrders();
-}
-window.closeOrdersModal = function() {
-    document.getElementById('ordersModal').style.display = 'none';
-}
-
-function renderOrders() {
-    const list = document.getElementById('ordersList');
-    const noOrders = document.getElementById('noOrdersMessage');
-
-    if (MOCK_ORDERS.length === 0) {
-        list.innerHTML = '';
-        noOrders.style.display = 'block';
-        return;
-    }
-    noOrders.style.display = 'none';
-
-    list.innerHTML = MOCK_ORDERS.map(order => {
-        let statusText = lang === 'ar' ? order.status_ar : order.status_en;
-        let color = order.status_index === 3 ? 'var(--success)' : (order.status_index === 0 ? 'var(--primary)' : 'var(--accent)');
-        
-        const itemsList = order.items.map(item => `
-            <li style="font-size:13px;color:var(--text-muted);">${item.name} x ${item.qty} (${item.price.toLocaleString()} Pi)</li>
-        `).join('');
-
-        return `
-            <div class="order-card">
-                <h4>${lang === 'ar' ? 'الطلب' : 'Order'} #${order.id}</h4>
-                <p style="margin-bottom:5px;font-size:14px;">
-                    <span style="font-weight:bold;">${lang === 'ar' ? 'الحالة:' : 'Status:'}</span> 
-                    <span class="order-status" style="color:${color};">${statusText}</span>
-                    <span style="float:${lang === 'ar' ? 'left' : 'right'};font-size:12px;color:var(--text-muted);">${order.date}</span>
-                </p>
-                <p style="margin:5px 0;">
-                    <span style="font-weight:bold;color:var(--primary);">${lang === 'ar' ? 'المجموع:' : 'Total:'}</span> ${order.total.toLocaleString()} Pi
-                </p>
-                <ul style="list-style:none;padding:0;margin:10px 0 0 0;">${itemsList}</ul>
-            </div>
-        `;
-    }).join('');
-}
-
-
-// ============================================
-// سجل العمليات (LOGS)
-// ============================================
-function logEvent(msg) {
-    const log = document.getElementById('txLog');
-    const t = new Date().toLocaleTimeString(lang === 'ar' ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' });
-    const entry = document.createElement('div');
-    entry.innerHTML = `[${t}] ${msg}`;
-    entry.style.cssText = 'padding:5px;margin-bottom:3px;background:var(--background-dark);border-radius:4px;font-size:13px;';
-    log.prepend(entry);
-}
-
-window.clearLogs = function() {
-    document.getElementById('txLog').innerHTML = '';
-    logEvent(lang === 'ar' ? 'تم مسح السجل' : 'Log cleared');
-}
-
-// ============================================
-// 📦 مدير الشحن الذكي (SMART SHIPPING)
-// ============================================
-window.startSmartShipping = function() {
-    const trackingNo = document.getElementById('trackingInput').value.trim();
-    const resultDiv = document.getElementById('shippingResult');
-    
-    if (!trackingNo) {
-        resultDiv.innerHTML = `<span style="color:${getComputedStyle(document.documentElement).getPropertyValue('--danger')};">` + (lang === 'ar' ? 'الرجاء إدخال رقم تتبع صالح.' : 'Please enter a valid tracking number.') + '</span>';
-        return;
-    }
-
-    const carriers = ['Aramex', 'DHL', 'FedEx'];
-    const chosenCarrier = carriers[Math.floor(Math.random() * carriers.length)];
-    const mockCost = (Math.random() * 5 + 2).toFixed(2); 
-    const mockStatus = ['In Transit', 'Out for Delivery', 'Delivered'][Math.floor(Math.random() * 3)];
-
-    resultDiv.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ' + (lang === 'ar' ? 'جاري تحليل الشحنة...' : 'Analyzing Shipment...');
-
-    setTimeout(() => {
-        resultDiv.innerHTML = `
-            <div style="color:var(--text-light);">
-                <span style="color:var(--primary);font-weight:bold;">${lang === 'ar' ? 'أفضل شركة شحن:' : 'Best Carrier:'}</span> ${chosenCarrier}<br>
-                <span style="color:var(--primary);font-weight:bold;">${lang === 'ar' ? 'التكلفة المقدرة:' : 'Estimated Cost:'}</span> ${mockCost} Pi<br>
-                <span style="color:var(--primary);font-weight:bold;">${lang === 'ar' ? 'حالة الشحنة:' : 'Tracking Status:'}</span> ${lang === 'ar' ? getArabicStatus(mockStatus) : mockStatus}
-            </div>
-            <div style="margin-top:5px;font-style:italic;font-size:12px;color:var(--success);">${lang === 'ar' ? 'تم إرسال تحديث العميل' : 'Customer update sent'}</div>
-        `;
-        logEvent((lang === 'ar' ? 'تتبع الشحنة ' : 'Tracked Shipment ') + trackingNo + ': ' + (lang === 'ar' ? getArabicStatus(mockStatus) : mockStatus) + ' via ' + chosenCarrier);
-    }, 1500);
-}
-
-function getArabicStatus(status) {
-    const statusMap = {'In Transit': 'في الطريق', 'Out for Delivery': 'قيد التوصيل', 'Delivered': 'تم التوصيل'};
-    return statusMap[status] || status;
-}
-
-// ============================================
-// ⚖️ حل النزاعات التلقائي (DISPUTE RESOLUTION)
-// ============================================
-window.openDisputeModal = function() {
-    document.getElementById('disputeModal').style.display = 'flex';
-    renderDisputes();
-}
-window.closeDisputeModal = function() { document.getElementById('disputeModal').style.display = 'none'; }
-
-function renderDisputes() {
-    const list = document.getElementById('disputeList');
-    if (MOCK_DISPUTES.length === 0) {
-        list.innerHTML = '<div style="text-align:center;padding:10px;color:var(--success);">' + (lang === 'ar' ? 'لا توجد نزاعات حالية.' : 'No active disputes.') + '</div>';
-        return;
-    }
-
-    list.innerHTML = MOCK_DISPUTES.map(d => `
-        <div class="dispute-item">
-            <strong>${lang === 'ar' ? 'الطلب' : 'Order'}: ${d.orderId}</strong>
-            <span style="float:${lang === 'ar' ? 'left' : 'right'};" class="dispute-status ${d.resolved ? 'resolved' : ''}">
-                ${lang === 'ar' ? d.status : (d.status === 'قيد التحليل' ? 'Analyzing' : d.status)}
-            </span><br>
-            <span style="color:var(--text-muted);font-size:12px;">${lang === 'ar' ? 'الشكوى:' : 'Complaint:'} ${d.complaint.substring(0, 30)}...</span>
-        </div>
-    `).join('');
-}
-
-window.submitDispute = function(e) {
-    e.preventDefault();
-    const orderId = document.getElementById('disputeOrderId').value.trim();
-    const complaint = document.getElementById('disputeComplaint').value.trim();
-    
-    const refundDecision = Math.random() < 0.5;
-
-    const newId = 'D' + (MOCK_DISPUTES.length + 1).toString().padStart(3, '0');
-    
-    const decisionText = refundDecision 
-        ? (lang === 'ar' ? 'تمت الموافقة على استرجاع المال' : 'Refund Approved')
-        : (lang === 'ar' ? 'تم رفض طلب الاسترجاع' : 'Refund Rejected');
-
-    const newDispute = {
-        id: newId,
-        orderId: orderId,
-        complaint: complaint,
-        status: decisionText,
-        result: refundDecision ? 'Refund issued' : 'Rejected due to insufficient evidence',
-        resolved: true
-    };
-
-    MOCK_DISPUTES.unshift(newDispute);
-    
-    setTimeout(() => {
-        renderDisputes();
-        closeDisputeModal();
-        logEvent((lang === 'ar' ? 'حل نزاع' : 'Dispute Resolved') + ' ' + orderId + ': ' + decisionText);
-        alert(lang === 'ar' ? `نتائج النزاع ${orderId}: ${decisionText}` : `Dispute ${orderId} Results: ${decisionText}`);
-    }, 2000);
-}
-
-// ============================================
-// ⭐ محلل البائعين (SELLER ANALYZER)
-// ============================================
-window.analyzeSeller = function() {
-    const resultDiv = document.getElementById('sellerAnalysisResult');
-    
-    resultDiv.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ' + (lang === 'ar' ? 'جاري تحليل سجل الأداء...' : 'Analyzing performance history...');
-
-    setTimeout(() => {
-        const rating = MOCK_SELLER_HISTORY.ai_rating.toFixed(2);
-        const status = lang === 'ar' ? MOCK_SELLER_HISTORY.status_ar : MOCK_SELLER_HISTORY.status_en;
-
-        resultDiv.innerHTML = `
-            <div style="color:var(--text-light);">
-                <div class="seller-metric">
-                    <span>${lang === 'ar' ? 'تقييم الذكاء الاصطناعي:' : 'AI Rating:'}</span> 
-                    <span style="color:var(--primary);font-weight:bold;">${rating} <i class="fa-solid fa-star"></i></span>
-                </div>
-                <div class="seller-metric">
-                    <span>${lang === 'ar' ? 'معدل النجاح:' : 'Success Rate:'}</span> 
-                    <span style="color:var(--success);font-weight:bold;">${(MOCK_SELLER_HISTORY.successful_rate * 100).toFixed(0)}%</span>
-                </div>
-                <div class="seller-metric">
-                    <span>${lang === 'ar' ? 'النزاعات المحلولة:' : 'Disputes Resolved:'}</span> 
-                    <span style="color:var(--accent);font-weight:bold;">${MOCK_SELLER_HISTORY.disputes_resolved}</span>
-                </div>
-                <div style="margin-top:10px;font-weight:bold;font-size:15px;text-align:center;">
-                    ${lang === 'ar' ? 'توصية المحلل:' : 'Analyzer Recommendation:'} <span style="color:var(--success);">${status}</span>
-                </div>
-            </div>
-        `;
-        logEvent(lang === 'ar' ? `تم تحليل أداء البائع بتقييم ${rating}` : `Seller performance analyzed: ${rating} rating`);
-    }, 1500);
-}
-
-// ============================================
-// 💰 محلل الأسعار الذكي و ✅ مدقق المنتجات
-// ============================================
-function auditProduct(product) {
-    if (product.img.toLowerCase().includes('fail')) {
-        return { passed: false, reason_ar: 'الصورة مخالفة أو غير واضحة.', reason_en: 'Image is blurry or violates policy.' };
-    }
-    if (product.desc_ar.includes('ممنوع') || product.desc_en.includes('prohibited')) {
-        return { passed: false, reason_ar: 'المنتج مصنف كمحظور.', reason_en: 'Product classified as prohibited.' };
-    }
-    if (product.cat === 'electronics' && product.price > 1000) {
-        return { passed: false, reason_ar: 'السعر غير منطقي لفئة الإلكترونيات.', reason_en: 'Illogical price for electronics category.' };
-    }
-    return { passed: true, reason_ar: 'مدقق المنتجات: مواصفات وصور مقبولة.', reason_en: 'Product Auditor: Specs and images accepted.' };
-}
-
-function analyzePrice(product) {
-    const categoryProducts = PRODUCTS.filter(p => p.cat === product.cat);
-    const avgPrice = categoryProducts.length > 0
-        ? categoryProducts.reduce((sum, p) => sum + p.price, 0) / categoryProducts.length
-        : product.price;
-
-    const suggestedPrice = parseFloat(avgPrice * (Math.random() * 0.2 + 0.9)).toFixed(2); // +/- 10%
-    const diffPercent = Math.abs(product.price - suggestedPrice) / suggestedPrice;
-    
-    if (diffPercent > 0.3) { // إذا كان الفرق أكثر من 30%
-        return {
-            warning: true,
-            suggestedPrice: suggestedPrice,
-            message_ar: `السعر المقترح (${suggestedPrice} Pi) يختلف بنسبة كبيرة. يرجى مراجعة تسعيرك.`,
-            message_en: `Suggested price (${suggestedPrice} Pi) differs significantly. Please review your pricing.`
-        };
-    }
-    
-    return {
-        warning: false,
-        suggestedPrice: suggestedPrice,
-        message_ar: `السعر (${product.price} Pi) ضمن النطاق المقبول.`,
-        message_en: `Price (${product.price} Pi) is within the acceptable range.`
-    };
-}
-
-
-window.submitProduct = function(e) {
-    e.preventDefault();
-    document.getElementById('submitProductBtn').disabled = true;
-
-    const newProd = {
-        id: 'p' + (PRODUCTS.length + 1),
-        cat: document.getElementById('productCategory').value,
-        name_ar: document.getElementById('productNameAr').value,
-        name_en: document.getElementById('productNameEn').value,
-        desc_ar: document.getElementById('productDescAr').value,
-        desc_en: document.getElementById('productDescEn').value,
-        price: parseFloat(document.getElementById('productPrice').value),
-        img: document.getElementById('productImage').value,
-        rating: 5.0,
-        verified: true
-    };
-
-    const statusDiv = document.getElementById('productAnalysisStatus');
-    statusDiv.style.display = 'block';
-    statusDiv.classList.remove('fail');
-    statusDiv.style.borderLeft = `3px solid ${getComputedStyle(document.documentElement).getPropertyValue('--accent')}`;
-    statusDiv.innerHTML = `<i class="fa-solid fa-flask fa-spin"></i> ${lang === 'ar' ? 'جاري تحليل المنتج بواسطة AI...' : 'Analyzing product with AI...'}`;
-
-    // خطوة 1: مدقق المنتجات
-    setTimeout(() => {
-        const auditResult = auditProduct(newProd);
-
-        if (!auditResult.passed) {
-            statusDiv.classList.add('fail');
-            statusDiv.style.borderLeft = `3px solid ${getComputedStyle(document.documentElement).getPropertyValue('--danger')}`;
-            statusDiv.innerHTML = `<i class="fa-solid fa-ban"></i> ${lang === 'ar' ? 'رفض مدقق المنتجات:' : 'Product Auditor Rejected:'} <span style="color:var(--danger);">${lang === 'ar' ? auditResult.reason_ar : auditResult.reason_en}</span>`;
-            document.getElementById('submitProductBtn').disabled = false;
-            logEvent(lang === 'ar' ? `رفض إضافة المنتج: ${auditResult.reason_ar}` : `Product Add Rejected: ${auditResult.reason_en}`);
-            return;
-        }
-
-        // خطوة 2: محلل الأسعار الذكي
-        setTimeout(() => {
-            const priceResult = analyzePrice(newProd);
-
-            let priceMessage = lang === 'ar' ? priceResult.message_ar : priceResult.message_en;
-            let priceIcon = priceResult.warning ? '<i class="fa-solid fa-triangle-exclamation" style="color:var(--primary);"></i>' : '<i class="fa-solid fa-check" style="color:var(--success);"></i>';
-            let priceBorder = priceResult.warning ? getComputedStyle(document.documentElement).getPropertyValue('--primary') : getComputedStyle(document.documentElement).getPropertyValue('--success');
-            
-            statusDiv.style.borderLeft = `3px solid ${priceBorder}`;
-            statusDiv.innerHTML = `
-                ${priceIcon} ${lang === 'ar' ? 'تحليل السعر:' : 'Price Analysis:'} ${priceMessage}<br>
-                <div style="margin-top:5px;">✅ ${lang === 'ar' ? auditResult.reason_ar : auditProduct.reason_en}</div>
-            `;
-
-            if (priceResult.warning) {
-                 // عرض تحذير دون منع الإضافة، ولكن بتأخير
-                 alert(lang === 'ar' ? `⚠️ تنبيه من محلل الأسعار:\n${priceResult.message_ar}` : `⚠️ Price Analyzer Alert:\n${priceResult.message_en}`);
-            }
-
-            // خطوة 3: الإضافة النهائية
-            setTimeout(() => {
-                PRODUCTS.unshift(newProd);
-                renderProducts(currentFilter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === currentFilter));
-                closeAddProductModal();
-                e.target.reset();
-                document.getElementById('submitProductBtn').disabled = false;
-                logEvent(lang === 'ar' ? 'تمت الموافقة وإضافة منتج جديد' : 'New product approved and added');
-                alert(lang === 'ar' ? 'تمت مراجعة المنتج وإضافته بنجاح' : 'Product reviewed and added successfully');
-            }, 1000); // تأخير لإظهار نتيجة تحليل السعر
-        }, 1500); // تأخير لمراجعة السعر
-    }, 1500); // تأخير لتدقيق المنتج
-}
-
-
-// ============================================
-// 💬 نظام المراسلة الذكي (SMART MESSAGING - NEW)
-// ============================================
-window.openLogyModal = function() { document.getElementById('logyModal').style.display = 'flex'; }
-window.closeLogyModal = function() { document.getElementById('logyModal').style.display = 'none'; }
-
-window.sendLogyMessage = function() {
-    const input = document.getElementById('logyInput');
-    const text = input.value.trim();
-    if (!text) return;
-    const chat = document.getElementById('logyAiChat');
-
-    // عرض رسالة المستخدم
-    chat.innerHTML += `<div style="text-align:right;margin-bottom:8px;"><span style="background:var(--accent);padding:5px 10px;border-radius:8px;color:#fff;font-size:16px;">${text}</span></div>`;
-    input.value = '';
-    
-    // تجهيز الرد الذكي
-    const lowerText = text.toLowerCase();
-    let replyAr, replyEn;
-
-    // 1. محاكاة التحويل للدعم البشري
-    if (lowerText.includes('الدعم البشري') || lowerText.includes('human support') || lowerText.includes('talk to human')) {
-        replyAr = 'تم تحويلك إلى الدعم البشري. يرجى الانتظار، سيتم الرد عليك في غضون 5 دقائق.';
-        replyEn = 'You have been transferred to Human Support. Please wait, a response will follow within 5 minutes.';
-    } 
-    // 2. محاكاة الرد على أسئلة حالة الطلب الشائعة
-    else if (lowerText.includes('حالة طلبي') || lowerText.includes('order status') || lowerText.includes('my order')) {
-        const latestOrder = MOCK_ORDERS[0];
-        if (latestOrder) {
-            replyAr = `حالة طلبك الأخير (${latestOrder.id}) هي: ${latestOrder.status_ar}`;
-            replyEn = `Your latest order status (${latestOrder.id}) is: ${latestOrder.status_en}`;
-        } else {
-            replyAr = 'لم يتم العثور على أي طلبات. يرجى التأكد من الدفع أولاً.';
-            replyEn = 'No orders found. Please ensure payment has been made first.';
-        }
-    }
-    // 3. محاكاة الترجمة التلقائية
-    else if (lowerText.includes('ترجم') || lowerText.includes('translate')) {
-        replyAr = 'تمت الترجمة تلقائياً (محاكاة): [مرحباً بك في Forsale، نأمل أن تجد كل ما تبحث عنه]';
-        replyEn = 'Auto-translated (Mock): [Welcome to Forsale, we hope you find everything you are looking for]';
-    }
-    // 4. الرد التلقائي (الأسئلة الشائعة العامة)
-    else {
-        replyAr = 'شكراً لسؤالك. أنا نظام المراسلة الذكي، وأستطيع الرد على الأسئلة الشائعة بسرعة. إذا احتجت مساعدة بشرية، اكتب "الدعم البشري".';
-        replyEn = 'Thank you for asking. I am the Smart Messaging System, and I can answer FAQs quickly. If you need human assistance, type "Human Support".';
-    }
-    
-    // عرض رسالة الذكاء الاصطناعي
-    setTimeout(() => {
-        const finalReply = lang === 'ar' ? replyAr : replyEn;
-        chat.innerHTML += `<div style="text-align:left;margin-bottom:8px;"><span style="background:var(--background-light);padding:5px 10px;border-radius:8px;color:var(--primary);font-size:16px;"><i class="fa-solid fa-comments"></i> ${finalReply}</span></div>`;
-        chat.scrollTop = chat.scrollHeight;
-    }, 1200);
-}
-
-
-// ============================================
-// باقي وظائف النوافذ المنبثقة (MODAL FUNCTIONS)
-// ============================================
-window.openVerificationModal = function() { document.getElementById('verificationModal').style.display = 'flex'; }
-window.closeVerificationModal = function() { document.getElementById('verificationModal').style.display = 'none'; }
-
-window.startVerification = function() {
-    const steps = ['step1', 'step2', 'step3', 'step4'];
-    let current = 0;
-    const btn = document.getElementById('startVerificationBtn');
-    btn.disabled = true;
-    
-    const runStep = () => {
-        if (current >= steps.length) {
-            userVerified = true;
-            updateUserBar();
-            closeVerificationModal();
-            logEvent(lang === 'ar' ? 'تم توثيق الحساب بنجاح!' : 'Account Verified Successfully!');
-            analyzeSeller(); // تشغيل تحليل البائع بعد التوثيق
-            alert(lang === 'ar' ? 'مبروك! تم التوثيق.' : 'Congratulations! Verified.');
-            return;
-        }
-        const el = document.getElementById(steps[current]);
-        el.classList.add('completed');
-        el.querySelector('.step-number').classList.add('completed');
-        el.querySelector('.step-number').innerHTML = '<i class="fa-solid fa-check"></i>';
-        current++;
-        setTimeout(runStep, 1000);
-    };
-    runStep();
-}
-
-window.openAddProductModal = function() { 
-    document.getElementById('addProductModal').style.display = 'flex'; 
-    document.getElementById('productAnalysisStatus').style.display = 'none'; // إخفاء لوحة التحليل عند الفتح
-}
-window.closeAddProductModal = function() { document.getElementById('addProductModal').style.display = 'none'; }
-
-window.toggleNetwork = function() {
-    network = network === 'Testnet' ? 'Mainnet' : 'Testnet';
-    updateUserBar();
-    logEvent((lang === 'ar' ? 'تم التحويل لشبكة: ' : 'Switched to: ') + network);
-}
-window.piConnect = function() {
-    setTimeout(() => {
-        piConnected = true;
-        updateUserBar();
-        logEvent(lang === 'ar' ? 'تم الاتصال بالمحفظة' : 'Wallet Connected');
-    }, 500);
-}
-window.piLogout = function() {
-    piConnected = false;
-    userVerified = false;
-    cart = [];
-    renderCart();
-    updateUserBar();
-    logEvent(lang === 'ar' ? 'تم تسجيل الخروج' : 'Logged out');
-}
-
-
-// التهيئة (INITIALIZE)
-document.addEventListener('DOMContentLoaded', () => {
-    renderCategories();
-    renderProducts(PRODUCTS);
-    updateUserBar();
-    translateUI();
-    renderDisputes();
-    // بدء محاكاة دورة حياة الطلبات الموجودة (مثل ORD-100)
-    MOCK_ORDERS.forEach(order => {
-        // تحديث حالة الطلبات القديمة لتبدو أنها تم توصيلها بالفعل
-        if (order.status_en !== 'Delivered') {
-            order.status_index = 3;
-            order.status_ar = ORDER_STATUSES_AR[3];
-            order.status_en = ORDER_STATUSES_EN[3];
-        }
-    });
-});
-</script>
 </body>
 </html>

@@ -1,20 +1,8 @@
 {
-  "name": "forsale-ai-pi-backend",
+  "name": "forsale-ai-static-app",
   "version": "1.0.0",
-  "description": "Global e-commerce backend integrated with Pi Network and Logy AI services.",
-  "main": "server.js",
+  "description": "Static HTML/CSS/JS application for Pi Network.",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
-  },
-  "dependencies": {
-    "axios": "^1.6.8",
-    "cors": "^2.8.5",
-    "express": "^4.19.2",
-    "fs": "^0.0.1-security",
-    "path": "^0.12.7"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
+    "start": "echo 'Starting static server...'"
   }
 }

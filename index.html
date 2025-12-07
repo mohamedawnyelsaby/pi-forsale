@@ -2,78 +2,97 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pi Connection Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Forsale AI</title>
     
-    <!-- استدعاء المكتبة -->
+    <!-- مكتبة Pi -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <script>Pi.init({ version: "2.0", sandbox: true });</script>
 
-    <style>
-        body { background-color: #000; color: #0f0; font-family: monospace; padding: 20px; font-size: 16px; }
-        button { 
-            background: #fff; color: #000; font-size: 20px; padding: 15px; 
-            width: 100%; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 20px;
-        }
-        #logs { border-top: 1px solid #333; padding-top: 10px; }
-        .log-line { margin-bottom: 5px; border-bottom: 1px dashed #333; padding-bottom: 2px; }
-        .error { color: #ff5252; }
-        .success { color: #ffff00; font-weight: bold; }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1>تجربة بدون تنبيهات</h1>
-    <button onclick="startAuth()">🔴 اضغط هنا للاتصال</button>
+    <!-- شاشة الدخول -->
+    <div id="auth-container">
+        <div class="auth-logo">
+            <span style="background:#00f2ff;color:black;padding:2px 8px;border-radius:6px">AI</span> Forsale
+        </div>
+        <div class="auth-card">
+            <h2>سوق المستقبل</h2>
+            <p style="color:#aaa;">سجل دخولك لإتمام الخطوة رقم 10</p>
+            <button class="main-btn pi-btn" onclick="startLogin()">
+                <i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi
+            </button>
+        </div>
+    </div>
 
-    <h3>سجل العمليات:</h3>
-    <div id="logs">...</div>
+    <!-- شاشة المنتجات -->
+    <div id="app-container" style="display:none;">
+        <div class="fixed-header-wrapper">
+            <div class="header"><div class="logo">Forsale AI</div></div>
+        </div>
+        
+        <div class="container" style="padding-top:80px;">
+            <h3 style="color:white; text-align:center;">اضغط شراء لتفعيل التطبيق</h3>
+            
+            <div class="product-card" onclick="buyTestItem()" style="background:rgba(255,255,255,0.1); padding:20px; border-radius:15px; margin:20px; text-align:center;">
+                <i class="fa-solid fa-gem" style="font-size:50px; color:#FFD700; margin-bottom:15px;"></i>
+                <h3 style="margin:10px 0;">منتج تفعيل (Test)</h3>
+                <p style="color:#00f2ff; font-size:24px; font-weight:bold;">1.0 Pi</p>
+                <button class="main-btn" style="background:#2ecc71; color:black;">شراء الآن</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // دالة لكتابة الرسائل على الشاشة
-        function log(msg, type = '') {
-            const logs = document.getElementById('logs');
-            const time = new Date().toLocaleTimeString();
-            logs.innerHTML = `<div class="log-line ${type}">[${time}] ${msg}</div>` + logs.innerHTML;
-        }
+        const API_BASE = "/api";
+        let currentUser = null;
 
-        // 1. التهيئة
-        try {
-            log("جاري تهيئة Pi SDK...");
-            // جربنا نشيل sandbox عشان نتأكد
-            Pi.init({ version: "2.0", sandbox: true });
-            log("✅ تم تهيئة SDK بنجاح.");
-        } catch (e) {
-            log("❌ خطأ في التهيئة: " + e, 'error');
-        }
-
-        // 2. الاتصال
-        async function startAuth() {
-            log("--- بدء محاولة الدخول ---");
-            
+        // 1. تسجيل الدخول
+        async function startLogin() {
             try {
                 const scopes = ['username', 'payments'];
+                const auth = await Pi.authenticate(scopes, onIncomplete);
+                currentUser = auth.user;
                 
-                log("⏳ جاري انتظار رد Pi Browser...");
-                
-                // عملنا خدعة: لو ماردش خلال 10 ثواني نطلع خطأ
-                const authPromise = Pi.authenticate(scopes, onIncomplete);
-                const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject("انتهى الوقت! المتصفح لا يستجيب."), 10000)
-                );
-
-                const auth = await Promise.race([authPromise, timeoutPromise]);
-
-                log("🎉 نجح الاتصال!", 'success');
-                log("المستخدم: " + auth.user.username, 'success');
-                log("Token: " + auth.accessToken.substring(0, 15) + "...", 'success');
-
+                alert("تم الدخول: " + currentUser.username);
+                document.getElementById('auth-container').style.display = 'none';
+                document.getElementById('app-container').style.display = 'block';
             } catch (err) {
-                log("❌ فشل: " + err, 'error');
-                log("تأكد أن الرابط مطابق تماماً لإعدادات المطورين.", 'error');
+                alert("خطأ في الدخول: " + err);
             }
         }
 
-        function onIncomplete(p) { log("عملية غير مكتملة: " + p.identifier); }
+        // 2. الشراء (عشان الخطوة 10)
+        async function buyTestItem() {
+            try {
+                const payment = await Pi.createPayment({
+                    amount: 1.0,
+                    memo: "تفعيل الخطوة 10 - Forsale AI",
+                    metadata: { test: true }
+                }, {
+                    onReadyForServerApproval: async (paymentId) => {
+                        // الموافقة
+                        await fetch(`${API_BASE}/approve`, {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ paymentId })
+                        });
+                    },
+                    onReadyForServerCompletion: async (paymentId, txid) => {
+                        alert("✅ مبروك! تمت العملية بنجاح.");
+                    },
+                    onCancel: () => alert("تم الإلغاء"),
+                    onError: (e) => alert("خطأ: " + e)
+                });
+            } catch (e) {
+                alert("خطأ: " + e);
+            }
+        }
+
+        function onIncomplete(p) { console.log(p); }
     </script>
 </body>
 </html>

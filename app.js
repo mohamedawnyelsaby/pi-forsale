@@ -1,6 +1,6 @@
 // ============================================
 // Forsale AI - Frontend Application
-// Pi Network Integration
+// Pi Network Integration (Updated)
 // ============================================
 
 const loadPiSDK = () => {
@@ -19,7 +19,7 @@ const loadPiSDK = () => {
 
 const API_BASE_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:3000/api'
-    : 'https://YOUR-BACKEND-URL.herokuapp.com/api';
+    : 'https://YOUR-BACKEND-URL.herokuapp.com/api'; // تأكد من تحديث هذا الرابط
 
 let piUser = null;
 let currentUser = null;
@@ -70,11 +70,13 @@ let PRODUCTS = [
     }
 ];
 
+// ============================================
+// Pi Network Functions
+// ============================================
+
 async function authenticateWithPi() {
     try {
         const Pi = await loadPiSDK();
-        // 🚨 ملاحظة هامة: يجب أن يتم تهيئة Pi.init هنا أو في الدالة عند التحميل
-        // Pi.init({ version: "2.0", sandbox: false });
         const scopes = ['username', 'payments'];
         const authResult = await Pi.authenticate(scopes, onIncompletePaymentFound);
         
@@ -91,12 +93,11 @@ async function authenticateWithPi() {
     } catch (error) {
         console.error('❌ Pi Authentication Error:', error);
         
-        // 💡 التعديل هنا: عرض رسالة الخطأ المفصلة
+        // 💡 التعديل #1: عرض سبب الخطأ في المصادقة
         let errorMessage = 'فشل تسجيل الدخول عبر Pi Network';
         if (error.message) {
             errorMessage += `\nالسبب: ${error.message}`;
         } else if (typeof error === 'object') {
-            // محاولة عرض كائن الخطأ كـ JSON في حال لم يكن له رسالة
             errorMessage += `\nالسبب (JSON): ${JSON.stringify(error, null, 2)}`;
         } else {
             errorMessage += `\nالسبب: ${error}`;
@@ -136,7 +137,7 @@ async function createPiPayment(amount, memo, metadata) {
             },
             onError: (error, payment) => {
                 console.error('Payment error:', error);
-                alert('حدث خطأ في عملية الدفع');
+                alert('حدث خطأ في عملية الدفع'); // قد نحتاج لطباعة هذا الخطأ لاحقاً
             }
         });
         
@@ -181,6 +182,47 @@ async function completePaymentOnServer(paymentId, txid) {
         console.error('Server completion error:', error);
     }
 }
+
+async function initiateCheckout() {
+    if (!currentUser) {
+        alert('يرجى تسجيل الدخول أولاً');
+        return;
+    }
+    
+    const product = window.currentProductForPurchase;
+    if (!product) return;
+    
+    try {
+        const payment = await createPiPayment(
+            product.price,
+            `Forsale AI - ${product.name}`,
+            {
+                productId: product.id,
+                productName: product.name,
+                buyerId: currentUser.uid
+            }
+        );
+        
+        console.log('Payment initiated:', payment);
+    } catch (error) {
+        console.error('❌ Checkout error:', error);
+        
+        // 💡 التعديل #2: عرض سبب الخطأ في عملية الشراء
+        let errorMessage = 'حدث خطأ في عملية الشراء';
+        if (error.message) {
+            errorMessage += `\nالسبب: ${error.message}`;
+        } else if (typeof error === 'object') {
+            errorMessage += `\nالسبب (JSON): ${JSON.stringify(error, null, 2)}`;
+        } else {
+            errorMessage += `\nالسبب: ${error}`;
+        }
+        alert(errorMessage);
+    }
+}
+
+// ============================================
+// UI/General Functions (No changes here)
+// ============================================
 
 function renderCategories() {
     const container = document.getElementById('level1-scroll');
@@ -256,33 +298,6 @@ function showDetailTab(tabId, el) {
     document.querySelectorAll('.detail-tab-item').forEach(i => i.classList.remove('active'));
     document.getElementById(`detail-${tabId}`).style.display = 'block';
     el.classList.add('active');
-}
-
-async function initiateCheckout() {
-    if (!currentUser) {
-        alert('يرجى تسجيل الدخول أولاً');
-        return;
-    }
-    
-    const product = window.currentProductForPurchase;
-    if (!product) return;
-    
-    try {
-        const payment = await createPiPayment(
-            product.price,
-            `Forsale AI - ${product.name}`,
-            {
-                productId: product.id,
-                productName: product.name,
-                buyerId: currentUser.uid
-            }
-        );
-        
-        console.log('Payment initiated:', payment);
-    } catch (error) {
-        console.error('Checkout error:', error);
-        alert('حدث خطأ في عملية الشراء');
-    }
 }
 
 function closeAllModals() {
@@ -414,9 +429,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         await loadPiSDK();
         
-        // 🚨 إضافة تهيئة Pi SDK هنا (إذا لم تكن موجودة بالفعل في مكان آخر)
-        // يوصى بوضعها هنا لضمان تهيئة المكتبة قبل محاولات المصادقة/الدفع
-        Pi.init({ version: "2.0", sandbox: false }); // استخدم sandbox: true إذا كنت تختبر
+        // تهيئة Pi SDK
+        Pi.init({ version: "2.0", sandbox: false }); // تأكد من القيمة: false للمين نت، true للساند بوكس
 
         console.log('✅ Pi SDK loaded and initialized');
     } catch (error) {

@@ -3,43 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Forsale AI</title>
-    <!-- ده السطر المهم اللي بيربطك بـ Pi -->
+    <title>Forsale AI - Pi Network</title>
+    
+    <!-- مكتبة Pi Network -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <script>Pi.init({ version: "2.0", sandbox: true });</script>
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- شاشة الدخول -->
+    <!-- شاشة تسجيل الدخول -->
     <div id="auth-container">
-        <div class="auth-logo"><span style="background:var(--accent);color:black;padding:2px 8px;border-radius:6px">AI</span> Forsale</div>
-        <p style="color:#aaa; text-align:center;">سجل دخولك لتبدأ البيع والشراء</p>
+        <div class="auth-logo">
+            <span style="background:var(--accent);color:black;padding:2px 8px;border-radius:6px">AI</span> Forsale
+        </div>
         <div class="auth-card">
-            <button class="main-btn pi-btn" id="login-btn">
-                <i class="fa-solid fa-network-wired"></i> تسجيل دخول Pi Network
+            <h2 style="margin-bottom:10px;">سوق المستقبل</h2>
+            <p style="color:#aaa; margin-bottom:20px;">سجل دخولك لتبدأ البيع والشراء</p>
+            
+            <!-- الزرار المعدل -->
+            <button class="main-btn pi-btn" onclick="handlePiLogin()">
+                <i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi
             </button>
         </div>
     </div>
 
-    <!-- شاشة التطبيق -->
+    <!-- شاشة التطبيق الرئيسية (مخفية في البداية) -->
     <div id="app-container" style="display:none;">
         <div class="fixed-header-wrapper">
             <div class="header">
                 <div class="content-wrapper">
-                    <div class="logo">Forsale AI</div>
-                    <div style="font-size:12px; color:#00f2ff;" id="username-display"></div>
+                    <div class="logo"><span class="ai-badge">AI</span> Forsale</div>
+                    <div id="user-welcome" style="font-size:12px; color:var(--accent);"></div>
                 </div>
             </div>
         </div>
-        
-        <div class="container" style="margin-top:80px;">
-            <h2 style="color:white;">المنتجات المتاحة</h2>
-            <div class="products-grid" id="products-grid">
-                <!-- المنتجات هتظهر هنا -->
+
+        <div class="container">
+            <div class="content-wrapper">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" placeholder="ابحث عن منتج...">
+                </div>
+                
+                <h3 style="color:white; margin:15px 0;">منتجات مميزة</h3>
+                <div class="products-grid" id="products-grid">
+                    <!-- المنتجات هتظهر هنا بالكود -->
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- مودال الشراء -->
+    <div id="checkoutModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:2000; align-items:center; justify-content:center; flex-direction:column;">
+        <div style="background:#1a2e44; padding:30px; border-radius:15px; text-align:center; width:90%; max-width:350px; border:1px solid rgba(255,255,255,0.1);">
+            <i class="fa-solid fa-cart-shopping" style="font-size:40px; color:#FFD700; margin-bottom:15px;"></i>
+            <h3 id="modal-title" style="color:white; margin:0;">منتج</h3>
+            <p id="modal-price" style="font-size:24px; color:#00f2ff; font-weight:bold; margin:15px 0;">0 Pi</p>
+            
+            <button class="main-btn" onclick="processPayment()" id="pay-btn">
+                تأكيد ودفع
+            </button>
+            <button class="main-btn" onclick="closeCheckout()" style="background:transparent; border:1px solid #555; margin-top:10px; color:#aaa;">
+                إلغاء
+            </button>
         </div>
     </div>
 

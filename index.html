@@ -3,80 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pi Debug Mode</title>
+    <title>Pi Connection Test</title>
     
-    <!-- تحميل مكتبة Pi -->
+    <!-- استدعاء المكتبة -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
     <style>
-        body { background-color: #0a1128; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-        .btn { 
-            background: #F8B62C; color: black; font-size: 18px; 
-            padding: 15px 30px; border: none; border-radius: 8px; 
-            width: 100%; margin-top: 20px; cursor: pointer; font-weight: bold;
+        body { background-color: #000; color: #0f0; font-family: monospace; padding: 20px; font-size: 16px; }
+        button { 
+            background: #fff; color: #000; font-size: 20px; padding: 15px; 
+            width: 100%; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 20px;
         }
-        #error-log { 
-            color: #ff5252; margin-top: 20px; font-size: 14px; 
-            border: 1px solid red; padding: 10px; display: none; text-align: left;
-        }
-        #success-log {
-            color: #2ecc71; margin-top: 20px; font-size: 16px; display: none;
-        }
+        #logs { border-top: 1px solid #333; padding-top: 10px; }
+        .log-line { margin-bottom: 5px; border-bottom: 1px dashed #333; padding-bottom: 2px; }
+        .error { color: #ff5252; }
+        .success { color: #ffff00; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h1>تجربة الاتصال</h1>
-    <p>اضغط أدناه لاختبار Pi Network</p>
+    <h1>تجربة بدون تنبيهات</h1>
+    <button onclick="startAuth()">🔴 اضغط هنا للاتصال</button>
 
-    <!-- زرار بسيط ومباشر -->
-    <button class="btn" onclick="startLogin()">🚀 تسجيل الدخول الآن</button>
-
-    <!-- مكان ظهور الأخطاء (عشان نعرف السبب) -->
-    <div id="success-log"></div>
-    <div id="error-log"></div>
+    <h3>سجل العمليات:</h3>
+    <div id="logs">...</div>
 
     <script>
-        // 1. تهيئة Pi SDK
-        try {
-            Pi.init({ version: "2.0", sandbox: true });
-        } catch (err) {
-            document.getElementById('error-log').style.display = 'block';
-            document.getElementById('error-log').innerHTML = "خطأ في تهيئة Pi: " + err;
+        // دالة لكتابة الرسائل على الشاشة
+        function log(msg, type = '') {
+            const logs = document.getElementById('logs');
+            const time = new Date().toLocaleTimeString();
+            logs.innerHTML = `<div class="log-line ${type}">[${time}] ${msg}</div>` + logs.innerHTML;
         }
 
-        // 2. دالة الدخول
-        async function startLogin() {
-            const errDiv = document.getElementById('error-log');
-            const succDiv = document.getElementById('success-log');
+        // 1. التهيئة
+        try {
+            log("جاري تهيئة Pi SDK...");
+            // جربنا نشيل sandbox عشان نتأكد
+            Pi.init({ version: "2.0", sandbox: true });
+            log("✅ تم تهيئة SDK بنجاح.");
+        } catch (e) {
+            log("❌ خطأ في التهيئة: " + e, 'error');
+        }
+
+        // 2. الاتصال
+        async function startAuth() {
+            log("--- بدء محاولة الدخول ---");
             
-            // تصفير الرسائل
-            errDiv.style.display = 'none';
-            errDiv.innerText = '';
-            succDiv.style.display = 'none';
-
             try {
-                // إظهار تنبيه إن الزرار اتداس
-                alert("جاري الاتصال بـ Pi... لو شوفت الرسالة دي يبقى الزرار شغال.");
-
-                // طلب الصلاحيات
                 const scopes = ['username', 'payments'];
-                const auth = await Pi.authenticate(scopes, onIncomplete);
+                
+                log("⏳ جاري انتظار رد Pi Browser...");
+                
+                // عملنا خدعة: لو ماردش خلال 10 ثواني نطلع خطأ
+                const authPromise = Pi.authenticate(scopes, onIncomplete);
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject("انتهى الوقت! المتصفح لا يستجيب."), 10000)
+                );
 
-                // لو نجح
-                succDiv.style.display = 'block';
-                succDiv.innerHTML = `✅ تم الدخول بنجاح!<br>المستخدم: <b>${auth.user.username}</b><br>Token: ${auth.accessToken.substring(0, 10)}...`;
-                alert("نجح الدخول!");
+                const auth = await Promise.race([authPromise, timeoutPromise]);
 
-            } catch (error) {
-                // لو فشل يظهر السبب
-                errDiv.style.display = 'block';
-                errDiv.innerText = "❌ حدث خطأ: " + JSON.stringify(error || "Unknown Error");
-                alert("فشل: " + error);
+                log("🎉 نجح الاتصال!", 'success');
+                log("المستخدم: " + auth.user.username, 'success');
+                log("Token: " + auth.accessToken.substring(0, 15) + "...", 'success');
+
+            } catch (err) {
+                log("❌ فشل: " + err, 'error');
+                log("تأكد أن الرابط مطابق تماماً لإعدادات المطورين.", 'error');
             }
         }
 
-        function onIncomplete(payment) { console.log(payment); }
+        function onIncomplete(p) { log("عملية غير مكتملة: " + p.identifier); }
     </script>
 </body>
 </html>

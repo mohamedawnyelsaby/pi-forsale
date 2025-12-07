@@ -2,93 +2,78 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Forsale AI</title>
-    
-    <!-- مكتبة Pi -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفعيل Pi Network</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <script>Pi.init({ version: "2.0", sandbox: true });</script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: #111; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        .btn { 
+            background: #F8B62C; color: black; font-size: 20px; font-weight: bold;
+            padding: 15px; width: 100%; border: none; border-radius: 10px; margin-top: 20px;
+        }
+        #status { margin-top: 20px; color: #00f2ff; }
+    </style>
 </head>
 <body>
 
-    <!-- شاشة الدخول -->
-    <div id="auth-container">
-        <div class="auth-logo">
-            <span style="background:#00f2ff;color:black;padding:2px 8px;border-radius:6px">AI</span> Forsale
-        </div>
-        <div class="auth-card">
-            <h2>سوق المستقبل</h2>
-            <p style="color:#aaa;">سجل دخولك لإتمام الخطوة رقم 10</p>
-            <button class="main-btn pi-btn" onclick="startLogin()">
-                <i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi
-            </button>
-        </div>
-    </div>
+    <h1>تفعيل الخطوة 10</h1>
+    <p id="status">اضغط على الزر للدخول...</p>
 
-    <!-- شاشة المنتجات -->
-    <div id="app-container" style="display:none;">
-        <div class="fixed-header-wrapper">
-            <div class="header"><div class="logo">Forsale AI</div></div>
-        </div>
-        
-        <div class="container" style="padding-top:80px;">
-            <h3 style="color:white; text-align:center;">اضغط شراء لتفعيل التطبيق</h3>
-            
-            <div class="product-card" onclick="buyTestItem()" style="background:rgba(255,255,255,0.1); padding:20px; border-radius:15px; margin:20px; text-align:center;">
-                <i class="fa-solid fa-gem" style="font-size:50px; color:#FFD700; margin-bottom:15px;"></i>
-                <h3 style="margin:10px 0;">منتج تفعيل (Test)</h3>
-                <p style="color:#00f2ff; font-size:24px; font-weight:bold;">1.0 Pi</p>
-                <button class="main-btn" style="background:#2ecc71; color:black;">شراء الآن</button>
-            </div>
-        </div>
-    </div>
+    <!-- زرار الدخول -->
+    <button id="loginBtn" class="btn" onclick="runLogin()">🔑 تسجيل الدخول</button>
+
+    <!-- زرار الدفع (هيظهر بعد الدخول) -->
+    <button id="payBtn" class="btn" onclick="runPayment()" style="display:none; background:#2ecc71;">💸 دفع 1 Pi (تست)</button>
 
     <script>
-        const API_BASE = "/api";
-        let currentUser = null;
+        // 1. تهيئة SDK
+        try {
+            Pi.init({ version: "2.0", sandbox: true });
+        } catch (e) { alert("خطأ في التهيئة: " + e); }
 
-        // 1. تسجيل الدخول
-        async function startLogin() {
+        // 2. دالة الدخول
+        async function runLogin() {
+            document.getElementById('status').innerText = "جاري الاتصال...";
             try {
                 const scopes = ['username', 'payments'];
                 const auth = await Pi.authenticate(scopes, onIncomplete);
-                currentUser = auth.user;
                 
-                alert("تم الدخول: " + currentUser.username);
-                document.getElementById('auth-container').style.display = 'none';
-                document.getElementById('app-container').style.display = 'block';
+                // نجح الدخول
+                document.getElementById('status').innerText = "أهلاً: " + auth.user.username;
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('payBtn').style.display = 'block'; // إظهار زر الدفع
+                alert("تم الدخول بنجاح! اضغط الآن على زر الدفع.");
+
             } catch (err) {
-                alert("خطأ في الدخول: " + err);
+                alert("فشل الدخول: " + err);
+                document.getElementById('status').innerText = "حاول مرة أخرى";
             }
         }
 
-        // 2. الشراء (عشان الخطوة 10)
-        async function buyTestItem() {
+        // 3. دالة الدفع (للخطوة 10)
+        async function runPayment() {
             try {
                 const payment = await Pi.createPayment({
-                    amount: 1.0,
-                    memo: "تفعيل الخطوة 10 - Forsale AI",
+                    amount: 1,
+                    memo: "تفعيل الخطوة 10",
                     metadata: { test: true }
                 }, {
                     onReadyForServerApproval: async (paymentId) => {
-                        // الموافقة
-                        await fetch(`${API_BASE}/approve`, {
+                        // طلب الموافقة من السيرفر بتاعنا
+                        await fetch('/api/approve', {
                             method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ paymentId })
                         });
                     },
                     onReadyForServerCompletion: async (paymentId, txid) => {
-                        alert("✅ مبروك! تمت العملية بنجاح.");
+                        alert("✅ مبروك! تمت العملية واكتملت الخطوة 10.");
                     },
                     onCancel: () => alert("تم الإلغاء"),
                     onError: (e) => alert("خطأ: " + e)
                 });
             } catch (e) {
-                alert("خطأ: " + e);
+                alert("خطأ في الدفع: " + e);
             }
         }
 

@@ -2,76 +2,81 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Forsale AI - Pi Network</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pi Debug Mode</title>
     
-    <!-- مكتبة Pi Network -->
+    <!-- تحميل مكتبة Pi -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <script>Pi.init({ version: "2.0", sandbox: true });</script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background-color: #0a1128; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        .btn { 
+            background: #F8B62C; color: black; font-size: 18px; 
+            padding: 15px 30px; border: none; border-radius: 8px; 
+            width: 100%; margin-top: 20px; cursor: pointer; font-weight: bold;
+        }
+        #error-log { 
+            color: #ff5252; margin-top: 20px; font-size: 14px; 
+            border: 1px solid red; padding: 10px; display: none; text-align: left;
+        }
+        #success-log {
+            color: #2ecc71; margin-top: 20px; font-size: 16px; display: none;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- شاشة تسجيل الدخول -->
-    <div id="auth-container">
-        <div class="auth-logo">
-            <span style="background:var(--accent);color:black;padding:2px 8px;border-radius:6px">AI</span> Forsale
-        </div>
-        <div class="auth-card">
-            <h2 style="margin-bottom:10px;">سوق المستقبل</h2>
-            <p style="color:#aaa; margin-bottom:20px;">سجل دخولك لتبدأ البيع والشراء</p>
+    <h1>تجربة الاتصال</h1>
+    <p>اضغط أدناه لاختبار Pi Network</p>
+
+    <!-- زرار بسيط ومباشر -->
+    <button class="btn" onclick="startLogin()">🚀 تسجيل الدخول الآن</button>
+
+    <!-- مكان ظهور الأخطاء (عشان نعرف السبب) -->
+    <div id="success-log"></div>
+    <div id="error-log"></div>
+
+    <script>
+        // 1. تهيئة Pi SDK
+        try {
+            Pi.init({ version: "2.0", sandbox: true });
+        } catch (err) {
+            document.getElementById('error-log').style.display = 'block';
+            document.getElementById('error-log').innerHTML = "خطأ في تهيئة Pi: " + err;
+        }
+
+        // 2. دالة الدخول
+        async function startLogin() {
+            const errDiv = document.getElementById('error-log');
+            const succDiv = document.getElementById('success-log');
             
-            <!-- الزرار المعدل -->
-            <button class="main-btn pi-btn" onclick="handlePiLogin()">
-                <i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi
-            </button>
-        </div>
-    </div>
+            // تصفير الرسائل
+            errDiv.style.display = 'none';
+            errDiv.innerText = '';
+            succDiv.style.display = 'none';
 
-    <!-- شاشة التطبيق الرئيسية (مخفية في البداية) -->
-    <div id="app-container" style="display:none;">
-        <div class="fixed-header-wrapper">
-            <div class="header">
-                <div class="content-wrapper">
-                    <div class="logo"><span class="ai-badge">AI</span> Forsale</div>
-                    <div id="user-welcome" style="font-size:12px; color:var(--accent);"></div>
-                </div>
-            </div>
-        </div>
+            try {
+                // إظهار تنبيه إن الزرار اتداس
+                alert("جاري الاتصال بـ Pi... لو شوفت الرسالة دي يبقى الزرار شغال.");
 
-        <div class="container">
-            <div class="content-wrapper">
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                    <input type="text" placeholder="ابحث عن منتج...">
-                </div>
-                
-                <h3 style="color:white; margin:15px 0;">منتجات مميزة</h3>
-                <div class="products-grid" id="products-grid">
-                    <!-- المنتجات هتظهر هنا بالكود -->
-                </div>
-            </div>
-        </div>
-    </div>
+                // طلب الصلاحيات
+                const scopes = ['username', 'payments'];
+                const auth = await Pi.authenticate(scopes, onIncomplete);
 
-    <!-- مودال الشراء -->
-    <div id="checkoutModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:2000; align-items:center; justify-content:center; flex-direction:column;">
-        <div style="background:#1a2e44; padding:30px; border-radius:15px; text-align:center; width:90%; max-width:350px; border:1px solid rgba(255,255,255,0.1);">
-            <i class="fa-solid fa-cart-shopping" style="font-size:40px; color:#FFD700; margin-bottom:15px;"></i>
-            <h3 id="modal-title" style="color:white; margin:0;">منتج</h3>
-            <p id="modal-price" style="font-size:24px; color:#00f2ff; font-weight:bold; margin:15px 0;">0 Pi</p>
-            
-            <button class="main-btn" onclick="processPayment()" id="pay-btn">
-                تأكيد ودفع
-            </button>
-            <button class="main-btn" onclick="closeCheckout()" style="background:transparent; border:1px solid #555; margin-top:10px; color:#aaa;">
-                إلغاء
-            </button>
-        </div>
-    </div>
+                // لو نجح
+                succDiv.style.display = 'block';
+                succDiv.innerHTML = `✅ تم الدخول بنجاح!<br>المستخدم: <b>${auth.user.username}</b><br>Token: ${auth.accessToken.substring(0, 10)}...`;
+                alert("نجح الدخول!");
 
-    <script src="script.js"></script>
+            } catch (error) {
+                // لو فشل يظهر السبب
+                errDiv.style.display = 'block';
+                errDiv.innerText = "❌ حدث خطأ: " + JSON.stringify(error || "Unknown Error");
+                alert("فشل: " + error);
+            }
+        }
+
+        function onIncomplete(payment) { console.log(payment); }
+    </script>
 </body>
 </html>

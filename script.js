@@ -1,8 +1,9 @@
-// الدالة المسؤولة عن معالجة الدفع العالق (استبدالها بهذا الكود)
+// في ملف script.js
+
 function onIncompletePaymentFound(payment) {
     console.log("Incomplete Payment Found:", payment);
     
-    // الحل: محاولة إنشاء الدفع مرة أخرى (Pi.createPayment) باستخدام كائن الدفع العالق
+    // الحل: محاولة إنشاء الدفع مرة أخرى باستخدام كائن الدفع العالق
     return Pi.createPayment(payment, {
         onReadyForServerApproval: (paymentId) => { 
             // 🚨 استخدام fetch بدلاً من axios

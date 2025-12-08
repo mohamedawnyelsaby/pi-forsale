@@ -8,7 +8,6 @@
     <!-- مكتبة Pi -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
-    <!-- التنسيقات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -21,9 +20,10 @@
         </div>
         <div class="auth-card">
             <h2 style="margin-bottom:20px;">سوق المستقبل</h2>
-            <p style="color:#aaa;">تم تأكيد الاتصال بنجاح ✅</p>
+            <p style="color:#aaa;">تم دمج الكود لضمان التشغيل ✅</p>
             
-            <button class="main-btn pi-btn" onclick="handlePiLogin()">
+            <!-- الزرار -->
+            <button id="mainLoginBtn" class="main-btn pi-btn" onclick="startSystem()">
                 <i class="fa-solid fa-network-wired"></i> دخول وشراء (تفعيل)
             </button>
         </div>
@@ -44,7 +44,7 @@
             <div class="content-wrapper">
                 <h3 style="color:white; margin:20px 0;">اضغط للشراء (الخطوة 10)</h3>
                 
-                <div class="product-card" onclick="startPayment()" style="background:rgba(255,255,255,0.08); padding:20px; border-radius:15px; border:1px solid rgba(255,255,255,0.1); text-align:center;">
+                <div class="product-card" onclick="processPurchase()" style="background:rgba(255,255,255,0.08); padding:20px; border-radius:15px; border:1px solid rgba(255,255,255,0.1); text-align:center;">
                     <i class="fa-solid fa-gem" style="font-size:50px; color:#FFD700; margin-bottom:15px;"></i>
                     <h3>باقة التفعيل</h3>
                     <p style="color:#00f2ff; font-weight:bold; font-size:20px;">1.0 Test-Pi</p>
@@ -54,7 +54,66 @@
         </div>
     </div>
 
-    <!-- ربط ملف السكريبت -->
-    <script src="script.js"></script>
+    <!-- كود التشغيل (مدمج هنا عشان يشتغل غصب عنه) -->
+    <script>
+        // 1. التهيئة الفورية
+        try {
+            Pi.init({ version: "2.0", sandbox: true });
+            console.log("Pi SDK Initialized inside HTML");
+        } catch (e) {
+            alert("خطأ في مكتبة Pi: " + e);
+        }
+
+        // 2. دالة الدخول
+        async function startSystem() {
+            // رسالة اختبار الزرار
+            alert("1. تم ضغط الزر.. جاري استدعاء Pi SDK");
+
+            try {
+                const scopes = ['username', 'payments'];
+                const auth = await Pi.authenticate(scopes, onIncomplete);
+                
+                // لو وصلنا هنا يبقى الدخول نجح
+                alert("2. تم الدخول بنجاح! المستخدم: " + auth.user.username);
+                
+                // تحويل الشاشة
+                document.getElementById('auth-container').style.display = 'none';
+                document.getElementById('app-container').style.display = 'block';
+                document.getElementById('username-display').innerText = auth.user.username;
+
+            } catch (err) {
+                alert("فشل الدخول: " + err);
+            }
+        }
+
+        // 3. دالة الشراء
+        async function processPurchase() {
+            try {
+                const payment = await Pi.createPayment({
+                    amount: 1,
+                    memo: "تفعيل المتجر - Forsale AI",
+                    metadata: { type: "test" }
+                }, {
+                    onReadyForServerApproval: async (paymentId) => {
+                        alert("جاري الموافقة...");
+                        await fetch('/api/approve', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ paymentId })
+                        });
+                    },
+                    onReadyForServerCompletion: async (paymentId, txid) => {
+                        alert("✅ مبروك! تمت العملية بنجاح.");
+                    },
+                    onCancel: () => alert("تم الإلغاء"),
+                    onError: (e) => alert("خطأ: " + e)
+                });
+            } catch (e) {
+                alert("خطأ: " + e);
+            }
+        }
+
+        function onIncomplete(p) { console.log(p); }
+    </script>
 </body>
 </html>

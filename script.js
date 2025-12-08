@@ -1,72 +1,74 @@
 const API_BASE = "/api";
 let currentUser = null;
 
-// تشغيل التطبيق
 document.addEventListener('DOMContentLoaded', () => {
-    // محاولة تعريف Pi SDK
     try {
         Pi.init({ version: "2.0", sandbox: true });
-    } catch (err) {
-        console.error("Pi SDK Error:", err);
-    }
+    } catch (err) { console.error(err); }
 });
 
-// 1. دالة تسجيل الدخول (لزرار الدخول)
 async function handlePiLogin() {
     try {
         const scopes = ['username', 'payments'];
-        const auth = await Pi.authenticate(scopes, onIncomplete);
+        // دالة onIncomplete هي اللي هتحل المشكلة دي
+        const auth = await Pi.authenticate(scopes, onIncompletePayment);
         
         currentUser = auth.user;
-        
-        // إخفاء شاشة الدخول وإظهار التطبيق
         document.getElementById('auth-container').style.display = 'none';
         document.getElementById('app-container').style.display = 'block';
-        
-        // رسالة ترحيب
-        alert(`أهلاً بك يا ${currentUser.username} في Forsale AI`);
+        alert(`أهلاً بك يا ${currentUser.username}`);
         
     } catch (err) {
-        alert("فشل الدخول: تأكد أنك تستخدم Pi Browser.");
+        alert("فشل الدخول: " + err);
     }
 }
 
-// 2. دالة الشراء (لزرار الشراء)
+// دي الدالة السحرية اللي بتعالج العمليات العالقة
+function onIncompletePayment(payment) {
+    console.log("Found incomplete payment:", payment);
+    
+    // محاولة إكمالها في السيرفر (لو كانت مدفوعة)
+    fetch('/api/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: payment.identifier })
+    }).then(() => {
+        alert("تم معالجة عملية عالقة سابقة بنجاح ✅");
+    }).catch((e) => {
+        console.log("Error handling incomplete:", e);
+    });
+}
+
 async function startPayment() {
-    if (!currentUser) {
-        alert("يجب تسجيل الدخول أولاً!");
-        return;
-    }
+    if (!currentUser) return alert("سجل الدخول أولاً");
 
     try {
         const payment = await Pi.createPayment({
-            amount: 1, // سعر المنتج (تست)
-            memo: "شراء منتج تجريبي - Forsale AI", 
-            metadata: { type: "test_product" }
+            amount: 1,
+            memo: "شراء منتج - Forsale AI",
+            metadata: { type: "test" }
         }, {
-            // Callback: الموافقة
             onReadyForServerApproval: async (paymentId) => {
-                alert("جاري الاتصال بالسيرفر للموافقة...");
-                const response = await fetch('/api/approve', {
+                await fetch('/api/approve', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ paymentId })
                 });
-                
-                if (!response.ok) throw new Error("فشل الموافقة من السيرفر");
             },
-            // Callback: النجاح
             onReadyForServerCompletion: async (paymentId, txid) => {
-                alert("✅ تم الدفع بنجاح! شكراً لشرائك.");
+                alert("✅ تم الدفع بنجاح!");
             },
-            // Callback: الإلغاء
-            onCancel: () => alert("تم إلغاء العملية."),
-            // Callback: الخطأ
-            onError: (err) => alert("حدث خطأ: " + err)
+            onCancel: () => alert("تم الإلغاء"),
+            onError: (err) => {
+                // لو الخطأ هو "pending payment"، نقول للمستخدم الحل
+                if (JSON.stringify(err).includes("pending payment")) {
+                    alert("⚠️ هناك عملية دفع سابقة لم تكتمل. قم بتحديث الصفحة وانتظر قليلاً.");
+                } else {
+                    alert("خطأ: " + err);
+                }
+            }
         });
     } catch (err) {
-        alert("خطأ في بدء الدفع: " + err);
+        alert("خطأ: " + err);
     }
 }
-
-function onIncomplete(payment) { console.log(payment); }

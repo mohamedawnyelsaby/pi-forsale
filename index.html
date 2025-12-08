@@ -2,73 +2,59 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pi Network Live</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Forsale AI</title>
+    
+    <!-- مكتبة Pi -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <style>
-        body { background: #000; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-        .btn { 
-            background: #F8B62C; color: black; font-size: 20px; font-weight: bold;
-            padding: 15px; width: 100%; border: none; border-radius: 10px; margin-top: 20px;
-            display: none; cursor: pointer;
-        }
-        #status { margin-top: 20px; color: #00f2ff; font-size: 18px; }
-        .error { color: #ff4444; font-size: 14px; margin-top: 10px; border: 1px solid #ff4444; padding: 10px; display: none; }
-    </style>
+
+    <!-- التنسيقات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1>الاتصال المباشر (Live)</h1>
-    <p id="status">جاري تهيئة Pi Network...</p>
+    <!-- شاشة تسجيل الدخول -->
+    <div id="auth-container">
+        <div class="auth-logo">
+            <span style="background:#00f2ff;color:black;padding:2px 8px;border-radius:6px">AI</span> Forsale
+        </div>
+        <div class="auth-card">
+            <h2 style="margin-bottom:20px;">سوق المستقبل</h2>
+            <p style="color:#aaa;">تم تأكيد الاتصال بنجاح ✅</p>
+            
+            <button class="main-btn pi-btn" onclick="handlePiLogin()">
+                <i class="fa-solid fa-network-wired"></i> دخول وشراء (تفعيل)
+            </button>
+        </div>
+    </div>
 
-    <button id="loginBtn" class="btn" onclick="startLogin()">🔗 ربط المحفظة الآن</button>
-    <div id="error-box" class="error"></div>
+    <!-- شاشة التطبيق -->
+    <div id="app-container" style="display:none;">
+        <div class="fixed-header-wrapper">
+            <div class="header">
+                <div class="content-wrapper">
+                    <div class="logo"><span class="ai-badge">AI</span> Forsale</div>
+                    <div id="username-display" style="font-size:12px; color:#00f2ff;"></div>
+                </div>
+            </div>
+        </div>
 
-    <script>
-        // 1. التهيئة (إلغاء وضع الساندبوكس)
-        document.addEventListener("DOMContentLoaded", () => {
-            try {
-                // التغيير هنا: sandbox: false
-                Pi.init({ version: "2.0", sandbox: false });
+        <div class="container">
+            <div class="content-wrapper">
+                <h3 style="color:white; margin:20px 0;">اضغط للشراء (الخطوة 10)</h3>
                 
-                document.getElementById('status').innerText = "✅ النظام جاهز. اضغط للربط.";
-                document.getElementById('loginBtn').style.display = "block";
-            } catch (err) {
-                showError("فشل التهيئة: " + err);
-            }
-        });
+                <div class="product-card" onclick="startPayment()" style="background:rgba(255,255,255,0.08); padding:20px; border-radius:15px; border:1px solid rgba(255,255,255,0.1); text-align:center;">
+                    <i class="fa-solid fa-gem" style="font-size:50px; color:#FFD700; margin-bottom:15px;"></i>
+                    <h3>باقة التفعيل</h3>
+                    <p style="color:#00f2ff; font-weight:bold; font-size:20px;">1.0 Test-Pi</p>
+                    <button class="main-btn" style="margin-top:15px; background:#2ecc71; color:black;">شراء الآن</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // 2. الدخول
-        async function startLogin() {
-            const btn = document.getElementById('loginBtn');
-            btn.innerHTML = "⏳ جاري الاتصال...";
-            btn.disabled = true;
-
-            try {
-                const scopes = ['username', 'payments'];
-                const auth = await Pi.authenticate(scopes, onIncomplete);
-                
-                // نجاح
-                document.getElementById('status').innerText = "🎉 تم الربط: " + auth.user.username;
-                document.getElementById('status').style.color = "#00c851";
-                btn.innerHTML = "تم بنجاح ✔️";
-                alert("نجح الاتصال أخيراً!");
-
-            } catch (err) {
-                // فشل
-                btn.innerHTML = "❌ فشل - حاول مرة أخرى";
-                btn.disabled = false;
-                showError("خطأ في المصادقة: " + err);
-            }
-        }
-
-        function onIncomplete(p) { console.log(p); }
-
-        function showError(msg) {
-            const box = document.getElementById('error-box');
-            box.style.display = "block";
-            box.innerText = msg;
-        }
-    </script>
+    <!-- ربط ملف السكريبت -->
+    <script src="script.js"></script>
 </body>
 </html>

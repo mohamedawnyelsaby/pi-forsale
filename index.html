@@ -3,86 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إصلاح نهائي</title>
+    <title>إتمام الدفع</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <script>try{Pi.init({version:"2.0",sandbox:false})}catch(e){}</script>
     <style>
         body { background: #000; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-        .btn { padding: 15px; width: 100%; border-radius: 10px; border: none; font-size: 18px; margin-top: 20px; cursor: pointer; }
-        .red { background: #ff4444; color: white; }
-        .green { background: #00c851; color: white; display: none; }
-        #log { font-size: 12px; color: #aaa; margin-top: 20px; text-align: left; border: 1px solid #333; padding: 10px; }
+        .btn { padding: 20px; width: 100%; border-radius: 10px; border: none; font-size: 20px; margin-top: 20px; cursor: pointer; font-weight: bold; }
+        .green { background: #00c851; color: white; }
+        .blue { background: #00f2ff; color: black; margin-bottom: 20px;}
     </style>
 </head>
 <body>
 
-    <h1>🔧 وضع الإصلاح المباشر</h1>
-    <p>تم إلغاء وضع التجربة لضمان الاتصال.</p>
+    <h1>الخطوة النهائية (10)</h1>
+    <p>حسابك نظيف وجاهز. اضغط للشراء مباشرة.</p>
 
-    <button class="btn red" onclick="startFix()">⚡ اضغط هنا للإصلاح</button>
-    <button class="btn green" id="buyBtn" onclick="buy()">🛒 شراء الآن</button>
+    <!-- زرار الشراء (ظاهر دائماً) -->
+    <button class="btn green" onclick="buy()">🛒 شراء 1 Pi (إتمام المهمة)</button>
 
-    <div id="log">Logs...</div>
+    <br><br>
+    <p style="font-size:12px; color:#aaa;">لو واجهت مشكلة، اضغط هنا لتسجيل الدخول أولاً:</p>
+    <button class="btn blue" onclick="login()">🔑 تسجيل الدخول (تحديث)</button>
 
     <script>
-        function log(msg) { document.getElementById('log').innerHTML += "<br>" + msg; }
-
-        // 1. التهيئة (الوضع الحقيقي)
-        try {
-            // التغيير هنا: sandbox: false
-            Pi.init({ version: "2.0", sandbox: false });
-            log("SDK Initialized (Production Mode)");
-        } catch (e) { log("Init Error: " + e); }
-
-        // 2. الإصلاح
-        async function startFix() {
-            log("جاري الاتصال بـ Pi...");
-            
+        // 1. دالة الشراء المباشرة
+        async function buy() {
             try {
-                // طلب المصادقة
-                const auth = await Pi.authenticate(['username', 'payments'], onIncompletePayment);
-                log("تم الاتصال بالمستخدم: " + auth.user.username);
-                
-                // لو وصلنا هنا ومفيش دالة اشتغلت، يبقى الحساب نضيف
-                alert("✅ حسابك سليم وجاهز! الزرار الأخضر ظهر.");
-                document.getElementById('buyBtn').style.display = 'block';
-
-            } catch (err) {
-                log("خطأ في الاتصال: " + err);
-                alert("فشل: " + err);
+                // محاولة الشراء
+                const payment = await Pi.createPayment({
+                    amount: 1, 
+                    memo: "Step 10 Completion", 
+                    metadata: { type: "test" }
+                }, {
+                    onReadyForServerApproval: (pid) => {
+                        // إرسال الموافقة للسيرفر
+                        fetch('/api/approve', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ paymentId: pid })
+                        });
+                    },
+                    onReadyForServerCompletion: (pid, txid) => { 
+                        alert("🎉 مبروك! تمت العملية بنجاح. اذهب لـ Pi Portal وتأكد."); 
+                    },
+                    onCancel: () => alert("تم الإلغاء"),
+                    onError: (e) => {
+                        alert("خطأ: " + e);
+                        // لو قالك سجل دخول، دوس على الزرار الأزرق
+                    }
+                });
+            } catch (e) { 
+                alert("يجب تسجيل الدخول أولاً (اضغط الزر الأزرق)"); 
             }
         }
 
-        // 3. دالة الحذف
-        function onIncompletePayment(payment) {
-            log("تم كشف عملية عالقة: " + payment.identifier);
-            alert("⚠️ جاري حذف العملية العالقة...");
-            
-            fetch('/api/approve', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ paymentId: payment.identifier })
-            }).then(res => res.json()).then(data => {
-                log("تم الحذف: " + data.message);
-                alert("✅ تم التنظيف! (قم بتحديث الصفحة)");
-                location.reload();
-            }).catch(e => log("خطأ سيرفر: " + e));
-        }
-
-        // 4. الشراء
-        async function buy() {
+        // 2. دالة تسجيل الدخول (لو طلبها)
+        async function login() {
             try {
-                await Pi.createPayment({
-                    amount: 1, memo: "Final Test", metadata: {test:true}
-                }, {
-                    onReadyForServerApproval: (pid) => {
-                        fetch('/api/approve', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId:pid})});
-                    },
-                    onReadyForServerCompletion: (pid, txid) => { alert("مبروك! تم الدفع."); },
-                    onCancel: () => alert("إلغاء"),
-                    onError: (e) => alert("خطأ: " + e)
-                });
-            } catch (e) { alert(e); }
-        }
-    </script>
-</body>
-</html>
+                await Pi.authe

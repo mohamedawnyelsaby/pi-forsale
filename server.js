@@ -1,5 +1,5 @@
 // ===============================================
-// server.js - Global Backend Code (Arabic & English)
+// server.js - Global Backend Code 
 // ===============================================
 
 const express = require('express');
@@ -20,9 +20,8 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'MOCK_GEMINI_KEY';
 const PI_API_URL = 'https://api.minepi.com'; 
 
 const DB_PATH = path.join(__dirname, 'db.json');
-// 🚨 مفتاح التحقق من الـ Webhook (يجب استبداله بالمفتاح الخاص بك)
-const WEBHOOK_VALIDATION_KEY = "f4b7067baebc91e85f31794ff320c6720a0fcf3f3f0912ac69a59933a1dd160feded8cab1dbffd4eb9de8752bfa7d4bf8ecbf23b7165fb43c8cfe2d4aacfe1d7"; 
-// ^^^ تم استخراجه من الملف validation-key.txt
+// 🚨 مفتاح التحقق من الـ Webhook (مأخوذ من الملف validation-key.txt)
+const WEBHOOK_VALIDATION_KEY = "f4b7067baebc91e85f31794ff320c6720a0fcf3f3f0912ac69a59933a1dd160feded8cab1dbffd4eb9de8752bfa7d4bf8ecbf23b7165fb43c8cfe2d4aacfe1d7";
 
 /** Reads data from the local JSON file. (Not for Production on Vercel) */
 function readDB() {
@@ -42,6 +41,7 @@ function writeDB(data) {
 
 // ----------------------------------------------------
 // 🚨 🔑 الخطوة 10: التحقق من صحة Webhook (GET Request)
+// يتم استدعاؤها مرة واحدة عند تفعيل الـ Webhook
 // ----------------------------------------------------
 app.get('/api/payments/webhook', (req, res) => {
     console.log("🚀 Webhook Validation Request Received.");
@@ -50,6 +50,7 @@ app.get('/api/payments/webhook', (req, res) => {
 });
 
 // 🚨 WEBHOOK LISTENER: Pi Network will call this endpoint (POST Request)
+// يتم استدعاؤها كلما تغيرت حالة الدفع
 app.post('/api/payments/webhook', (req, res) => {
     const data = req.body;
     console.log(`📡 Webhook Received: Status ${data.status} for Payment ${data.identifier}`);
@@ -76,14 +77,11 @@ app.post('/api/payments/webhook', (req, res) => {
 app.post('/api/payments/approve', async (req, res) => {
     const { paymentId, orderId } = req.body;
     const db = readDB();
-    // ملاحظة: يجب أن يرسل الـ Frontend الـ orderId في مرحلة لاحقة لتحديد الطلب.
-    // بما أننا في وضع Mock، سنبحث عن الطلب بناءً على orderId (إن وجد)
     const order = db.orders.find(o => o.id === orderId);
 
     if (!order) {
-		// في وضع التجربة، قد لا نجد orderId مباشرة هنا، لذا ننشئ طلبًا وهميًا
+		// في وضع التجربة، قد ننشئ طلبًا وهميًا لربطه بالدفع العالق
 		if (PI_API_KEY === 'MOCK_PI_KEY') {
-			// محاكاة إنشاء طلب جديد للدفع العالق
 			const newOrderId = 'ORDER_PENDING_' + Date.now();
 			db.orders.push({ 
 				id: newOrderId, 
@@ -101,7 +99,6 @@ app.post('/api/payments/approve', async (req, res) => {
                 return res.json({ success: true, message: 'Simulated approval in MOCK mode (New Order Created)' });
             }
 		}
-		// إذا لم يكن وضع Mock ولم نجد طلبًا
 		return res.status(404).json({ error: 'Order not found' });
 	}
     
@@ -157,7 +154,6 @@ app.post('/api/payments/complete', async (req, res) => {
 
 // AI analyzes product data and lists it automatically
 app.post('/api/ai/analyze', async (req, res) => {
-    // ... (بقية كود AI Analyze) ...
     const { description, files } = req.body;
     
     if (GEMINI_API_KEY === 'MOCK_GEMINI_KEY') {
@@ -188,7 +184,6 @@ app.post('/api/ai/analyze', async (req, res) => {
 
 // Logy AI Chatbot interaction
 app.post('/api/ai/chat', async (req, res) => {
-    // ... (بقية كود AI Chat) ...
     const { message } = req.body;
     
     if (GEMINI_API_KEY === 'MOCK_GEMINI_KEY') {

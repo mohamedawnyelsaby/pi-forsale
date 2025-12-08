@@ -1,20 +1,24 @@
-// ... (داخل دالة handlePiLogin أو حيث تستدعي Pi.authenticate)
-const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
-// ...
-
-// الدالة المسؤولة عن معالجة الدفع العالق
+// الدالة المسؤولة عن معالجة الدفع العالق (استبدالها بهذا الكود)
 function onIncompletePaymentFound(payment) {
     console.log("Incomplete Payment Found:", payment);
     
     // الحل: محاولة إنشاء الدفع مرة أخرى (Pi.createPayment) باستخدام كائن الدفع العالق
     return Pi.createPayment(payment, {
         onReadyForServerApproval: (paymentId) => { 
-            // logic to call your server's /payments/approve endpoint
-            axios.post(`${API_BASE_URL}/payments/approve`, { paymentId });
+            // 🚨 استخدام fetch بدلاً من axios
+            fetch(`${API_BASE_URL}/payments/approve`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paymentId })
+            }).then(res => res.json()).then(data => console.log("Incomplete Approved:", data));
         },
         onReadyForServerCompletion: (paymentId, txid) => { 
-            // logic to call your server's /payments/complete endpoint
-            axios.post(`${API_BASE_URL}/payments/complete`, { paymentId, txid });
+            // 🚨 استخدام fetch بدلاً من axios
+            fetch(`${API_BASE_URL}/payments/complete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paymentId, txid })
+            }).then(res => res.json()).then(data => console.log("Incomplete Completed:", data));
         },
         onCancel: (paymentId) => { console.log("Cancelled Incomplete Payment", paymentId); },
         onError: (error, payment) => { console.error("Error on Incomplete Payment", error); }

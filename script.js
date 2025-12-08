@@ -1,76 +1,65 @@
 const API_BASE = "/api";
 let currentUser = null;
 
-// 1. التشغيل
+// 1. التهيئة (نفس الطريقة اللي نجحت)
 document.addEventListener('DOMContentLoaded', () => {
     try {
-        // بنشيل sandbox عشان نكون في الوضع الصارم
+        // بنستخدم sandbox: true عشان ده رصيد وهمي (Testnet)
+        // لو واجهت مشكلة غيرها لـ false زي المرة اللي فاتت
         Pi.init({ version: "2.0", sandbox: true });
-        // بننادي على الدخول فوراً عشان نكتشف الأخطاء
-        handlePiLogin();
-    } catch (e) { console.error(e); }
+        console.log("Pi SDK Initialized");
+    } catch (err) {
+        console.error(err);
+    }
 });
 
-// 2. دالة الدخول واكتشاف الأخطاء
+// 2. الدخول
 async function handlePiLogin() {
     try {
         const scopes = ['username', 'payments'];
-        
-        // onIncompletePayment: دي الدالة اللي هتمسك العملية المحشورة
-        const auth = await Pi.authenticate(scopes, onIncompletePayment);
+        const auth = await Pi.authenticate(scopes, onIncomplete);
         
         currentUser = auth.user;
+        
+        // إظهار التطبيق
         document.getElementById('auth-container').style.display = 'none';
         document.getElementById('app-container').style.display = 'block';
-        document.getElementById('username-display').innerText = auth.user.username;
+        document.getElementById('username-display').innerText = "أهلاً: " + auth.user.username;
         
+        alert("تم الدخول! اضغط الآن على زر الشراء.");
+
     } catch (err) {
-        console.log("Login check done.");
+        alert("فشل الدخول: " + err);
     }
 }
 
-// 3. دالة التنظيف (هتشتغل لوحدها لو فيه مشكلة)
-function onIncompletePayment(payment) {
-    // إظهار تنبيه للمستخدم
-    alert(`⚠️ تم كشف عملية عالقة! جاري حذفها الآن... ID: ${payment.identifier}`);
-    
-    // إرسالها للسيرفر للإلغاء
-    fetch('/api/approve', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId: payment.identifier })
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert("✅ تم تنظيف العملية بنجاح! جرب الشراء الآن.");
-        // إعادة تحميل الصفحة عشان نبدأ على نضيف
-        location.reload(); 
-    })
-    .catch(e => alert("فشل التنظيف: " + e));
-}
-
-// 4. دالة الشراء الجديدة
+// 3. الشراء (عشان الخطوة 10)
 async function startPayment() {
-    if (!currentUser) return alert("انتظر تحميل البيانات...");
+    if (!currentUser) return alert("يجب تسجيل الدخول");
 
     try {
         const payment = await Pi.createPayment({
             amount: 1,
-            memo: "New Order",
+            memo: "تفعيل المتجر - Forsale AI",
             metadata: { type: "test" }
         }, {
-            onReadyForServerApproval: (paymentId) => { alert("Payment ID generated: " + paymentId); },
-            onReadyForServerCompletion: (paymentId, txid) => { alert("Done! TXID: " + txid); },
-            onCancel: () => { alert("Cancelled"); },
-            onError: (err) => { 
-                // لو الخطأ ظهر تاني، يبقى لسه بتتحذف
-                alert("خطأ: " + JSON.stringify(err));
-                if(JSON.stringify(err).includes("pending")) {
-                    location.reload(); // ريفرش عشان يلقطها وينضفها
-                }
-            }
+            onReadyForServerApproval: async (paymentId) => {
+                // إرسال للسيرفر للموافقة
+                await fetch('/api/approve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ paymentId })
+                });
+            },
+            onReadyForServerCompletion: async (paymentId, txid) => {
+                alert("✅ مبروك! تمت العملية بنجاح.");
+            },
+            onCancel: () => alert("تم الإلغاء"),
+            onError: (e) => alert("خطأ: " + e)
         });
-    } catch (err) {
-        alert("Start Error: " + err);
+    } catch (e) {
+        alert("خطأ: " + e);
     }
 }
+
+function onIncomplete(p) { console.log(p); }

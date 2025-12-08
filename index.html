@@ -1,86 +1,52 @@
-/* script.js - Production Version */
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Forsale AI</title>
+    <!-- مكتبة Pi -->
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <script>try { Pi.init({ version: "2.0", sandbox: true }); } catch(e){}</script>
 
-const API_BASE = "/api";
-let currentUser = null;
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-// منتجات حقيقية (تقدر تزود وتغير الصور والأسعار براحتك)
-const products = [
-    { id: "iphone15", title: "iPhone 15 Pro Max", price: 350, img: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400" },
-    { id: "ps5", title: "Sony PlayStation 5", price: 120, img: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=400" },
-    { id: "macbook", title: "MacBook Air M2", price: 850, img: "https://images.unsplash.com/photo-1611186871348-af283e9c353d?w=400" },
-    { id: "watch", title: "Apple Watch Ultra", price: 80, img: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400" }
-];
+    <!-- شاشة التحميل -->
+    <div id="loading" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#0a1128; z-index:9999; display:flex; justify-content:center; align-items:center;">
+        <i class="fa-solid fa-circle-notch fa-spin" style="font-size:40px; color:#FFD700;"></i>
+    </div>
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('loading').style.display = 'none';
-    renderProducts();
-});
+    <!-- شاشة الدخول -->
+    <div id="auth-container">
+        <div class="auth-logo"><span style="background:#00f2ff;color:black;padding:2px 8px;border-radius:6px">AI</span> Forsale</div>
+        <div class="auth-card">
+            <h2>مرحباً بك</h2>
+            <p style="color:#aaa;">سجل دخولك لاستخدام التطبيق</p>
+            <button class="main-btn pi-btn" onclick="handleLogin()">
+                <i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi
+            </button>
+        </div>
+    </div>
 
-// 1. تسجيل الدخول
-async function handleLogin() {
-    try {
-        const scopes = ['username', 'payments'];
-        const auth = await Pi.authenticate(scopes, onIncomplete);
-        currentUser = auth.user;
-        
-        document.getElementById('auth-container').style.display = 'none';
-        document.getElementById('app-container').style.display = 'block';
-        document.getElementById('username-display').innerText = "أهلاً, " + currentUser.username;
-    } catch (err) {
-        alert("فشل الدخول: " + err);
-    }
-}
-
-// 2. عرض المنتجات
-function renderProducts() {
-    const grid = document.getElementById('products-grid');
-    grid.innerHTML = products.map(p => `
-        <div class="product-card" onclick="buyProduct('${p.id}')">
-            <div class="p-img-box">
-                <img src="${p.img}" alt="${p.title}">
-                <div class="ai-tag">AI Verified</div>
-            </div>
-            <div class="p-details">
-                <div class="p-name">${p.title}</div>
-                <div class="p-price">${p.price} Pi</div>
+    <!-- التطبيق الرئيسي -->
+    <div id="app-container" style="display:none;">
+        <div class="fixed-header-wrapper">
+            <div class="header">
+                <div class="content-wrapper">
+                    <div class="logo">Forsale AI</div>
+                    <div id="username-display" style="font-size:12px; color:#00f2ff;"></div>
+                </div>
             </div>
         </div>
-    `).join('');
-}
 
-// 3. عملية الدفع الكاملة (مربوطة بالسيرفر)
-async function buyProduct(id) {
-    if(!currentUser) { alert("يرجى تسجيل الدخول أولاً"); return; }
-    
-    const product = products.find(p => p.id === id);
-    if(!product) return;
+        <div class="container" style="padding-top:80px;">
+            <h3 style="color:white; text-align:center;">المنتجات المتاحة</h3>
+            <div class="products-grid" id="products-grid"></div>
+        </div>
+    </div>
 
-    const confirmMsg = confirm(`هل تريد شراء ${product.title} بسعر ${product.price} Pi؟`);
-    if(!confirmMsg) return;
-
-    try {
-        const payment = await Pi.createPayment({
-            amount: product.price,
-            memo: `شراء ${product.title} - Forsale AI`,
-            metadata: { productId: product.id }
-        }, {
-            onReadyForServerApproval: async (paymentId) => {
-                // الاتصال بملف api/approve.js اللي عملناه
-                await fetch(`${API_BASE}/approve`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ paymentId })
-                });
-            },
-            onReadyForServerCompletion: async (paymentId, txid) => {
-                alert(`✅ مبروك! تم شراء ${product.title} بنجاح.\nرقم العملية: ${txid}`);
-            },
-            onCancel: () => alert("تم إلغاء العملية"),
-            onError: (e) => alert("حدث خطأ: " + e)
-        });
-    } catch (e) {
-        alert("خطأ: " + e);
-    }
-}
-
-function onIncomplete(p) { console.log(p); }
+    <script src="script.js"></script>
+</body>
+</html>

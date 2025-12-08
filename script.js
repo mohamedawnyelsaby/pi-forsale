@@ -1,95 +1,75 @@
-/* script.js */
+/* script.js - Production Version */
 
-const API_BASE = "/api"; 
+const API_BASE = "/api";
 let currentUser = null;
 
-// منتج التفعيل
 const products = [
-    { 
-        id: "activation_item_10", 
-        title: "تفعيل الخطوة 10 (Test)", 
-        price: 1.0, 
-        icon: "fa-check-circle" 
-    }
+    { id: "iphone15", title: "iPhone 15 Pro", price: 350, img: "https://via.placeholder.com/150" },
+    { id: "ps5", title: "PlayStation 5", price: 120, img: "https://via.placeholder.com/150" }
 ];
 
-// 1. تشغيل التطبيق وعرض المنتجات
 document.addEventListener('DOMContentLoaded', () => {
+    // إخفاء التحميل
+    const loader = document.getElementById('loading');
+    if(loader) loader.style.display = 'none';
     renderProducts();
 });
 
-// 2. تسجيل الدخول
+// 1. تسجيل الدخول
 async function handleLogin() {
-    // رسالة عشان نتأكد إن الزرار شغال
-    alert("جاري الاتصال بـ Pi Network... ⏳");
-
     try {
         const scopes = ['username', 'payments'];
         const auth = await Pi.authenticate(scopes, onIncomplete);
-        
         currentUser = auth.user;
         
-        // تغيير الواجهة
         document.getElementById('auth-container').style.display = 'none';
         document.getElementById('app-container').style.display = 'block';
-        document.getElementById('username').innerText = "أهلاً: " + currentUser.username;
-
+        document.getElementById('username-display').innerText = currentUser.username;
     } catch (err) {
         alert("فشل الدخول: " + err);
-        console.error(err);
     }
 }
 
-// 3. عرض المنتجات
+// 2. عرض المنتجات
 function renderProducts() {
     const grid = document.getElementById('products-grid');
+    if(!grid) return;
+    
     grid.innerHTML = products.map(p => `
-        <div class="product-card" onclick="buyItem('${p.id}')">
-            <div class="p-img-box">
-                <i class="fa-solid ${p.icon}" style="font-size:40px; color:#FFD700;"></i>
-            </div>
-            <div class="p-details">
-                <div class="p-name">${p.title}</div>
-                <div class="p-price">${p.price} Pi</div>
-                <button class="main-btn" style="margin-top:10px; font-size:12px;">شراء للتفعيل</button>
-            </div>
+        <div class="product-card" onclick="buyProduct('${p.id}')" style="background:rgba(255,255,255,0.1); padding:15px; border-radius:10px; margin:10px;">
+            <h3>${p.title}</h3>
+            <p style="color:#FFD700; font-weight:bold;">${p.price} Pi</p>
+            <button class="main-btn" style="width:100%; margin-top:5px;">شراء</button>
         </div>
     `).join('');
 }
 
-// 4. عملية الدفع (الأهم لتفعيل الخطوة 10)
-async function buyItem(id) {
-    if(!currentUser) return alert("يجب تسجيل الدخول أولاً");
-
+// 3. الدفع
+async function buyProduct(id) {
+    if(!currentUser) return;
     const product = products.find(p => p.id === id);
 
     try {
         const payment = await Pi.createPayment({
             amount: product.price,
-            memo: "تفعيل - Forsale AI",
-            metadata: { type: "activation" }
+            memo: `شراء ${product.title}`,
+            metadata: { productId: product.id }
         }, {
-            // أ) الموافقة من السيرفر (Server Approval)
             onReadyForServerApproval: async (paymentId) => {
-                alert("جاري طلب الموافقة من السيرفر...");
                 await fetch(`${API_BASE}/approve`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ paymentId })
                 });
             },
-            // ب) اكتمال العملية (Server Completion)
             onReadyForServerCompletion: async (paymentId, txid) => {
-                alert("✅ مبروك! تمت العملية بنجاح. الخطوة 10 اكتملت.");
+                alert("✅ تم الشراء بنجاح!");
             },
-            // ج) إلغاء
             onCancel: () => alert("تم الإلغاء"),
-            // د) خطأ
-            onError: (error) => alert("خطأ: " + error)
+            onError: (e) => alert("خطأ: " + e)
         });
-
     } catch (e) {
-        alert("خطأ في إنشاء الدفعة: " + e);
+        alert("خطأ: " + e);
     }
 }
 

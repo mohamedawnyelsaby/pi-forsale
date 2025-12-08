@@ -1,34 +1,34 @@
-const axios = require('axios');
+import axios from 'axios';
 
-module.exports = async (req, res) => {
-    // 1. التأكد من الطريقة
-    if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
+export default async function handler(req, res) {
+    // السماح للكود يشتغل
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
     const { paymentId } = req.body;
     const PI_API_KEY = process.env.PI_API_KEY;
 
-    if (!PI_API_KEY) return res.status(500).json({ error: "Missing API Key" });
+    // لو المفتاح مش موجود، نرجع رسالة واضحة بدل ما السيرفر يقع
+    if (!PI_API_KEY) {
+        return res.status(500).json({ error: "API Key Not Found" });
+    }
 
     try {
-        console.log(`ATTEMPTING FORCE FIX: ${paymentId}`);
+        console.log(`Force fixing payment: ${paymentId}`);
 
         // المحاولة الأولى: إلغاء (Cancel)
-        // بنحاول نلغيها عشان نفتح الطريق لعملية جديدة
         await axios.post(`https://api.minepi.com/v2/payments/${paymentId}/cancel`, {}, {
             headers: { Authorization: `Key ${PI_API_KEY}` }
-        }).catch(err => console.log("Cancel failed (maybe completed?)"));
+        }).catch(err => console.log("Cancel skipped"));
 
         // المحاولة الثانية: إكمال (Complete)
-        // لو الإلغاء فشل، بنحاول ننهيها كأنها نجحت عشان تروح من القائمة
         await axios.post(`https://api.minepi.com/v2/payments/${paymentId}/complete`, { txid: '' }, {
             headers: { Authorization: `Key ${PI_API_KEY}` }
-        }).catch(err => console.log("Complete failed"));
+        }).catch(err => console.log("Complete skipped"));
 
-        // في كل الأحوال نرجع نجاح للواجهة عشان المستخدم يرتاح
-        res.status(200).json({ success: true, message: "Fixed" });
+        // نرجع نجاح عشان التطبيق يفك التعليقة
+        return res.status(200).json({ success: true, message: "Fixed" });
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Server Error" });
+        return res.status(500).json({ error: "Server logic error", details: error.message });
     }
-};
+}

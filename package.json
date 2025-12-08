@@ -1,8 +1,8 @@
 {
-  "name": "forsale-ai-static-app",
+  "name": "forsale-pi-app",
   "version": "1.0.0",
-  "description": "Static HTML/CSS/JS application for Pi Network.",
-  "scripts": {
-    "start": "echo 'Starting static server...'"
+  "type": "module",
+  "dependencies": {
+    "axios": "^1.6.2"
   }
 }

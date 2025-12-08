@@ -2,145 +2,71 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Forsale AI</title>
-    
-    <!-- 1. استدعاء مكتبة Pi -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أداة الإصلاح</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    
-    <!-- 2. تهيئة Pi SDK فوراً -->
-    <script>
-        try {
-            Pi.init({ version: "2.0", sandbox: false });
-        } catch (e) {
-            console.error("خطأ في تهيئة Pi:", e);
-        }
-    </script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <script>try{Pi.init({version:"2.0",sandbox:true})}catch(e){}</script>
+    <style>
+        body { background: #000; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        .btn { padding: 15px; width: 100%; border-radius: 10px; border: none; font-size: 18px; margin-top: 20px; cursor: pointer; }
+        .red { background: #ff4444; color: white; }
+        .green { background: #00c851; color: white; display: none; }
+    </style>
 </head>
 <body>
 
-    <!-- شاشة تسجيل الدخول -->
-    <div id="auth-container">
-        <div class="auth-logo">
-            <span style="background:#00f2ff;color:black;padding:2px 8px;border-radius:6px">AI</span> Forsale
-        </div>
-        <div class="auth-card">
-            <h2 style="margin-bottom:20px;">سوق المستقبل</h2>
-            
-            <!-- زرار الدخول (تم الإصلاح) -->
-            <button id="loginBtn" class="main-btn pi-btn" onclick="startPiLogin()">
-                <i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi
-            </button>
-            
-            <!-- مكان لظهور رسائل الخطأ لو حصلت -->
-            <p id="debug-msg" style="color:red; font-size:12px; margin-top:10px;"></p>
-        </div>
-    </div>
+    <h1>🔧 أداة إصلاح العمليات العالقة</h1>
+    <p>اضغط على الزر الأحمر لتنظيف حسابك من العمليات القديمة.</p>
 
-    <!-- شاشة التطبيق (هتظهر بعد الدخول) -->
-    <div id="app-container" style="display:none;">
-        <div class="fixed-header-wrapper">
-            <div class="header">
-                <div class="content-wrapper">
-                    <div class="logo"><span class="ai-badge">AI</span> Forsale</div>
-                    <div id="username-display" style="color:#00f2ff; font-size:14px;"></div>
-                </div>
-            </div>
-        </div>
+    <button class="btn red" onclick="forceFix()">🗑️ تنظيف العمليات العالقة الآن</button>
+    <button class="btn green" id="buyBtn" onclick="buy()">✅ الشراء (بعد التنظيف)</button>
 
-        <div class="container">
-            <div class="content-wrapper">
-                <h3 style="color:white; margin:20px 0;">منتجات مميزة</h3>
-                
-                <!-- كارت منتج -->
-                <div class="product-card" onclick="startPayment()" style="background:rgba(255,255,255,0.08); padding:15px; border-radius:15px; border:1px solid rgba(255,255,255,0.1); cursor:pointer;">
-                    <div style="height:150px; background:#222; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:10px;">
-                        <i class="fa-solid fa-gem" style="font-size:50px; color:#FFD700;"></i>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <div style="font-weight:bold; color:white;">باقة تفعيل (Test)</div>
-                            <div style="font-size:12px; color:#aaa;">تفعيل الحساب</div>
-                        </div>
-                        <div style="color:#00f2ff; font-weight:bold;">1 Pi</div>
-                    </div>
-                    <button class="main-btn" style="margin-top:10px;">شراء الآن</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 3. كود الجافاسكربت المدمج (عشان نضمن انه يشتغل) -->
     <script>
-        // تعريف المتغيرات
-        let currentUser = null;
+        const API_BASE = "/api";
 
-        // دالة الدخول (مرتبطة بالزرار)
-        async function startPiLogin() {
-            const btn = document.getElementById('loginBtn');
-            const msg = document.getElementById('debug-msg');
-            
-            // تغيير شكل الزرار عشان تعرف إنه داس
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الاتصال...';
-            msg.innerText = "";
-
+        // 1. دالة التنظيف اليدوية
+        async function forceFix() {
+            alert("جاري البحث عن المصيبة القديمة...");
             try {
-                const scopes = ['username', 'payments'];
-                // طلب المصادقة
-                const auth = await Pi.authenticate(scopes, onIncomplete);
-                
-                // نجاح!
-                currentUser = auth.user;
-                showApp(currentUser.username);
-
+                // بننادي على المصادقة عشان تمسك العملية
+                await Pi.authenticate(['username', 'payments'], onIncompletePayment);
+                // لو مفيش عمليات عالقة، الكود هيكمل هنا
+                alert("👍 حسابك سليم! مفيش عمليات عالقة. تقدر تشتري دلوقتي.");
+                document.getElementById('buyBtn').style.display = 'block';
             } catch (err) {
-                // فشل - إظهار السبب
-                console.error(err);
-                btn.innerHTML = '<i class="fa-solid fa-network-wired"></i> حاول مرة أخرى';
-                msg.innerText = "فشل الاتصال: " + err;
                 alert("خطأ: " + err);
             }
         }
 
-        // دالة إظهار التطبيق
-        function showApp(username) {
-            document.getElementById('auth-container').style.display = 'none';
-            document.getElementById('app-container').style.display = 'block';
-            document.getElementById('username-display').innerText = username;
-            alert("تم الدخول بنجاح! أهلاً " + username);
+        // 2. الدالة اللي بتلاقي العملية وتمسحها
+        function onIncompletePayment(payment) {
+            alert(`⚠️ تم كشف العملية: ${payment.identifier}\nجاري الحذف...`);
+            
+            fetch('/api/approve', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ paymentId: payment.identifier })
+            }).then(res => res.json()).then(data => {
+                alert(`تم الحل: ${data.action}\nدوس OK واضغط تنظيف تاني للتأكد.`);
+                location.reload(); // ريفرش عشان تنظف الذاكرة
+            });
         }
 
-        // دالة الشراء
-        async function startPayment() {
+        // 3. دالة الشراء العادية
+        async function buy() {
             try {
-                const payment = await Pi.createPayment({
-                    amount: 1,
-                    memo: "شراء تجريبي",
-                    metadata: { type: "test" }
+                await Pi.createPayment({
+                    amount: 1, memo: "Test", metadata: {test:true}
                 }, {
-                    onReadyForServerApproval: async (paymentId) => {
-                        alert("جاري الموافقة...");
-                        await fetch('/api/approve', {
-                            method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify({ paymentId })
-                        });
+                    onReadyForServerApproval: (pid) => {
+                        fetch('/api/approve', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId:pid})});
                     },
-                    onReadyForServerCompletion: async (paymentId, txid) => {
-                        alert("✅ تم الدفع بنجاح!");
-                    },
-                    onCancel: () => alert("تم الإلغاء"),
+                    onReadyForServerCompletion: (pid, txid) => { alert("نجح الدفع!"); },
+                    onCancel: () => alert("إلغاء"),
                     onError: (e) => alert("خطأ: " + e)
                 });
-            } catch (e) {
-                alert("خطأ: " + e);
-            }
+            } catch (e) { alert(e); }
         }
-
-        function onIncomplete(p) { console.log(p); }
     </script>
 </body>
 </html>

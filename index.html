@@ -3,72 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pi Network Force</title>
-    
-    <!-- تحميل المكتبة -->
+    <title>Pi Network Live</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
-        button { 
-            padding: 20px; width: 100%; font-size: 20px; border-radius: 10px; 
-            border: none; cursor: pointer; margin-top: 20px; font-weight: bold;
-            display: none; /* مخفي في البداية */
+        body { background: #000; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        .btn { 
+            background: #F8B62C; color: black; font-size: 20px; font-weight: bold;
+            padding: 15px; width: 100%; border: none; border-radius: 10px; margin-top: 20px;
+            display: none; cursor: pointer;
         }
-        #btn-login { background: #F8B62C; color: #000; }
-        #status { font-size: 18px; margin-bottom: 20px; color: #00f2ff; }
+        #status { margin-top: 20px; color: #00f2ff; font-size: 18px; }
+        .error { color: #ff4444; font-size: 14px; margin-top: 10px; border: 1px solid #ff4444; padding: 10px; display: none; }
     </style>
 </head>
 <body>
 
-    <h2>نظام الاتصال المؤكد</h2>
-    <div id="status">جاري تحميل مكتبة Pi...</div>
+    <h1>الاتصال المباشر (Live)</h1>
+    <p id="status">جاري تهيئة Pi Network...</p>
 
-    <button id="btn-login" onclick="doLogin()">🚀 اتصال الآن</button>
+    <button id="loginBtn" class="btn" onclick="startLogin()">🔗 ربط المحفظة الآن</button>
+    <div id="error-box" class="error"></div>
 
     <script>
-        const statusDiv = document.getElementById('status');
-        const btn = document.getElementById('btn-login');
-
-        // 1. الانتظار حتى تحميل الصفحة بالكامل
-        window.addEventListener('load', () => {
+        // 1. التهيئة (إلغاء وضع الساندبوكس)
+        document.addEventListener("DOMContentLoaded", () => {
             try {
-                statusDiv.innerText = "جاري تهيئة Pi...";
+                // التغيير هنا: sandbox: false
+                Pi.init({ version: "2.0", sandbox: false });
                 
-                // تهيئة المكتبة (الإصدار 2.0 أضمن)
-                Pi.init({ version: "2.0", sandbox: true });
-                
-                // لو وصلنا هنا يبقى نجحت التهيئة
-                statusDiv.innerText = "✅ المكتبة جاهزة. اضغط للاتصال.";
-                statusDiv.style.color = "#00c851";
-                btn.style.display = "block"; // إظهار الزرار الآن فقط
-
+                document.getElementById('status').innerText = "✅ النظام جاهز. اضغط للربط.";
+                document.getElementById('loginBtn').style.display = "block";
             } catch (err) {
-                statusDiv.innerText = "فشل التهيئة: " + err;
-                statusDiv.style.color = "red";
+                showError("فشل التهيئة: " + err);
             }
         });
 
-        // 2. دالة الاتصال
-        async function doLogin() {
+        // 2. الدخول
+        async function startLogin() {
+            const btn = document.getElementById('loginBtn');
+            btn.innerHTML = "⏳ جاري الاتصال...";
             btn.disabled = true;
-            btn.innerText = "جاري الاتصال...";
-            
+
             try {
                 const scopes = ['username', 'payments'];
                 const auth = await Pi.authenticate(scopes, onIncomplete);
                 
-                alert("تم الدخول بنجاح! المستخدم: " + auth.user.username);
-                btn.innerText = "تم الدخول ✅";
-                
+                // نجاح
+                document.getElementById('status').innerText = "🎉 تم الربط: " + auth.user.username;
+                document.getElementById('status').style.color = "#00c851";
+                btn.innerHTML = "تم بنجاح ✔️";
+                alert("نجح الاتصال أخيراً!");
+
             } catch (err) {
-                alert("خطأ: " + err);
-                btn.innerText = "حاول مرة أخرى";
+                // فشل
+                btn.innerHTML = "❌ فشل - حاول مرة أخرى";
                 btn.disabled = false;
+                showError("خطأ في المصادقة: " + err);
             }
         }
 
         function onIncomplete(p) { console.log(p); }
+
+        function showError(msg) {
+            const box = document.getElementById('error-box');
+            box.style.display = "block";
+            box.innerText = msg;
+        }
     </script>
 </body>
 </html>

@@ -3,117 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pi Payment Final</title>
-    
-    <!-- تحميل المكتبة -->
+    <title>إصلاح نهائي</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-
     <style>
-        body { background-color: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
+        body { background: #000; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
         button { 
             padding: 20px; width: 100%; font-size: 22px; border-radius: 12px; 
             border: none; cursor: pointer; margin-top: 20px; font-weight: bold;
         }
+        .red { background: #ff4444; color: white; }
         .green { background: #00c851; color: white; }
-        .blue { background: #00f2ff; color: black; }
-        #debug { 
-            margin-top: 20px; color: yellow; font-size: 14px; text-align: left; 
-            border: 1px solid #333; padding: 10px; background: #111;
-        }
     </style>
 </head>
 <body>
 
-    <h1>الخطوة 10: الدفع</h1>
-    <p id="status">جاري تجهيز النظام...</p>
+    <h1>إصلاح العملية العالقة</h1>
+    <p>اضغط على الزر الأحمر لتنظيف العملية القديمة.</p>
 
-    <!-- الأزرار -->
-    <button id="btnAuth" class="blue" onclick="runAuth()">1. تسجيل الدخول</button>
-    <button id="btnPay" class="green" onclick="runPay()" style="display:none;">2. دفع 1 Pi</button>
-
-    <!-- شاشة لكتابة الأخطاء -->
-    <div id="debug">Sytem Logs:</div>
+    <!-- زرار الإصلاح -->
+    <button class="red" onclick="fixPayment()">🛠️ إصلاح العملية العالقة</button>
+    
+    <!-- زرار الدفع (بعد الإصلاح) -->
+    <button class="green" onclick="payNew()">🛒 دفع عملية جديدة</button>
 
     <script>
-        // دالة لكتابة الأخطاء على الشاشة
-        function log(msg) {
-            document.getElementById('debug').innerHTML += "<br>> " + msg;
-        }
+        // تهيئة المكتبة
+        try { Pi.init({ version: "2.0", sandbox: false }); } catch(e){}
 
-        // 1. التأكد من تحميل المكتبة
-        window.onload = function() {
-            try {
-                if (window.Pi) {
-                    Pi.init({ version: "2.0", sandbox: false });
-                    document.getElementById('status').innerText = "✅ النظام جاهز. اضغط الزر الأزرق.";
-                    document.getElementById('status').style.color = "#00c851";
-                    log("Pi SDK Initialized.");
-                } else {
-                    log("Error: Pi SDK not found.");
-                    alert("فشل تحميل مكتبة Pi. تأكد من الإنترنت.");
-                }
-            } catch (e) {
-                log("Init Error: " + e);
-            }
-        };
+        // رقم العملية المحشورة (جبته من الصورة اللي بعتها)
+        const stuckPaymentId = "limR5hUktJ4hYgP8D59eyXvLbuL4";
 
-        // 2. دالة الدخول
-        async function runAuth() {
-            alert("تم ضغط الزر.. جاري الاتصال."); // تنبيه فوري
-            log("Authenticating...");
+        // 1. دالة الإصلاح اليدوي
+        async function fixPayment() {
+            alert("جاري محاولة إلغاء العملية القديمة...");
             
             try {
-                const auth = await Pi.authenticate(['username', 'payments'], onIncomplete);
-                log("Auth Success: " + auth.user.username);
+                const response = await fetch('/api/approve', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ paymentId: stuckPaymentId })
+                });
                 
-                // إظهار زر الدفع
-                document.getElementById('btnAuth').style.display = 'none';
-                document.getElementById('btnPay').style.display = 'block';
-                alert("تم الدخول! اضغط الزر الأخضر الآن.");
+                const data = await response.json();
+                alert("النتيجة: " + JSON.stringify(data));
                 
             } catch (e) {
-                log("Auth Error: " + e);
-                alert("خطأ في الدخول: " + e);
+                alert("خطأ في الاتصال: " + e);
             }
         }
 
-        // 3. دالة الدفع
-        async function runPay() {
-            alert("بدء عملية الدفع..."); // تنبيه فوري
-            log("Creating Payment...");
-
+        // 2. دالة الدفع الجديدة
+        async function payNew() {
             try {
+                // مصادقة الأول
+                await Pi.authenticate(['username', 'payments'], onIncomplete);
+                
+                // بدء الدفع
                 await Pi.createPayment({
                     amount: 1, 
-                    memo: "Step 10 Final", 
+                    memo: "New Payment", 
                     metadata: { type: "test" }
                 }, {
                     onReadyForServerApproval: (pid) => {
-                        log("Payment ID: " + pid);
-                        // إرسال للسيرفر
                         fetch('/api/approve', {
                             method: 'POST',
                             headers: {'Content-Type': 'application/json'},
                             body: JSON.stringify({ paymentId: pid })
-                        }).then(() => log("Server Approved sent."));
+                        });
                     },
                     onReadyForServerCompletion: (pid, txid) => {
-                        log("COMPLETED! TXID: " + txid);
-                        alert("🎉 مبروك! تمت العملية بنجاح. صور الشاشة!");
+                        alert("✅ مبروك! تم الدفع بنجاح.");
                     },
                     onCancel: () => alert("إلغاء"),
-                    onError: (e) => {
-                        log("Payment Error: " + e);
-                        alert("خطأ: " + e);
-                    }
+                    onError: (e) => alert("خطأ: " + e)
                 });
-            } catch (e) {
-                log("Payment Function Error: " + e);
-                alert("خطأ: " + e);
-            }
+            } catch (e) { alert(e); }
         }
 
-        function onIncomplete(p) { log("Incomplete found: " + p.identifier); }
+        function onIncomplete(p) { console.log(p); }
     </script>
 </body>
 </html>

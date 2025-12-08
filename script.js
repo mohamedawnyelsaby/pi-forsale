@@ -2,14 +2,13 @@ const API_BASE = "/api";
 let currentUser = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    try { Pi.init({ version: "2.0", sandbox: true }); } catch (e) { }
+    try { Pi.init({ version: "2.0", sandbox: true }); } catch (e) {}
 });
 
 async function handlePiLogin() {
-    alert("جاري البحث عن عمليات معلقة...");
     try {
         const scopes = ['username', 'payments'];
-        // هنا السر: onIncompletePayment هي اللي بتمسك العملية المحشورة
+        // هنا السر: أي عملية عالقة هتروح لدالة onIncompletePayment
         const auth = await Pi.authenticate(scopes, onIncompletePayment);
         
         currentUser = auth.user;
@@ -18,28 +17,25 @@ async function handlePiLogin() {
         document.getElementById('username-display').innerText = auth.user.username;
         
     } catch (err) {
-        alert("خطأ: " + err);
+        alert("فشل الدخول: " + err);
     }
 }
 
-// دالة التنظيف
+// دالة التنظيف الإجباري
 function onIncompletePayment(payment) {
-    alert("⚠️ تم العثور على عملية معلقة! جاري إصلاحها...");
+    // تنبيه للمستخدم
+    alert(`⚠️ تم كشف عملية عالقة (${payment.identifier}). جاري حذفها...`);
     
-    fetch('/api/approve', {
+    // استدعاء ملف الممحاة
+    fetch('/api/cancel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: payment.identifier })
     })
-    .then(response => response.json())
-    .then(data => {
-        if(data.success) {
-            alert("✅ تم تنظيف العملية المعلقة بنجاح! يمكنك الشراء الآن.");
-        } else {
-            alert("❌ فشل التنظيف، حاول مرة أخرى.");
-        }
+    .then(() => {
+        alert("✅ تم تنظيف العملية العالقة! اضغط على زر الشراء الآن.");
     })
-    .catch(e => alert("خطأ في الاتصال: " + e));
+    .catch(e => alert("خطأ في التنظيف: " + e));
 }
 
 async function startPayment() {
@@ -48,7 +44,7 @@ async function startPayment() {
     try {
         const payment = await Pi.createPayment({
             amount: 1,
-            memo: "شراء منتج جديد",
+            memo: "شراء جديد - Forsale AI",
             metadata: { type: "test" }
         }, {
             onReadyForServerApproval: async (paymentId) => {
@@ -59,12 +55,12 @@ async function startPayment() {
                 });
             },
             onReadyForServerCompletion: async (paymentId, txid) => {
-                alert("✅ تم الدفع بنجاح!");
+                alert("✅ مبروك! تم الدفع بنجاح.");
             },
             onCancel: () => alert("تم الإلغاء"),
             onError: (err) => {
-                // لو قالك لسه فيه عملية معلقة، يبقى محتاج ريفرش
-                alert("خطأ: " + JSON.stringify(err));
+                // لو ظهر الخطأ تاني، نطلب من المستخدم يعمل ريفرش
+                alert("♻️ خطأ: " + err + " -> قم بتحديث الصفحة وحاول مرة أخرى.");
             }
         });
     } catch (err) {

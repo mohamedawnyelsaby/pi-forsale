@@ -1,15 +1,41 @@
 {
-  "name": "pi-forsale",
-  "version": "1.0.0",
-  "description": "Pi Network Backend for Forsale AI on Vercel",
-  "main": "server.js",
-  "type": "module",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "axios": "^1.6.2"
-  }
+  "products": [
+    {
+      "id": "p1",
+      "name": "جهاز تحليل بيانات Pi عالي الكفاءة",
+      "price": 50000,
+      "cat": "tech",
+      "details": "جهاز ذكي بتقنية الذكاء الاصطناعي لتحليل معاملات Pi الكبيرة. ضمان 3 سنوات.",
+      "seller_id": "mohamed",
+      "img": "https://placehold.co/600x400/0a1128/9BE5FF?text=AI+Analyzer"
+    },
+    {
+      "id": "p2",
+      "name": "مجموعة تطوير تطبيق Pi - للمبتدئين",
+      "price": 25000,
+      "cat": "software",
+      "details": "تشمل مجموعة أدوات لإنشاء تطبيق Pi مبسط، مع دعم فني لمدة شهرين.",
+      "seller_id": "logy-dev",
+      "img": "https://placehold.co/600x400/1E88E5/FFFFFF?text=Pi+Dev+Kit"
+    },
+    {
+      "id": "p3",
+      "name": "نظارة واقع افتراضي متطورة",
+      "price": 120000,
+      "cat": "gaming",
+      "details": "نظارة الجيل القادم للواقع الافتراضي، متوافقة مع منصات Pi للألعاب.",
+      "seller_id": "gamerPi",
+      "img": "https://placehold.co/600x400/9C27B0/FFFFFF?text=VR+Headset"
+    },
+    {
+      "id": "p4",
+      "name": "طابعة ثلاثية الأبعاد سريعة",
+      "price": 85000,
+      "cat": "tech",
+      "details": "طابعة 3D احترافية، مثالية لإنشاء نماذج المنتجات المعروضة للبيع.",
+      "seller_id": "engineer",
+      "img": "https://placehold.co/600x400/E91E63/FFFFFF?text=3D+Printer"
+    }
+  ],
+  "orders": []
 }

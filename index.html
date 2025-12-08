@@ -2,115 +2,67 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Forsale AI</title>
-    
-    <!-- مكتبة Pi -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفعيل الدفع النهائي</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: #000; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        .btn { padding: 15px; width: 100%; border-radius: 10px; border: none; font-size: 20px; margin-top: 20px; cursor: pointer; }
+        .blue { background: #00f2ff; color: black; }
+        .green { background: #00c851; color: white; display: none; }
+    </style>
 </head>
 <body>
 
-    <!-- شاشة تسجيل الدخول -->
-    <div id="auth-container">
-        <div class="auth-logo">
-            <span style="background:#00f2ff;color:black;padding:2px 8px;border-radius:6px">AI</span> Forsale
-        </div>
-        <div class="auth-card">
-            <h2 style="margin-bottom:20px;">سوق المستقبل</h2>
-            <p style="color:#aaa;">تم دمج الكود لضمان التشغيل ✅</p>
-            
-            <!-- الزرار -->
-            <button id="mainLoginBtn" class="main-btn pi-btn" onclick="startSystem()">
-                <i class="fa-solid fa-network-wired"></i> دخول وشراء (تفعيل)
-            </button>
-        </div>
-    </div>
+    <h1>الخطوة الأخيرة (10)</h1>
+    <p id="msg">جاهز للربط...</p>
 
-    <!-- شاشة التطبيق -->
-    <div id="app-container" style="display:none;">
-        <div class="fixed-header-wrapper">
-            <div class="header">
-                <div class="content-wrapper">
-                    <div class="logo"><span class="ai-badge">AI</span> Forsale</div>
-                    <div id="username-display" style="font-size:12px; color:#00f2ff;"></div>
-                </div>
-            </div>
-        </div>
+    <button id="loginBtn" class="btn blue" onclick="doLogin()">1. ربط المحفظة</button>
+    <button id="payBtn" class="btn green" onclick="doPay()">2. دفع 1 Pi</button>
 
-        <div class="container">
-            <div class="content-wrapper">
-                <h3 style="color:white; margin:20px 0;">اضغط للشراء (الخطوة 10)</h3>
-                
-                <div class="product-card" onclick="processPurchase()" style="background:rgba(255,255,255,0.08); padding:20px; border-radius:15px; border:1px solid rgba(255,255,255,0.1); text-align:center;">
-                    <i class="fa-solid fa-gem" style="font-size:50px; color:#FFD700; margin-bottom:15px;"></i>
-                    <h3>باقة التفعيل</h3>
-                    <p style="color:#00f2ff; font-weight:bold; font-size:20px;">1.0 Test-Pi</p>
-                    <button class="main-btn" style="margin-top:15px; background:#2ecc71; color:black;">شراء الآن</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- كود التشغيل (مدمج هنا عشان يشتغل غصب عنه) -->
     <script>
-        // 1. التهيئة الفورية
+        // 1. إعداد Pi (الوضع الرسمي)
         try {
-            Pi.init({ version: "2.0", sandbox: true });
-            console.log("Pi SDK Initialized inside HTML");
-        } catch (e) {
-            alert("خطأ في مكتبة Pi: " + e);
-        }
+            Pi.init({ version: "2.0", sandbox: false });
+        } catch (e) { alert(e); }
 
-        // 2. دالة الدخول
-        async function startSystem() {
-            // رسالة اختبار الزرار
-            alert("1. تم ضغط الزر.. جاري استدعاء Pi SDK");
-
+        // 2. الدخول
+        async function doLogin() {
             try {
                 const scopes = ['username', 'payments'];
                 const auth = await Pi.authenticate(scopes, onIncomplete);
                 
-                // لو وصلنا هنا يبقى الدخول نجح
-                alert("2. تم الدخول بنجاح! المستخدم: " + auth.user.username);
-                
-                // تحويل الشاشة
-                document.getElementById('auth-container').style.display = 'none';
-                document.getElementById('app-container').style.display = 'block';
-                document.getElementById('username-display').innerText = auth.user.username;
-
+                document.getElementById('msg').innerText = "أهلاً " + auth.user.username;
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('payBtn').style.display = 'block';
+                alert("تم الربط! اضغط الآن على الزر الأخضر للدفع.");
             } catch (err) {
-                alert("فشل الدخول: " + err);
+                alert("فشل الربط: " + err);
             }
         }
 
-        // 3. دالة الشراء
-        async function processPurchase() {
+        // 3. الدفع
+        async function doPay() {
             try {
-                const payment = await Pi.createPayment({
+                await Pi.createPayment({
                     amount: 1,
-                    memo: "تفعيل المتجر - Forsale AI",
+                    memo: "تفعيل المتجر - خطوة 10",
                     metadata: { type: "test" }
                 }, {
-                    onReadyForServerApproval: async (paymentId) => {
-                        alert("جاري الموافقة...");
-                        await fetch('/api/approve', {
+                    onReadyForServerApproval: (pid) => {
+                        fetch('/api/approve', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ paymentId })
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ paymentId: pid })
                         });
                     },
-                    onReadyForServerCompletion: async (paymentId, txid) => {
-                        alert("✅ مبروك! تمت العملية بنجاح.");
+                    onReadyForServerCompletion: (pid, txid) => {
+                        alert("✅ مبروك! تمت المهمة بنجاح.");
                     },
-                    onCancel: () => alert("تم الإلغاء"),
+                    onCancel: () => alert("إلغاء"),
                     onError: (e) => alert("خطأ: " + e)
                 });
-            } catch (e) {
-                alert("خطأ: " + e);
-            }
+            } catch (e) { alert(e); }
         }
 
         function onIncomplete(p) { console.log(p); }

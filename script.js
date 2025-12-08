@@ -2,41 +2,44 @@ const API_BASE = "/api";
 let currentUser = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    try {
-        Pi.init({ version: "2.0", sandbox: true });
-    } catch (err) { console.error(err); }
+    try { Pi.init({ version: "2.0", sandbox: true }); } catch (e) { }
 });
 
 async function handlePiLogin() {
+    alert("جاري البحث عن عمليات معلقة...");
     try {
         const scopes = ['username', 'payments'];
-        // دالة onIncomplete هي اللي هتحل المشكلة دي
+        // هنا السر: onIncompletePayment هي اللي بتمسك العملية المحشورة
         const auth = await Pi.authenticate(scopes, onIncompletePayment);
         
         currentUser = auth.user;
         document.getElementById('auth-container').style.display = 'none';
         document.getElementById('app-container').style.display = 'block';
-        alert(`أهلاً بك يا ${currentUser.username}`);
+        document.getElementById('username-display').innerText = auth.user.username;
         
     } catch (err) {
-        alert("فشل الدخول: " + err);
+        alert("خطأ: " + err);
     }
 }
 
-// دي الدالة السحرية اللي بتعالج العمليات العالقة
+// دالة التنظيف
 function onIncompletePayment(payment) {
-    console.log("Found incomplete payment:", payment);
+    alert("⚠️ تم العثور على عملية معلقة! جاري إصلاحها...");
     
-    // محاولة إكمالها في السيرفر (لو كانت مدفوعة)
     fetch('/api/approve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: payment.identifier })
-    }).then(() => {
-        alert("تم معالجة عملية عالقة سابقة بنجاح ✅");
-    }).catch((e) => {
-        console.log("Error handling incomplete:", e);
-    });
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) {
+            alert("✅ تم تنظيف العملية المعلقة بنجاح! يمكنك الشراء الآن.");
+        } else {
+            alert("❌ فشل التنظيف، حاول مرة أخرى.");
+        }
+    })
+    .catch(e => alert("خطأ في الاتصال: " + e));
 }
 
 async function startPayment() {
@@ -45,7 +48,7 @@ async function startPayment() {
     try {
         const payment = await Pi.createPayment({
             amount: 1,
-            memo: "شراء منتج - Forsale AI",
+            memo: "شراء منتج جديد",
             metadata: { type: "test" }
         }, {
             onReadyForServerApproval: async (paymentId) => {
@@ -60,12 +63,8 @@ async function startPayment() {
             },
             onCancel: () => alert("تم الإلغاء"),
             onError: (err) => {
-                // لو الخطأ هو "pending payment"، نقول للمستخدم الحل
-                if (JSON.stringify(err).includes("pending payment")) {
-                    alert("⚠️ هناك عملية دفع سابقة لم تكتمل. قم بتحديث الصفحة وانتظر قليلاً.");
-                } else {
-                    alert("خطأ: " + err);
-                }
+                // لو قالك لسه فيه عملية معلقة، يبقى محتاج ريفرش
+                alert("خطأ: " + JSON.stringify(err));
             }
         });
     } catch (err) {

@@ -1,65 +1,148 @@
-const API_BASE = "/api";
+const API_BASE_URL = "https://pi-forsale.vercel.app/api";
 let currentUser = null;
 
-// 1. التهيئة (نفس الطريقة اللي نجحت)
-document.addEventListener('DOMContentLoaded', () => {
+// 1. Initialize Pi SDK immediately upon page load
+document.addEventListener('DOMContentLoaded', async () => {
     try {
-        // بنستخدم sandbox: true عشان ده رصيد وهمي (Testnet)
-        // لو واجهت مشكلة غيرها لـ false زي المرة اللي فاتت
-        Pi.init({ version: "2.0", sandbox: true });
-        console.log("Pi SDK Initialized");
+        // Initialize Pi SDK (sandbox: false for Production/Mainnet)
+        await Pi.init({ version: "2.0", sandbox: false });
+        console.log("✅ Pi SDK Initialized Successfully");
+
+        // Setup button listeners after successful init
+        setupEventListeners();
+
     } catch (err) {
-        console.error(err);
+        console.error("Pi Init Failed:", err);
+        alert("Error: " + err.message);
     }
 });
 
-// 2. الدخول
+// 2. Setup Event Listeners for Buttons
+function setupEventListeners() {
+    const loginBtn = document.getElementById('pi-login-btn');
+    const buyBtn = document.getElementById('buy-btn'); 
+    
+    if (loginBtn) {
+        loginBtn.addEventListener('click', handlePiLogin);
+    }
+
+    if (buyBtn) {
+        buyBtn.addEventListener('click', startPayment);
+    }
+}
+
+// 3. Handle Login
 async function handlePiLogin() {
     try {
         const scopes = ['username', 'payments'];
-        const auth = await Pi.authenticate(scopes, onIncomplete);
+        const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
         
         currentUser = auth.user;
+        console.log("Logged in user:", currentUser);
+
+        // UI Update: Hide Login, Show App
+        const authContainer = document.getElementById('auth-container');
+        const appContainer = document.getElementById('app-container');
         
-        // إظهار التطبيق
-        document.getElementById('auth-container').style.display = 'none';
-        document.getElementById('app-container').style.display = 'block';
-        document.getElementById('username-display').innerText = "أهلاً: " + auth.user.username;
-        
-        alert("تم الدخول! اضغط الآن على زر الشراء.");
+        if(authContainer) authContainer.style.display = 'none';
+        if(appContainer) appContainer.style.display = 'block';
 
     } catch (err) {
-        alert("فشل الدخول: " + err);
+        console.error("Login Error:", err);
+        alert("Login Failed: " + err.message);
     }
 }
 
-// 3. الشراء (عشان الخطوة 10)
+// 4. Handle Payment
 async function startPayment() {
-    if (!currentUser) return alert("يجب تسجيل الدخول");
+    if (!currentUser) {
+        alert("Please login first.");
+        return;
+    }
 
     try {
-        const payment = await Pi.createPayment({
-            amount: 1,
-            memo: "تفعيل المتجر - Forsale AI",
-            metadata: { type: "test" }
-        }, {
+        // Create Payment Data
+        const paymentData = {
+            amount: 1, 
+            memo: "Forsale AI Purchase", 
+            metadata: { type: "digital_item" } 
+        };
+
+        // Call Pi SDK
+        const payment = await Pi.createPayment(paymentData, {
             onReadyForServerApproval: async (paymentId) => {
-                // إرسال للسيرفر للموافقة
-                await fetch('/api/approve', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ paymentId })
+                console.log("Payment ID:", paymentId);
+                // Send to Backend for Approval
+                await axios.post(`${API_BASE_URL}/payments/approve`, {
+                    paymentId: paymentId
                 });
             },
             onReadyForServerCompletion: async (paymentId, txid) => {
-                alert("✅ مبروك! تمت العملية بنجاح.");
+                console.log("Completing Payment:", txid);
+                // Send to Backend for Completion
+                await axios.post(`${API_BASE_URL}/payments/complete`, {
+                    paymentId: paymentId,
+                    txid: txid
+                });
+                alert("✅ Payment Successful!");
             },
-            onCancel: () => alert("تم الإلغاء"),
-            onError: (e) => alert("خطأ: " + e)
+            onCancel: (paymentId) => { 
+                console.log("Payment Cancelled", paymentId); 
+            },
+            onError: (error, payment) => { 
+                console.error("Payment Error", error);
+                alert("Payment Error: " + error.message);
+            }
         });
-    } catch (e) {
-        alert("خطأ: " + e);
+
+    } catch (err) {
+        console.error("Payment Init Error:", err);
+        alert("Payment Failed: " + err.message);
     }
 }
 
-function onIncomplete(p) { console.log(p); }
+// 5. Handle Incomplete Payments
+function onIncompletePaymentFound(payment) {
+    console.log("Incomplete Payment Found:", payment);
+    return Pi.createPayment(payment, {
+        onReadyForServerApproval: (paymentId) => {
+            axios.post(`${API_BASE_URL}/payments/approve`, { paymentId });
+        },
+        onReadyForServerCompletion: (paymentId, txid) => {
+            axios.post(`${API_BASE_URL}/payments/complete`, { paymentId, txid });
+        },
+        onCancel: (paymentId) => { console.log("Cancelled", paymentId); },
+        onError: (error, payment) => { console.error("Error", error); }
+    });
+}
+
+// AI Analysis Function (Linked to HTML Button)
+window.startAiAnalysis = async function() {
+    const btn = document.getElementById('start-analysis-btn');
+    if(btn) {
+        btn.innerHTML = "Analyzing...";
+        btn.disabled = true;
+    }
+    
+    // Simulate AI delay
+    setTimeout(() => {
+        alert("AI Analysis Complete! Product Listed.");
+        if(btn) {
+            btn.innerHTML = "Analyze & List";
+            btn.disabled = false;
+        }
+        // Close modal logic if needed
+        const modal = document.getElementById('ai-upload-modal');
+        if(modal) modal.style.display = 'none';
+    }, 2000);
+};
+
+// Chat Function (Linked to HTML Button)
+window.sendMessage = async function() {
+    const input = document.getElementById('logy-input');
+    if(input && input.value) {
+        console.log("User sent:", input.value);
+        input.value = "";
+        // Here you would add the logic to display the message
+    }
+};

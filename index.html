@@ -3,69 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تفعيل الدفع النهائي</title>
+    <title>أداة الإصلاح</title>
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
     <style>
         body { background: #000; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-        .btn { padding: 15px; width: 100%; border-radius: 10px; border: none; font-size: 20px; margin-top: 20px; cursor: pointer; }
-        .blue { background: #00f2ff; color: black; }
+        .btn { padding: 20px; width: 100%; border-radius: 10px; border: none; font-size: 18px; margin-top: 20px; cursor: pointer; font-weight: bold; }
+        .red { background: #ff4444; color: white; }
         .green { background: #00c851; color: white; display: none; }
     </style>
 </head>
 <body>
 
-    <h1>الخطوة الأخيرة (10)</h1>
-    <p id="msg">جاهز للربط...</p>
+    <h1>🔧 أداة إصلاح العمليات العالقة</h1>
+    <p>اضغط على الزر الأحمر لتنظيف حسابك من العمليات القديمة.</p>
 
-    <button id="loginBtn" class="btn blue" onclick="doLogin()">1. ربط المحفظة</button>
-    <button id="payBtn" class="btn green" onclick="doPay()">2. دفع 1 Pi</button>
+    <!-- الزرار الأحمر للتنظيف -->
+    <button class="btn red" onclick="forceFix()">🗑️ تنظيف العمليات العالقة الآن</button>
+    
+    <!-- الزرار الأخضر للشراء (هيظهر بعد التنظيف) -->
+    <button class="btn green" id="buyBtn" onclick="buy()">✅ الشراء (بعد التنظيف)</button>
 
     <script>
-        // 1. إعداد Pi (الوضع الرسمي)
-        try {
-            Pi.init({ version: "2.0", sandbox: false });
-        } catch (e) { alert(e); }
+        // تهيئة Pi
+        try { Pi.init({ version: "2.0", sandbox: true }); } catch(e){}
 
-        // 2. الدخول
-        async function doLogin() {
+        // 1. دالة التنظيف اليدوية
+        async function forceFix() {
+            alert("جاري البحث عن العملية المعلقة...");
             try {
-                const scopes = ['username', 'payments'];
-                const auth = await Pi.authenticate(scopes, onIncomplete);
+                // بننادي على المصادقة عشان تمسك العملية (onIncompletePayment)
+                await Pi.authenticate(['username', 'payments'], onIncompletePayment);
                 
-                document.getElementById('msg').innerText = "أهلاً " + auth.user.username;
-                document.getElementById('loginBtn').style.display = 'none';
-                document.getElementById('payBtn').style.display = 'block';
-                alert("تم الربط! اضغط الآن على الزر الأخضر للدفع.");
+                // لو الكود وصل هنا ومفيش دالة اشتغلت، يبقى الحساب سليم
+                alert("👍 حسابك سليم! مفيش عمليات عالقة. تقدر تشتري دلوقتي.");
+                document.getElementById('buyBtn').style.display = 'block';
+                
             } catch (err) {
-                alert("فشل الربط: " + err);
+                alert("خطأ: " + err);
             }
         }
 
-        // 3. الدفع
-        async function doPay() {
+        // 2. الدالة اللي بتلاقي العملية وتمسحها
+        function onIncompletePayment(payment) {
+            alert(`⚠️ تم كشف العملية العالقة: ${payment.identifier}\nجاري الحذف من السيرفر...`);
+            
+            fetch('/api/approve', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ paymentId: payment.identifier })
+            }).then(res => res.json()).then(data => {
+                alert(`✅ تم التنظيف! اضغط OK وسيتم تحديث الصفحة.`);
+                location.reload(); // ريفرش عشان تنظف الذاكرة ونبدا من جديد
+            }).catch(e => {
+                alert("فشل الاتصال بالسيرفر: " + e);
+            });
+        }
+
+        // 3. دالة الشراء العادية
+        async function buy() {
             try {
-                await Pi.createPayment({
-                    amount: 1,
-                    memo: "تفعيل المتجر - خطوة 10",
-                    metadata: { type: "test" }
+                const payment = await Pi.createPayment({
+                    amount: 1, memo: "Test Payment", metadata: {test:true}
                 }, {
                     onReadyForServerApproval: (pid) => {
-                        fetch('/api/approve', {
-                            method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify({ paymentId: pid })
-                        });
+                        fetch('/api/approve', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({paymentId:pid})});
                     },
-                    onReadyForServerCompletion: (pid, txid) => {
-                        alert("✅ مبروك! تمت المهمة بنجاح.");
+                    onReadyForServerCompletion: (pid, txid) => { 
+                        alert("🎉 نجح الدفع! مبروك."); 
                     },
                     onCancel: () => alert("إلغاء"),
                     onError: (e) => alert("خطأ: " + e)
                 });
             } catch (e) { alert(e); }
         }
-
-        function onIncomplete(p) { console.log(p); }
     </script>
 </body>
 </html>

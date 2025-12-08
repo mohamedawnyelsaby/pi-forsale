@@ -2,82 +2,142 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إصلاح نهائي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Forsale AI</title>
+    
+    <!-- 1. استدعاء مكتبة Pi -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <style>
-        body { background: #000; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-        button { 
-            padding: 20px; width: 100%; font-size: 22px; border-radius: 12px; 
-            border: none; cursor: pointer; margin-top: 20px; font-weight: bold;
+    
+    <!-- 2. تهيئة Pi SDK فوراً -->
+    <script>
+        try {
+            Pi.init({ version: "2.0", sandbox: true });
+        } catch (e) {
+            console.error("خطأ في تهيئة Pi:", e);
         }
-        .red { background: #ff4444; color: white; }
-        .green { background: #00c851; color: white; }
-    </style>
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1>إصلاح العملية العالقة</h1>
-    <p>اضغط على الزر الأحمر لتنظيف العملية القديمة.</p>
-
-    <!-- زرار الإصلاح -->
-    <button class="red" onclick="fixPayment()">🛠️ إصلاح العملية العالقة</button>
-    
-    <!-- زرار الدفع (بعد الإصلاح) -->
-    <button class="green" onclick="payNew()">🛒 دفع عملية جديدة</button>
-
-    <script>
-        // تهيئة المكتبة
-        try Pi.init({ version: "2.0", sandbox: true });
-
-        // رقم العملية المحشورة (جبته من الصورة اللي بعتها)
-        const stuckPaymentId = "limR5hUktJ4hYgP8D59eyXvLbuL4";
-
-        // 1. دالة الإصلاح اليدوي
-        async function fixPayment() {
-            alert("جاري محاولة إلغاء العملية القديمة...");
+    <!-- شاشة تسجيل الدخول -->
+    <div id="auth-container">
+        <div class="auth-logo">
+            <span style="background:#00f2ff;color:black;padding:2px 8px;border-radius:6px">AI</span> Forsale
+        </div>
+        <div class="auth-card">
+            <h2 style="margin-bottom:20px;">سوق المستقبل</h2>
             
+            <!-- زرار الدخول (تم الإصلاح) -->
+            <button id="loginBtn" class="main-btn pi-btn" onclick="startPiLogin()">
+                <i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi
+            </button>
+            
+            <!-- مكان لظهور رسائل الخطأ لو حصلت -->
+            <p id="debug-msg" style="color:red; font-size:12px; margin-top:10px;"></p>
+        </div>
+    </div>
+
+    <!-- شاشة التطبيق (هتظهر بعد الدخول) -->
+    <div id="app-container" style="display:none;">
+        <div class="fixed-header-wrapper">
+            <div class="header">
+                <div class="content-wrapper">
+                    <div class="logo"><span class="ai-badge">AI</span> Forsale</div>
+                    <div id="username-display" style="color:#00f2ff; font-size:14px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="content-wrapper">
+                <h3 style="color:white; margin:20px 0;">منتجات مميزة</h3>
+                
+                <!-- كارت منتج -->
+                <div class="product-card" onclick="startPayment()" style="background:rgba(255,255,255,0.08); padding:15px; border-radius:15px; border:1px solid rgba(255,255,255,0.1); cursor:pointer;">
+                    <div style="height:150px; background:#222; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:10px;">
+                        <i class="fa-solid fa-gem" style="font-size:50px; color:#FFD700;"></i>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-weight:bold; color:white;">باقة تفعيل (Test)</div>
+                            <div style="font-size:12px; color:#aaa;">تفعيل الحساب</div>
+                        </div>
+                        <div style="color:#00f2ff; font-weight:bold;">1 Pi</div>
+                    </div>
+                    <button class="main-btn" style="margin-top:10px;">شراء الآن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. كود الجافاسكربت المدمج (عشان نضمن انه يشتغل) -->
+    <script>
+        // تعريف المتغيرات
+        let currentUser = null;
+
+        // دالة الدخول (مرتبطة بالزرار)
+        async function startPiLogin() {
+            const btn = document.getElementById('loginBtn');
+            const msg = document.getElementById('debug-msg');
+            
+            // تغيير شكل الزرار عشان تعرف إنه داس
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الاتصال...';
+            msg.innerText = "";
+
             try {
-                const response = await fetch('/api/approve', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ paymentId: stuckPaymentId })
-                });
+                const scopes = ['username', 'payments'];
+                // طلب المصادقة
+                const auth = await Pi.authenticate(scopes, onIncomplete);
                 
-                const data = await response.json();
-                alert("النتيجة: " + JSON.stringify(data));
-                
-            } catch (e) {
-                alert("خطأ في الاتصال: " + e);
+                // نجاح!
+                currentUser = auth.user;
+                showApp(currentUser.username);
+
+            } catch (err) {
+                // فشل - إظهار السبب
+                console.error(err);
+                btn.innerHTML = '<i class="fa-solid fa-network-wired"></i> حاول مرة أخرى';
+                msg.innerText = "فشل الاتصال: " + err;
+                alert("خطأ: " + err);
             }
         }
 
-        // 2. دالة الدفع الجديدة
-        async function payNew() {
+        // دالة إظهار التطبيق
+        function showApp(username) {
+            document.getElementById('auth-container').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+            document.getElementById('username-display').innerText = username;
+            alert("تم الدخول بنجاح! أهلاً " + username);
+        }
+
+        // دالة الشراء
+        async function startPayment() {
             try {
-                // مصادقة الأول
-                await Pi.authenticate(['username', 'payments'], onIncomplete);
-                
-                // بدء الدفع
-                await Pi.createPayment({
-                    amount: 1, 
-                    memo: "New Payment", 
+                const payment = await Pi.createPayment({
+                    amount: 1,
+                    memo: "شراء تجريبي",
                     metadata: { type: "test" }
                 }, {
-                    onReadyForServerApproval: (pid) => {
-                        fetch('/api/approve', {
+                    onReadyForServerApproval: async (paymentId) => {
+                        alert("جاري الموافقة...");
+                        await fetch('/api/approve', {
                             method: 'POST',
                             headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify({ paymentId: pid })
+                            body: JSON.stringify({ paymentId })
                         });
                     },
-                    onReadyForServerCompletion: (pid, txid) => {
-                        alert("✅ مبروك! تم الدفع بنجاح.");
+                    onReadyForServerCompletion: async (paymentId, txid) => {
+                        alert("✅ تم الدفع بنجاح!");
                     },
-                    onCancel: () => alert("إلغاء"),
+                    onCancel: () => alert("تم الإلغاء"),
                     onError: (e) => alert("خطأ: " + e)
                 });
-            } catch (e) { alert(e); }
+            } catch (e) {
+                alert("خطأ: " + e);
+            }
         }
 
         function onIncomplete(p) { console.log(p); }

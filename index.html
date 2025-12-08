@@ -4,7 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Forsale AI</title>
+    
+    <!-- 1. استدعاء مكتبة Pi -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    
+    <!-- 2. تهيئة Pi SDK فوراً -->
+    <script>
+        try {
+            Pi.init({ version: "2.0", sandbox: true });
+        } catch (e) {
+            console.error("خطأ في تهيئة Pi:", e);
+        }
+    </script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -17,18 +29,24 @@
         </div>
         <div class="auth-card">
             <h2 style="margin-bottom:20px;">سوق المستقبل</h2>
-            <button class="main-btn pi-btn" onclick="handlePiLogin()">
+            
+            <!-- زرار الدخول (تم الإصلاح) -->
+            <button id="loginBtn" class="main-btn pi-btn" onclick="startPiLogin()">
                 <i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi
             </button>
+            
+            <!-- مكان لظهور رسائل الخطأ لو حصلت -->
+            <p id="debug-msg" style="color:red; font-size:12px; margin-top:10px;"></p>
         </div>
     </div>
 
-    <!-- شاشة التطبيق والمنتجات -->
+    <!-- شاشة التطبيق (هتظهر بعد الدخول) -->
     <div id="app-container" style="display:none;">
         <div class="fixed-header-wrapper">
             <div class="header">
                 <div class="content-wrapper">
                     <div class="logo"><span class="ai-badge">AI</span> Forsale</div>
+                    <div id="username-display" style="color:#00f2ff; font-size:14px;"></div>
                 </div>
             </div>
         </div>
@@ -37,25 +55,92 @@
             <div class="content-wrapper">
                 <h3 style="color:white; margin:20px 0;">منتجات مميزة</h3>
                 
-                <!-- كارت منتج تجريبي -->
+                <!-- كارت منتج -->
                 <div class="product-card" onclick="startPayment()" style="background:rgba(255,255,255,0.08); padding:15px; border-radius:15px; border:1px solid rgba(255,255,255,0.1); cursor:pointer;">
                     <div style="height:150px; background:#222; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:10px;">
                         <i class="fa-solid fa-gem" style="font-size:50px; color:#FFD700;"></i>
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div>
-                            <div style="font-weight:bold; color:white;">باقة الذكاء الاصطناعي</div>
-                            <div style="font-size:12px; color:#aaa;">تفعيل كامل للمميزات</div>
+                            <div style="font-weight:bold; color:white;">باقة تفعيل (Test)</div>
+                            <div style="font-size:12px; color:#aaa;">تفعيل الحساب</div>
                         </div>
                         <div style="color:#00f2ff; font-weight:bold;">1 Pi</div>
                     </div>
                     <button class="main-btn" style="margin-top:10px;">شراء الآن</button>
                 </div>
-
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- 3. كود الجافاسكربت المدمج (عشان نضمن انه يشتغل) -->
+    <script>
+        // تعريف المتغيرات
+        let currentUser = null;
+
+        // دالة الدخول (مرتبطة بالزرار)
+        async function startPiLogin() {
+            const btn = document.getElementById('loginBtn');
+            const msg = document.getElementById('debug-msg');
+            
+            // تغيير شكل الزرار عشان تعرف إنه داس
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الاتصال...';
+            msg.innerText = "";
+
+            try {
+                const scopes = ['username', 'payments'];
+                // طلب المصادقة
+                const auth = await Pi.authenticate(scopes, onIncomplete);
+                
+                // نجاح!
+                currentUser = auth.user;
+                showApp(currentUser.username);
+
+            } catch (err) {
+                // فشل - إظهار السبب
+                console.error(err);
+                btn.innerHTML = '<i class="fa-solid fa-network-wired"></i> حاول مرة أخرى';
+                msg.innerText = "فشل الاتصال: " + err;
+                alert("خطأ: " + err);
+            }
+        }
+
+        // دالة إظهار التطبيق
+        function showApp(username) {
+            document.getElementById('auth-container').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+            document.getElementById('username-display').innerText = username;
+            alert("تم الدخول بنجاح! أهلاً " + username);
+        }
+
+        // دالة الشراء
+        async function startPayment() {
+            try {
+                const payment = await Pi.createPayment({
+                    amount: 1,
+                    memo: "شراء تجريبي",
+                    metadata: { type: "test" }
+                }, {
+                    onReadyForServerApproval: async (paymentId) => {
+                        alert("جاري الموافقة...");
+                        await fetch('/api/approve', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ paymentId })
+                        });
+                    },
+                    onReadyForServerCompletion: async (paymentId, txid) => {
+                        alert("✅ تم الدفع بنجاح!");
+                    },
+                    onCancel: () => alert("تم الإلغاء"),
+                    onError: (e) => alert("خطأ: " + e)
+                });
+            } catch (e) {
+                alert("خطأ: " + e);
+            }
+        }
+
+        function onIncomplete(p) { console.log(p); }
+    </script>
 </body>
 </html>

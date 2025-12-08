@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pi Network 2.1</title>
+    <title>Pi Network Force</title>
     
     <!-- تحميل المكتبة -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
@@ -13,92 +13,62 @@
         button { 
             padding: 20px; width: 100%; font-size: 20px; border-radius: 10px; 
             border: none; cursor: pointer; margin-top: 20px; font-weight: bold;
+            display: none; /* مخفي في البداية */
         }
         #btn-login { background: #F8B62C; color: #000; }
-        #btn-fix { background: #ff4444; color: #fff; display: none; }
-        #console { text-align: left; margin-top: 20px; color: #0f0; font-size: 12px; border: 1px solid #333; padding: 10px; }
+        #status { font-size: 18px; margin-bottom: 20px; color: #00f2ff; }
     </style>
 </head>
 <body>
 
-    <h2>نظام الاتصال V2.1</h2>
-    <div id="status">جاهز للاتصال...</div>
+    <h2>نظام الاتصال المؤكد</h2>
+    <div id="status">جاري تحميل مكتبة Pi...</div>
 
-    <button id="btn-login" onclick="doLogin()">🚀 بدء الاتصال (v2.1)</button>
-    <button id="btn-fix" onclick="fixStuck()">🔧 تنظيف إجباري</button>
-
-    <div id="console">Log starts...</div>
+    <button id="btn-login" onclick="doLogin()">🚀 اتصال الآن</button>
 
     <script>
-        // دالة للكتابة على الشاشة
-        function log(txt) {
-            document.getElementById('console').innerHTML += "<br>> " + txt;
-        }
+        const statusDiv = document.getElementById('status');
+        const btn = document.getElementById('btn-login');
 
-        // 1. تهيئة المكتبة بإصدار أحدث
-        try {
-            if (window.Pi) {
-                // استخدام الإصدار 2.1 قد يحل مشكلة التعليق
-                Pi.init({ version: "2.1", sandbox: true });
-                log("Pi SDK v2.1 Initialized ✅");
-            } else {
-                log("CRITICAL: Pi SDK not loaded ❌");
-                document.getElementById('status').innerText = "فشل تحميل المكتبة!";
+        // 1. الانتظار حتى تحميل الصفحة بالكامل
+        window.addEventListener('load', () => {
+            try {
+                statusDiv.innerText = "جاري تهيئة Pi...";
+                
+                // تهيئة المكتبة (الإصدار 2.0 أضمن)
+                Pi.init({ version: "2.0", sandbox: true });
+                
+                // لو وصلنا هنا يبقى نجحت التهيئة
+                statusDiv.innerText = "✅ المكتبة جاهزة. اضغط للاتصال.";
+                statusDiv.style.color = "#00c851";
+                btn.style.display = "block"; // إظهار الزرار الآن فقط
+
+            } catch (err) {
+                statusDiv.innerText = "فشل التهيئة: " + err;
+                statusDiv.style.color = "red";
             }
-        } catch (e) {
-            log("Init Error: " + e);
-        }
+        });
 
         // 2. دالة الاتصال
         async function doLogin() {
-            document.getElementById('status').innerText = "جاري الاتصال...";
-            log("Calling authenticate...");
-
+            btn.disabled = true;
+            btn.innerText = "جاري الاتصال...";
+            
             try {
                 const scopes = ['username', 'payments'];
+                const auth = await Pi.authenticate(scopes, onIncomplete);
                 
-                // هنا التغيير: هنستنى الرد
-                const auth = await Pi.authenticate(scopes, onIncompletePayment);
+                alert("تم الدخول بنجاح! المستخدم: " + auth.user.username);
+                btn.innerText = "تم الدخول ✅";
                 
-                document.getElementById('status').innerText = "تم الدخول: " + auth.user.username;
-                log("Auth Success! User: " + auth.user.username);
-                alert("نجح الدخول! ✅");
-
             } catch (err) {
-                log("Auth Failed: " + err);
-                document.getElementById('status').innerText = "فشل الاتصال";
-                alert("فشل: " + err);
+                alert("خطأ: " + err);
+                btn.innerText = "حاول مرة أخرى";
+                btn.disabled = false;
             }
         }
 
-        // 3. دالة التعامل مع العمليات العالقة
-        function onIncompletePayment(payment) {
-            log("Found Stuck Payment: " + payment.identifier);
-            document.getElementById('btn-fix').style.display = 'block'; // إظهار زر الإصلاح
-            
-            // تخزين ID العملية عشان نستخدمه في الزرار الأحمر
-            window.stuckPaymentId = payment.identifier;
-            alert("⚠️ تم كشف عملية عالقة! اضغط الزر الأحمر للتنظيف.");
-        }
-
-        // 4. زر التنظيف اليدوي
-        async function fixStuck() {
-            if(!window.stuckPaymentId) return alert("لا يوجد عملية للتنظيف");
-            
-            log("Fixing payment: " + window.stuckPaymentId);
-            
-            try {
-                await fetch('/api/approve', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ paymentId: window.stuckPaymentId })
-                });
-                alert("تم إرسال أمر التنظيف. قم بتحديث الصفحة.");
-                location.reload();
-            } catch(e) {
-                alert("خطأ: " + e);
-            }
-        }
+        function onIncomplete(p) { console.log(p); }
     </script>
 </body>
 </html>

@@ -1,0 +1,22 @@
+{
+  "manifest_version": 1,
+  "name": "Forsale",
+  "short_name": "Forsale",
+  "description": "Forsale AI Marketplace built on Pi Network.",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#6A1B9A",
+  "background_color": "#FFFFFF",
+  "pi_network": {
+    "enabled": true,
+    "sandbox": true
+  }
+}

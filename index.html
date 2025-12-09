@@ -1,197 +1,21 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Forsale AI - سوق المستقبل</title>
-    <!-- Pi Network SDK -->
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <!-- Axios للاتصال بالسيرفر الخلفي -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<!-- شاشة التحميل والدخول -->
-<div id="auth-container">
-    <div class="auth-logo">
-        <span style="background:var(--accent);color:black;font-size:14px;padding:2px 8px;border-radius:6px">AI</span> 
-        Forsale
-    </div>
-    <p style="color:var(--text-muted);margin-bottom:30px;text-align:center">منصة المستقبل الذكية - مدعومة بـ Pi Network</p>
-
-    <div class="auth-card">
-        <h2 style="margin-bottom:20px">تسجيل الدخول</h2>
-        <div id="login-loading" style="display:none; margin-bottom: 20px;">
-            <i class="fa-solid fa-spinner fa-spin fa-2x" style="color:var(--primary);"></i>
-            <p>جاري الاتصال بـ Pi Network...</p>
-        </div>
-        <button class="main-btn pi-btn" id="pi-login-btn">
-            <i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi
-        </button>
-        <div class="auth-footer">
-            <p>يجب فتح التطبيق من متصفح Pi Browser</p>
-        </div>
-    </div>
-</div>
-
-<!-- التطبيق الرئيسي -->
-<div id="app-container">
-    <div class="fixed-header-wrapper">
-        <div class="header" id="main-header">
-            <div class="content-wrapper">
-                <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-store"></i> Forsale</div>
-                <div style="display:flex; gap:10px;">
-                    <div class="icon-btn primary" onclick="openAiUploadModal()"><i class="fa-solid fa-plus"></i></div>
-                    <div class="notification-icon-container">
-                        <div class="notification-dot" id="notification-dot"></div>
-                        <div class="icon-btn" onclick="openNotificationsModal()"><i class="fa-solid fa-bell"></i></div>
-                    </div>
-                    <div class="icon-btn" onclick="openSettingsModal()"><i class="fa-solid fa-gear"></i></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="content-wrapper">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="main-search-input" placeholder="ابحث بذكاء اصطناعي أو صف منتج أحلامك...">
-            </div>
-            
-            <div class="cats-scroll" id="level1-scroll"></div>
-
-            <div class="dynamic-filters glass-panel" id="filter-panel">
-                <div class="sub-chips" id="level2-chips"> </div>
-                <div id="level3-area"> </div>
-            </div>
-
-            <h2 style="font-size: 20px; color: var(--text-main); margin: 0 0 15px;">اقتراحات Logy AI</h2>
-            
-            <div class="products-grid" id="products-grid"> </div>
-        </div>
-    </div>
-
-    <!-- نافذة تفاصيل المنتج -->
-    <div id="product-detail-modal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-eye"></i> تفاصيل المنتج</div>
-            <div class="icon-btn" onclick="closeProductDetailModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <img id="detail-img" class="detail-img" src="" alt="صورة المنتج">
-            <div class="detail-title" id="detail-title"></div>
-            <div class="detail-price" id="detail-price"></div>
-
-            <h3 class="ai-section-title"><i class="fa-solid fa-microchip"></i> تحليل Logy AI للسعر</h3>
-            <div class="glass-panel ai-price-card">
-                <div class="stat-box" id="ai-score-box">
-                    <div class="value" id="ai-score">0.0</div>
-                    <div class="label">نقطة قوة العرض (10 هي الأفضل)</div>
-                </div>
-                <div class="stat-box">
-                    <div class="value" id="ai-market-price">0 Pi</div>
-                    <div class="label">متوسط السعر السوقي (AI)</div>
-                </div>
-            </div>
-            <p id="ai-summary" style="font-size: 13px; color: var(--text-muted); margin-top: 10px; padding: 0 15px;"></p>
-
-            <h3 class="ai-section-title"><i class="fa-solid fa-truck-fast"></i> الشحن (Logy Express)</h3>
-            <div class="glass-panel ai-logistics-card">
-                <div class="step">
-                    <div class="step-icon"><i class="fa-solid fa-calendar-alt"></i></div>
-                    <div class="step-text">زمن التوصيل: <span id="shipping-eta" style="font-weight: bold; color:var(--accent);"></span></div>
-                </div>
-            </div>
-            
-            <div class="detail-tabs-container glass-panel">
-                <div class="detail-tabs-scroll">
-                    <div class="detail-tab-item active" data-tab="description" onclick="showDetailTab('description', this)">الوصف</div>
-                    <div class="detail-tab-item" data-tab="specs" onclick="showDetailTab('specs', this)">المواصفات</div>
-                </div>
-                <div class="detail-tab-content" id="detail-description">
-                    <p id="detail-desc" style="line-height: 1.8; color: var(--text-main); font-size: 14px;"></p>
-                </div>
-                <div class="detail-tab-content" id="detail-specs" style="display:none;">
-                    <ul id="specs-list" style="list-style: none; padding: 0; margin: 0;"></ul>
-                </div>
-            </div>
-        </div>
-        <div class="buy-fixed-bar">
-            <div class="content-wrapper">
-                <button class="buy-btn" id="buy-btn-modal" onclick=""><i class="fa-solid fa-shopping-cart"></i> شراء المنتج الآن</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- نافذة الدفع -->
-    <div id="checkoutModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-credit-card"></i> تأكيد الدفع</div>
-            <div class="icon-btn" onclick="closeCheckoutModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">ملخص عملية الشراء</h2>
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-box"></i> المنتج</h4>
-                <p id="checkout-product-name" style="font-weight: bold; font-size: 15px; margin-bottom: 5px;"></p>
-                <p>السعر: <span id="checkout-product-price" style="font-weight: bold; color:var(--primary);"></span></p>
-                <p style="font-size:12px; color:gray;">الرسوم (0.01 Pi) تضاف تلقائياً بواسطة الشبكة.</p>
-            </div>
-            <div class="buy-fixed-bar">
-                <div class="content-wrapper">
-                    <!-- سيتم تعيين دالة الشراء ديناميكياً -->
-                    <button class="buy-btn" id="confirm-payment-btn" style="background:var(--success-color); color:black;">
-                        <i class="fa-solid fa-wallet"></i> ادفع باستخدام Pi
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- باقي النوافذ كما هي (Settings, Notifications, Wallet...) للإيجاز، افترض وجودها -->
-    <div id="settingsModal" style="display:none;">
-         <div class="detail-header">
-            <div class="logo">الإعدادات</div>
-            <div class="icon-btn" onclick="closeSettingsModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper" style="padding-top:20px;">
-            <p>اسم المستخدم: <span id="profile-username" style="color:var(--primary)"></span></p>
-            <button class="buy-btn" style="background:var(--danger); margin-top:20px;" onclick="alert('لا يمكن تسجيل الخروج في Pi Browser')">خروج</button>
-        </div>
-    </div>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Forsale AI - Pi Network Market"
+    />
+    <title>Forsale Pi</title>
     
-    <!-- نافذة المحادثة Logy AI -->
-    <div id="logyAiModal">
-        <div class="logy-chat-header">
-            <div class="logo"><span class="ai-badge">AI</span> Logy AI</div>
-            <div class="icon-btn" onclick="closeLogyAiModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="logy-chat-area" id="logy-chat-area"></div>
-        <div class="logy-input-bar">
-            <input type="text" id="logy-input" placeholder="اسأل Logy AI...">
-            <div class="logy-send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></div>
-        </div>
-    </div>
-
-    <div class="footer-nav">
-        <div class="nav-item active" onclick="showApp()">
-            <i class="fa-solid fa-house"></i> <span>الرئيسية</span>
-        </div>
-        <div class="nav-item" onclick="openLogyAiModal()">
-            <i class="fa-solid fa-robot"></i> <span>Logy AI</span>
-        </div>
-        <div class="nav-item" onclick="alert('قريباً')">
-            <i class="fa-solid fa-box"></i> <span>الطلبات</span>
-        </div>
-        <div class="nav-item" onclick="alert('راجع رصيدك في تطبيق Pi Wallet الأصلي')">
-            <i class="fa-solid fa-wallet"></i> <span>المحفظة</span>
-        </div>
-    </div>
-</div>
-
-<script src="script.js"></script>
-</body>
+    <!-- هام جداً: ده السطر اللي كان ناقص وهو سبب التعليق -->
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
 </html>

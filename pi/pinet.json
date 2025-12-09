@@ -1,12 +1,6 @@
 {
-  "name": "Forsale",
-  "start_url": "/index.html",
-  "description": "Forsale AI: Smart Pi marketplace",
-  "icons": [
-    {
-      "src": "/icon.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
+  "pi_payment_request_url": "https://pi-forsale.vercel.app/",
+  "developer_public_key": "",
+  "name": "Forsale AI",
+  "testnet": true
 }

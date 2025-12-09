@@ -3,48 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pi Step 10 Activator</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <title>Pi Payment Step 10</title>
+    <!-- استدعاء SDK الرسمي -->
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <style>
+        body { background-color: #121212; color: white; font-family: sans-serif; text-align: center; padding: 50px 20px; }
+        .btn { display: block; width: 100%; max-width: 300px; margin: 20px auto; padding: 15px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; }
+        .btn-login { background-color: #f4b400; color: black; }
+        .btn-pay { background-color: #2ecc71; color: white; }
+        #log { margin-top: 20px; font-size: 12px; color: #888; text-align: left; background: #222; padding: 10px; border-radius: 5px; }
+    </style>
 </head>
 <body>
 
-    <div id="app-container">
-        <!-- شاشة تسجيل الدخول -->
-        <div id="login-screen" class="screen active">
-            <div class="card">
-                <h2>Step 10 Activator</h2>
-                <p>Login to enable the Payment button</p>
-                <button id="pi-login-btn" class="main-btn">
-                    <i class="fa-solid fa-bolt"></i> Login with Pi
-                </button>
-                <p id="status-msg" style="margin-top:10px; color:red; font-size:12px;"></p>
-            </div>
-        </div>
+    <h1>Step 10 Activator</h1>
+    
+    <button id="loginBtn" class="btn btn-login" onclick="doLogin()">1. Login with Pi</button>
+    <button id="payBtn" class="btn btn-pay" onclick="doPayment()" disabled>2. Pay 1 Pi (Testnet)</button>
 
-        <!-- شاشة الشراء (تظهر بعد الدخول) -->
-        <div id="shop-screen" class="screen" style="display:none;">
-            <div class="header">
-                <span>Welcome, <b id="username-display">User</b></span>
-            </div>
-            
-            <div class="card product-card">
-                <div class="icon-box"><i class="fa-solid fa-box-open"></i></div>
-                <h3>Test Product</h3>
-                <p class="price">1.0 Pi</p>
-                <p style="font-size:12px; color:#aaa;">Buying this triggers Step 10</p>
-                
-                <button id="pay-btn" class="main-btn success">
-                    <i class="fa-solid fa-wallet"></i> Pay 1 Pi Now
-                </button>
-            </div>
-        </div>
-    </div>
+    <div id="log">Logs will appear here...</div>
 
-    <!-- مكتبة Pi SDK الرسمية -->
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <!-- ملف الجافاسكريبت الخاص بنا -->
     <script src="script.js"></script>
-
 </body>
 </html>

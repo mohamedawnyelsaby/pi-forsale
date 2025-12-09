@@ -1,23 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from './pages/Login';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
 
-// افترضنا ان عندك صفحة اسمها Home، لو مش عندك هنعمل واحدة بسيطة مؤقتاً
-const Home = () => (
-  <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-    <h1 className="text-3xl">مرحباً بك في الصفحة الرئيسية 👋</h1>
-  </div>
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  // شيلنا StrictMode عشان نضمن إن الاتصال يحصل مرة واحدة بس
+  <App />
 );
-
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/home" element={<Home />} />
-      </Routes>
-    </Router>
-  );
-}
-
-export default App;

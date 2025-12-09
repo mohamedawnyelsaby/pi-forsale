@@ -1,219 +1,50 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Forsale AI - Future Market</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pi Step 10 Activator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="auth-container">
-    <div class="auth-logo">
-        <span style="background:var(--accent);color:black;font-size:14px;padding:2px 8px;border-radius:6px">AI</span> 
-        Forsale
-    </div>
-    <p style="color:var(--text-muted);margin-bottom:30px;text-align:center">The Future Platform - Powered by Pi Network</p>
-
-    <div class="auth-card">
-        <h2 style="margin-bottom:20px">Secure Login</h2>
-        
-        <div class="input-group">
-            <i class="fa-solid fa-envelope"></i>
-            <input type="email" placeholder="Email" id="login-email">
-        </div>
-        
-        <div class="input-group">
-            <i class="fa-solid fa-lock"></i>
-            <input type="password" placeholder="Password" id="login-password">
-        </div>
-
-        <button class="main-btn" id="login-btn">
-            Login <i class="fa-solid fa-arrow-left"></i>
-        </button>
-
-        <div style="margin-top:20px; cursor:pointer;" id="fingerprint-login-btn">
-            <i class="fa-solid fa-fingerprint fingerprint-scan"></i>
-            <p style="font-size:14px; color:var(--accent); font-weight:bold;">Or use Pi Network Biometrics</p>
-        </div>
-
-        <!-- Pi Login Button -->
-        <button class="main-btn pi-btn" id="pi-login-btn" style="margin-top:10px;">
-            <i class="fa-solid fa-network-wired"></i> Login with Pi Browser
-        </button>
-
-        <div class="auth-footer">
-            <p>No account? <a href="#" onclick="showRegister()">Register Now</a></p>
-        </div>
-    </div>
-</div>
-
-<div id="app-container">
-    <div class="fixed-header-wrapper">
-        <div class="header" id="main-header">
-            <div class="content-wrapper">
-                <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-store"></i> Forsale</div>
-                <div style="display:flex; gap:10px;">
-                    <div class="icon-btn primary" onclick="openAiUploadModal()"><i class="fa-solid fa-plus"></i></div>
-                    <div class="notification-icon-container">
-                        <div class="notification-dot" id="notification-dot"></div>
-                        <div class="icon-btn" onclick="openNotificationsModal()"><i class="fa-solid fa-bell"></i></div>
-                    </div>
-                    <div class="icon-btn" onclick="openSettingsModal()"><i class="fa-solid fa-gear"></i></div>
-                </div>
+    <div id="app-container">
+        <!-- شاشة تسجيل الدخول -->
+        <div id="login-screen" class="screen active">
+            <div class="card">
+                <h2>Step 10 Activator</h2>
+                <p>Login to enable the Payment button</p>
+                <button id="pi-login-btn" class="main-btn">
+                    <i class="fa-solid fa-bolt"></i> Login with Pi
+                </button>
+                <p id="status-msg" style="margin-top:10px; color:red; font-size:12px;"></p>
             </div>
         </div>
-    </div>
 
-    <div class="container">
-        <div class="content-wrapper">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" placeholder="Search with AI or describe your dream product...">
+        <!-- شاشة الشراء (تظهر بعد الدخول) -->
+        <div id="shop-screen" class="screen" style="display:none;">
+            <div class="header">
+                <span>Welcome, <b id="username-display">User</b></span>
             </div>
             
-            <div class="cats-scroll" id="level1-scroll"></div>
-
-            <div class="dynamic-filters glass-panel" id="filter-panel">
-                <div class="sub-chips" id="level2-chips"> </div>
-                <div id="level3-area"> </div>
-            </div>
-
-            <h2 style="font-size: 20px; color: var(--text-main); margin: 0 0 15px;">Logy AI Suggestions</h2>
-            
-            <div class="products-grid" id="products-grid"> </div>
-        </div>
-    </div>
-
-    <!-- Product Detail Modal -->
-    <div id="product-detail-modal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-eye"></i> Product Details</div>
-            <div class="icon-btn" onclick="closeProductDetailModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <img id="detail-img" class="detail-img" src="" alt="Product Image">
-            <div class="detail-title" id="detail-title"></div>
-            <div class="detail-price" id="detail-price"></div>
-
-            <h3 class="ai-section-title"><i class="fa-solid fa-microchip"></i> Logy AI Price Analysis</h3>
-            <div class="glass-panel ai-price-card">
-                <div class="stat-box" id="ai-score-box">
-                    <div class="value" id="ai-score">0.0</div>
-                    <div class="label">Deal Score (10 is best)</div>
-                </div>
-                <div class="stat-box">
-                    <div class="value" id="ai-market-price">0 Pi</div>
-                    <div class="label">AI Market Price</div>
-                </div>
-            </div>
-            <div class="price-chart-mock"><div class="chart-line"></div></div>
-            <p id="ai-summary" style="font-size: 13px; color: var(--text-muted); margin-top: 10px; padding: 0 15px;"></p>
-
-            <h3 class="ai-section-title"><i class="fa-solid fa-truck-fast"></i> AI Secured Logistics</h3>
-            <div class="glass-panel ai-logistics-card">
-                <div class="step">
-                    <div class="step-icon"><i class="fa-solid fa-calendar-alt"></i></div>
-                    <div class="step-text">ETA: <span id="shipping-eta" style="font-weight: bold; color:var(--accent);">3-5 Days</span></div>
-                </div>
-                <div class="step">
-                    <div class="step-icon"><i class="fa-solid fa-shield-alt"></i></div>
-                    <div class="step-text">Handling: <span id="shipping-problem" style="color:var(--text-main);">AI Managed</span></div>
-                </div>
-                <div class="step">
-                    <div class="step-icon"><i class="fa-solid fa-box"></i></div>
-                    <div class="step-text">Carrier: <span id="shipping-carrier" style="font-weight: bold; color:var(--primary);">Logy AI Express</span></div>
-                </div>
-            </div>
-            
-            <div class="detail-tabs-container glass-panel">
-                <div class="detail-tabs-scroll">
-                    <div class="detail-tab-item active" data-tab="description" onclick="showDetailTab('description', this)">
-                        <i class="fa-solid fa-file-alt"></i> Description 
-                    </div>
-                    <div class="detail-tab-item" data-tab="specs" onclick="showDetailTab('specs', this)">
-                        <i class="fa-solid fa-cogs"></i> Specs 
-                    </div>
-                </div>
-                <div class="detail-tab-content" id="detail-description">
-                    <p id="detail-desc" style="line-height: 1.8; color: var(--text-main); font-size: 14px;"></p>
-                </div>
-                <div class="detail-tab-content" id="detail-specs" style="display:none;">
-                    <ul id="specs-list" style="list-style: none; padding: 0; margin: 0;"></ul>
-                </div>
-            </div>
-
-            <div class="buy-fixed-bar">
-                <div class="content-wrapper">
-                    <button class="buy-btn" id="buy-btn" onclick="openCheckoutModal()"><i class="fa-solid fa-shopping-cart"></i> Buy Now</button>
-                </div>
+            <div class="card product-card">
+                <div class="icon-box"><i class="fa-solid fa-box-open"></i></div>
+                <h3>Test Product</h3>
+                <p class="price">1.0 Pi</p>
+                <p style="font-size:12px; color:#aaa;">Buying this triggers Step 10</p>
+                
+                <button id="pay-btn" class="main-btn success">
+                    <i class="fa-solid fa-wallet"></i> Pay 1 Pi Now
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Checkout Modal -->
-    <div id="checkoutModal">
-        <div class="detail-header">
-            <div class="logo"><span class="ai-badge">AI</span><i class="fa-solid fa-credit-card"></i> Confirm Payment</div>
-            <div class="icon-btn" onclick="closeCheckoutModal()"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="content-wrapper">
-            <h2 style="font-size: 20px; color: var(--primary); margin: 15px 0;">Purchase Summary</h2>
-            
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-box"></i> Product</h4>
-                <p id="checkout-product-name" style="font-weight: bold; font-size: 15px; margin-bottom: 5px;">iPhone 15 Pro</p>
-                <p>Price: <span id="checkout-product-price" style="font-weight: bold; color:var(--primary);">105,000 Pi</span></p>
-            </div>
-            
-            <div class="settings-group">
-                <h4><i class="fa-solid fa-shield-alt"></i> Buyer Protection (Escrow)</h4>
-                <p style="color:var(--success-color); font-weight: bold;">Secured: Funds held in Escrow until delivery.</p>
-            </div>
-
-            <div class="buy-fixed-bar">
-                <div class="content-wrapper">
-                    <!-- This button triggers the Pi Payment -->
-                    <button class="buy-btn" style="background:var(--success-color); color:black;" onclick="checkout()"><i class="fa-solid fa-wallet"></i> Pay with Pi Network</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modals placeholders (Settings, Orders, AI, etc.) kept simple for brevity -->
-    <div id="ai-upload-modal"></div>
-    <div id="settingsModal"></div>
-    <div id="ordersModal"></div>
-    <div id="walletModal"></div>
-    <div id="evidenceUploadModal"></div>
-    <div id="notificationsModal"></div>
-    <div id="sellerDashboardModal"></div>
-    <div id="logyAiModal"></div>
-
-    <div class="footer-nav">
-        <div class="nav-item active" onclick="showApp('home')">
-            <i class="fa-solid fa-house"></i>
-            <span>Home</span>
-        </div>
-        <div class="nav-item" onclick="openLogyAiModal()">
-            <i class="fa-solid fa-robot"></i>
-            <span>AI Chat</span>
-        </div>
-        <div class="nav-item" onclick="openOrdersModal()">
-            <i class="fa-solid fa-box"></i>
-            <span>Orders</span>
-        </div>
-        <div class="nav-item" onclick="openWalletModal()">
-            <i class="fa-solid fa-wallet"></i>
-            <span>Wallet</span>
-        </div>
-    </div>
-</div>
-
-<!-- Pi Network SDK (Official) -->
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
-<script src="script.js"></script>
+    <!-- مكتبة Pi SDK الرسمية -->
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <!-- ملف الجافاسكريبت الخاص بنا -->
+    <script src="script.js"></script>
 
 </body>
 </html>

@@ -1,79 +1,69 @@
-// server.js
+// هذا ملف Node.js Backend
+// يحتاج تثبيت: npm install express axios body-parser cors
+
 const express = require('express');
-const bodyParser = require('body-parser');
-const Pi = require('pi-node-sdk');
-require('dotenv').config(); // لتحميل PI_APP_SECRET من ملف .env
-
-// 1. **التحقق الأمني والمفتاح السري**
-const PI_APP_SECRET = process.env.PI_APP_SECRET;
-if (!PI_APP_SECRET) {
-    console.error("FATAL ERROR: PI_APP_SECRET is not defined. Please check your .env file in the server directory.");
-    process.exit(1);
-}
-
-const piClient = new Pi.Client({
-    appSecret: PI_APP_SECRET // استخدام المفتاح السري بأمان
-});
-
+const axios = require('axios');
+const cors = require('cors');
 const app = express();
 
-// إعداد الخادم
-app.use(bodyParser.json());
-// لكي يتمكن الخادم من تقديم ملفات الواجهة الأمامية (HTML/JS)
-app.use(express.static('client')); 
+app.use(cors());
+app.use(express.json());
 
-// ==========================================================
-// 2. مسار الموافقة على الدفع (Server Approval)
-// ==========================================================
-app.post('/api/payments/approve', async (req, res) => {
-    const { paymentId } = req.body;
+// مفتاح API الخاص بك من Pi Developer Portal
+const PI_API_KEY = "PUT_YOUR_PI_API_KEY_HERE"; 
+const PI_PLATFORM_API_URL = "https://api.minepi.com/v2";
 
-    if (!paymentId) {
-        return res.status(400).json({ success: false, error: 'Payment ID is required.' });
-    }
+// 1. نقطة الموافقة على الدفع (/approve)
+app.post('/payment/approve', async (req, res) => {
+    const { paymentId, productId } = req.body;
+    console.log(`Approving payment: ${paymentId} for product: ${productId}`);
 
     try {
-        // الاتصال بـ Pi API لـ "منح الإذن" باستخدام المفتاح السري
-        const approvalResponse = await piClient.post(`payments/${paymentId}/approve`, {});
-        
-        // **هنا يجب تخزين حالة الدفع مؤقتاً في قاعدة بيانات**
-
-        res.json({ success: true, message: 'Payment approved successfully.', data: approvalResponse });
-
+        // نخبر سيرفرات Pi أننا موافقون على هذه العملية
+        const response = await axios.post(
+            `${PI_PLATFORM_API_URL}/payments/${paymentId}/approve`, 
+            {}, 
+            { headers: { 'Authorization': `Key ${PI_API_KEY}` } }
+        );
+        res.status(200).json(response.data);
     } catch (error) {
-        console.error(`Error approving payment ${paymentId}:`, error.response ? error.response.data : error.message);
-        res.status(500).json({ success: false, error: 'Failed to approve payment with Pi API.' });
+        console.error("Error approving payment:", error.response?.data || error.message);
+        res.status(500).json({ error: "Approval failed" });
     }
 });
 
-// ==========================================================
-// 3. مسار إكمال الدفع (Server Completion)
-// ==========================================================
-app.post('/api/payments/complete', async (req, res) => {
+// 2. نقطة إكمال الدفع (/complete)
+app.post('/payment/complete', async (req, res) => {
     const { paymentId, txid } = req.body;
-
-    if (!paymentId || !txid) {
-        return res.status(400).json({ success: false, error: 'Payment ID and TxID are required.' });
-    }
+    console.log(`Completing payment: ${paymentId}, TXID: ${txid}`);
 
     try {
-        // الاتصال بـ Pi API لـ "إكمال المعاملة"
-        const completionResponse = await piClient.post(`payments/${paymentId}/complete`, { txid });
+        // نخبر سيرفرات Pi أننا تحققنا من TXID (يمكنك التحقق منه في البلوكتشين هنا)
+        const response = await axios.post(
+            `${PI_PLATFORM_API_URL}/payments/${paymentId}/complete`, 
+            { txid }, 
+            { headers: { 'Authorization': `Key ${PI_API_KEY}` } }
+        );
+        
+        // هنا يمكنك حفظ الطلب في قاعدة بياناتك (MongoDB مثلاً)
+        // saveOrderToDatabase(paymentId, txid);
 
-        // **الخطوة الحاسمة:** تحديث حالة الطلب في قاعدة البيانات إلى "مكتمل"
-        // منح المستخدم المنتج/الخدمة التي دفع مقابلها.
-
-        res.json({ success: true, message: 'Payment completed successfully, product delivered.', data: completionResponse });
+        res.status(200).json(response.data);
     } catch (error) {
-        console.error(`Error completing payment ${paymentId}:`, error.response ? error.response.data : error.message);
-        res.status(500).json({ success: false, error: 'Failed to complete payment with Pi API.' });
+        console.error("Error completing payment:", error.response?.data || error.message);
+        res.status(500).json({ error: "Completion failed" });
     }
 });
 
-// ==========================================================
-// 4. بدء الخادم
-// ==========================================================
+// 3. التعامل مع الدفعات المعلقة
+app.post('/payment/incomplete', async (req, res) => {
+    const { payment } = req.body;
+    // منطق للتحقق من حالة الدفع وإكماله أو إلغاؤه
+    // هذا يعتمد على حالتها (transaction_verified أم لا)
+    res.status(200).send("Processed");
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Secure Pi Backend running on http://localhost:${PORT}`);
+    console.log(`Forsale AI Backend running on port ${PORT}`);
 });

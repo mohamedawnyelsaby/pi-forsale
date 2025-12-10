@@ -1,12 +1,8 @@
 {
-  "name": "forsale-ai",
+  "name": "forsale-ai-static-app",
   "version": "1.0.0",
-  "type": "module",
-  "dependencies": {
-    "node-fetch": "^3.3.2"
-  },
+  "description": "Static HTML/CSS/JS application for Pi Network.",
   "scripts": {
-    "dev": "vercel dev",
-    "start": "echo 'Static app served by Vercel'"
+    "start": "echo 'Starting static server...'"
   }
 }

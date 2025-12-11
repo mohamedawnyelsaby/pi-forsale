@@ -1,136 +1,229 @@
 // ============================================
-// 🤖 Forsale AI - FIXED LOGIN
-// ✅ Using addEventListener - WORKS 100%
+// 🤖 Forsale AI - Complete Frontend Logic
 // ============================================
 
-console.log('🚀 Script loaded');
+// 🔒 Environment Detection
+const IS_PRODUCTION = window.location.hostname !== 'localhost' && 
+                      window.location.hostname !== '127.0.0.1';
 
-// Global State
+// 🔧 Safe Logging (Production-safe)
+const safeLog = IS_PRODUCTION ? () => {} : console.log;
+
+// 🌍 Global State
 let currentUser = null;
 let currentProduct = null;
-let logyMsgs = [{s:'ai', t:'مرحباً! أنا Logy AI 🤖'}];
-let unreadNotifications = 2;
+let logyMessages = [{sender:'ai', text:'مرحباً! أنا Logy AI 🤖 كيف يمكنني مساعدتك اليوم؟'}];
+let unreadNotifications = 0;
+
+// 🎯 Pi Network SDK
+let Pi = null;
+let piSDKInitialized = false;
 
 // ============================================
-// LOGIN FUNCTIONS
+// 🚀 INITIALIZATION
 // ============================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    safeLog('🚀 Forsale AI Frontend Initializing...');
+    
+    initializeLoginButtons();
+    initializeChat();
+    checkStoredUser();
+    setupPiSDK();
+});
+
+// ============================================
+// 🔐 AUTHENTICATION FUNCTIONS
+// ============================================
+
+function initializeLoginButtons() {
+    // Demo Login Button
+    const loginBtn = document.getElementById('login-btn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', demoLogin);
+    }
+    
+    // Pi Network Login Button
+    const piLoginBtn = document.getElementById('pi-login-btn');
+    if (piLoginBtn) {
+        piLoginBtn.addEventListener('click', piNetworkLogin);
+    }
+}
 
 function demoLogin() {
-    console.log('✅ demoLogin called!');
+    safeLog('🔐 Demo login initiated');
     
-    const btn = document.getElementById('login-btn');
     const email = document.getElementById('login-email')?.value || 'demo@forsale-ai.com';
     
-    if (btn) {
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري...';
-        btn.disabled = true;
-    }
+    showLoading('جاري تسجيل الدخول...');
     
     setTimeout(() => {
         currentUser = {
-            id: Date.now(),
+            id: Date.now().toString(),
             email: email,
-            username: 'Demo User',
-            isPiUser: false
+            username: 'مستخدم تجريبي',
+            isPiUser: false,
+            balance: 1000
         };
         
         localStorage.setItem('forsale_current_user', JSON.stringify(currentUser));
-        console.log('✅ User saved:', currentUser);
+        safeLog('✅ Demo user logged in:', currentUser);
         
+        hideLoading();
         showApp();
-    }, 500);
+    }, 800);
 }
 
-function showApp() {
-    console.log('✅ showApp called!');
+function piNetworkLogin() {
+    if (!piSDKInitialized || !Pi) {
+        alert('⚠️ Pi Network SDK غير مهيئ. استخدم الدخول التجريبي أو تأكد من استخدام Pi Browser.');
+        return;
+    }
     
-    const auth = document.getElementById('auth-container');
-    const app = document.getElementById('app-container');
+    Pi.authenticate(['username', 'payments'], onPiAuthSuccess)
+      .then(authResult => {
+          safeLog('🔐 Pi Network auth result:', authResult);
+      })
+      .catch(error => {
+          safeLog('❌ Pi Network auth error:', error);
+          alert('فشل المصادقة عبر Pi Network. استخدم الدخول التجريبي.');
+      });
+}
+
+function onPiAuthSuccess(authResult) {
+    safeLog('✅ Pi Network authentication successful:', authResult);
     
-    if (auth && app) {
-        auth.style.display = 'none';
-        app.style.display = 'block';
-        initializeApp();
-        console.log('✅ App shown!');
-    } else {
-        console.error('❌ Containers not found!');
+    showLoading('جاري تحميل بيانات Pi...');
+    
+    currentUser = {
+        id: authResult.user.uid,
+        email: authResult.user.email || `${authResult.user.username}@pi`,
+        username: authResult.user.username,
+        isPiUser: true,
+        piAccessToken: authResult.accessToken,
+        balance: 5000
+    };
+    
+    localStorage.setItem('forsale_current_user', JSON.stringify(currentUser));
+    localStorage.setItem('pi_auth_data', JSON.stringify(authResult));
+    
+    setTimeout(() => {
+        hideLoading();
+        showApp();
+        showNotification('✅ تم تسجيل الدخول بنجاح عبر Pi Network!');
+    }, 1000);
+}
+
+function checkStoredUser() {
+    try {
+        const stored = localStorage.getItem('forsale_current_user');
+        if (stored) {
+            const user = JSON.parse(stored);
+            if (user && user.id) {
+                currentUser = user;
+                safeLog('✅ Found stored user:', user);
+                showApp();
+            }
+        }
+    } catch (error) {
+        safeLog('❌ Error parsing stored user:', error);
+        localStorage.removeItem('forsale_current_user');
     }
 }
 
 // ============================================
-// PRODUCTS DATA
+// 📱 APP NAVIGATION
+// ============================================
+
+function showApp() {
+    const authContainer = document.getElementById('auth-container');
+    const appContainer = document.getElementById('app-container');
+    
+    if (authContainer && appContainer) {
+        authContainer.style.display = 'none';
+        appContainer.style.display = 'block';
+        initializeApp();
+        safeLog('✅ App interface shown');
+    }
+}
+
+function initializeApp() {
+    renderCategories();
+    renderProducts();
+    updateNotificationDot();
+    safeLog('✅ App initialized');
+}
+
+// ============================================
+// 🛍️ PRODUCTS FUNCTIONS
 // ============================================
 
 const PRODUCTS = [
     {
         id: 'p1',
-        name: 'iPhone 15 Pro',
-        price: 105000,
-        cat: 'tech',
-        details: 'آيفون 15 برو، حالة ممتازة، 256GB.',
-        img: 'https://placehold.co/600x400/00f2ff/0a1128?text=iPhone+15+Pro',
-        ai_analysis: {
-            score: 9.2,
-            market_price: 110000,
-            summary: 'عرض ممتاز!',
-            price_state_color: '#00f2ff'
-        },
-        shipping_ai: {eta:'3-5 أيام', carrier:'Logy AI Express'},
-        specs: {'الماركة':'أبل','التخزين':'256GB'}
+        name: 'iPhone 15 Pro - 256GB',
+        price: 105,
+        category: 'electronics',
+        description: 'آيفون 15 برو، حالة ممتازة، 256GB، مضمون من Apple، مع علبة وشاحن أصلي.',
+        image: 'https://placehold.co/600x400/00f2ff/0a1128?text=iPhone+15+Pro',
+        aiScore: 9.2,
+        marketPrice: 110,
+        specs: {
+            'النوع': 'هاتف ذكي',
+            'الماركة': 'Apple',
+            'التخزين': '256GB',
+            'الحالة': 'ممتازة'
+        }
     },
     {
         id: 'p2',
-        name: 'MacBook Pro 2024',
-        price: 155000,
-        cat: 'tech',
-        details: 'لابتوب احترافي، M3 Max.',
-        img: 'https://placehold.co/600x400/FFD700/0a1128?text=MacBook',
-        ai_analysis: {
-            score: 8.8,
-            market_price: 155000,
-            summary: 'سعر مناسب',
-            price_state_color: '#FFD700'
-        },
-        shipping_ai: {eta:'5-7 أيام', carrier:'Logy AI Express'},
-        specs: {'الماركة':'أبل','المعالج':'M3 Max'}
+        name: 'MacBook Pro M3 - 16GB',
+        price: 155,
+        category: 'electronics',
+        description: 'لابتوب MacBook Pro 2024 بشاشة 14 بوصة، معالج M3، 16GB RAM، 512GB SSD.',
+        image: 'https://placehold.co/600x400/FFD700/0a1128?text=MacBook+Pro',
+        aiScore: 8.8,
+        marketPrice: 160,
+        specs: {
+            'النوع': 'لابتوب',
+            'الماركة': 'Apple',
+            'المعالج': 'M3',
+            'الذاكرة': '16GB'
+        }
     },
     {
         id: 'p3',
-        name: 'فيلا بالرياض',
-        price: 1500000,
-        cat: 'real',
-        details: 'فيلا 500م²، 6 غرف.',
-        img: 'https://placehold.co/800x600/2ECC71/0a1128?text=Villa',
-        ai_analysis: {
-            score: 9.9,
-            market_price: 1800000,
-            summary: 'فرصة استثمارية!',
-            price_state_color: '#2ECC71'
-        },
-        shipping_ai: {eta:'14 يوم', carrier:'Logy AI Legal'},
-        specs: {'الموقع':'الرياض','المساحة':'500م²'}
+        name: 'ساعة Apple Watch Series 9',
+        price: 85,
+        category: 'electronics',
+        description: 'ساعة Apple Watch Series 9، GPS + Cellular، حالة جديدة، ضمان سنتين.',
+        image: 'https://placehold.co/600x400/2ECC71/0a1128?text=Apple+Watch',
+        aiScore: 9.5,
+        marketPrice: 90,
+        specs: {
+            'النوع': 'ساعة ذكية',
+            'الماركة': 'Apple',
+            'الموديل': 'Series 9',
+            'الشبكة': 'GPS + Cellular'
+        }
     }
 ];
-
-// ============================================
-// RENDER FUNCTIONS
-// ============================================
 
 function renderProducts() {
     const grid = document.getElementById('products-grid');
     if (!grid) return;
     
-    grid.innerHTML = PRODUCTS.map(p => `
-        <div class="product-card glass-panel" onclick="openProductDetail('${p.id}')">
+    grid.innerHTML = PRODUCTS.map(product => `
+        <div class="product-card glass-panel" onclick="openProductDetail('${product.id}')">
             <div class="p-img-box">
-                <img src="${p.img}" alt="${p.name}">
-                <div class="ai-tag" style="border-color:${p.ai_analysis.price_state_color};color:${p.ai_analysis.price_state_color};">
-                    <i class="fa-solid fa-brain"></i> ${p.ai_analysis.score}
+                <img src="${product.image}" alt="${product.name}" loading="lazy">
+                <div class="ai-tag">
+                    <i class="fa-solid fa-brain"></i> ${product.aiScore}
                 </div>
             </div>
             <div class="p-details">
-                <div class="p-name">${p.name}</div>
-                <div class="p-price">${p.price.toLocaleString()} Pi</div>
+                <div class="p-name">${product.name}</div>
+                <div class="p-price">${product.price} Pi</div>
             </div>
         </div>
     `).join('');
@@ -141,60 +234,227 @@ function renderCategories() {
     if (!container) return;
     
     container.innerHTML = `
-        <div class="cat-item active"><i class="fa-solid fa-layer-group"></i> الكل</div>
-        <div class="cat-item"><i class="fa-solid fa-laptop-code"></i> إلكترونيات</div>
-        <div class="cat-item"><i class="fa-solid fa-building"></i> عقارات</div>
+        <div class="cat-item active" onclick="filterCategory('all')">
+            <i class="fa-solid fa-layer-group"></i> الكل
+        </div>
+        <div class="cat-item" onclick="filterCategory('electronics')">
+            <i class="fa-solid fa-laptop-code"></i> إلكترونيات
+        </div>
+        <div class="cat-item" onclick="filterCategory('real-estate')">
+            <i class="fa-solid fa-building"></i> عقارات
+        </div>
+        <div class="cat-item" onclick="filterCategory('fashion')">
+            <i class="fa-solid fa-tshirt"></i> أزياء
+        </div>
     `;
 }
 
-function openProductDetail(id) {
-    const p = PRODUCTS.find(x => x.id === id);
-    if (!p) return;
+function filterCategory(category) {
+    safeLog(`Filtering by category: ${category}`);
+    showNotification(`تصفية حسب: ${category}`);
+}
+
+// ============================================
+// 📦 PRODUCT DETAIL FUNCTIONS
+// ============================================
+
+function openProductDetail(productId) {
+    const product = PRODUCTS.find(p => p.id === productId);
+    if (!product) return;
     
-    currentProduct = p;
+    currentProduct = product;
     
-    document.getElementById('detail-title').textContent = p.name;
-    document.getElementById('detail-price').textContent = `${p.price.toLocaleString()} Pi`;
-    document.getElementById('detail-img').src = p.img;
-    document.getElementById('detail-desc').textContent = p.details;
-    document.getElementById('ai-score').textContent = p.ai_analysis.score;
-    document.getElementById('ai-market-price').textContent = `${p.ai_analysis.market_price.toLocaleString()} Pi`;
-    document.getElementById('ai-summary').textContent = p.ai_analysis.summary;
-    document.getElementById('shipping-eta').textContent = p.shipping_ai.eta;
-    document.getElementById('shipping-carrier').textContent = p.shipping_ai.carrier;
+    // Update modal content
+    document.getElementById('detail-title').textContent = product.name;
+    document.getElementById('detail-price').textContent = `${product.price} Pi`;
+    document.getElementById('detail-img').src = product.image;
+    document.getElementById('detail-img').alt = product.name;
+    document.getElementById('detail-desc').textContent = product.description;
+    document.getElementById('ai-score').textContent = product.aiScore;
+    document.getElementById('ai-market-price').textContent = `${product.marketPrice} Pi`;
+    document.getElementById('shipping-eta').textContent = '3-5 أيام عمل';
     
-    const specs = document.getElementById('specs-list');
-    specs.innerHTML = Object.entries(p.specs).map(([k,v]) => 
-        `<li style="display:flex;justify-content:space-between;padding:5px 0;">
-            <span style="color:var(--text-muted);">${k}</span>
-            <span style="font-weight:bold;">${v}</span>
-        </li>`
-    ).join('');
-    
+    // Show modal
     document.getElementById('product-detail-modal').style.display = 'block';
     document.body.style.overflow = 'hidden';
+    
+    safeLog(`📦 Product detail opened: ${product.name}`);
 }
 
 function closeProductDetailModal() {
     document.getElementById('product-detail-modal').style.display = 'none';
     document.body.style.overflow = '';
+    safeLog('📦 Product detail closed');
 }
 
-function showDetailTab(tab, el) {
-    document.querySelectorAll('.detail-tab-content').forEach(c => c.style.display = 'none');
-    document.querySelectorAll('.detail-tab-item').forEach(i => i.classList.remove('active'));
-    document.getElementById(`detail-${tab}`).style.display = 'block';
-    el.classList.add('active');
-}
-
-function initiatePurchase() {
-    if (!currentProduct) return;
-    alert(`🎉 محاكاة شراء!\n\nالمنتج: ${currentProduct.name}\nالسعر: ${currentProduct.price.toLocaleString()} Pi`);
-    closeProductDetailModal();
+function showDetailTab(tabName, element) {
+    // Hide all tab contents
+    document.querySelectorAll('.detail-tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+    
+    // Remove active class from all tabs
+    document.querySelectorAll('.detail-tab-item').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Show selected tab and mark as active
+    document.getElementById(`detail-${tabName}`).style.display = 'block';
+    element.classList.add('active');
 }
 
 // ============================================
-// CHAT FUNCTIONS
+// 💰 PAYMENT FUNCTIONS (Pi Network Testnet)
+// ============================================
+
+function initiatePurchase() {
+    if (!currentUser) {
+        alert('⚠️ يجب تسجيل الدخول أولاً');
+        return;
+    }
+    
+    if (!currentProduct) {
+        alert('⚠️ لا يوجد منتج محدد');
+        return;
+    }
+    
+    if (currentUser.isPiUser) {
+        // Pi Network payment
+        startPiPayment();
+    } else {
+        // Demo payment
+        processDemoPayment();
+    }
+}
+
+function startPiPayment() {
+    if (!piSDKInitialized || !Pi) {
+        alert('❌ Pi Network SDK غير متاح. تأكد من استخدام Pi Browser.');
+        return;
+    }
+    
+    // Show payment modal
+    document.getElementById('payment-title').textContent = `دفع ${currentProduct.price} Pi`;
+    document.getElementById('payment-details').innerHTML = `
+        <p>المنتج: <strong>${currentProduct.name}</strong></p>
+        <p>السعر: <strong style="color:var(--primary);">${currentProduct.price} Pi</strong></p>
+        <p>الشبكة: <span style="color:var(--accent);">Testnet (تجريبي)</span></p>
+    `;
+    
+    document.getElementById('product-detail-modal').style.display = 'none';
+    document.getElementById('pi-payment-modal').style.display = 'block';
+}
+
+function processPiPayment() {
+    showLoading('جاري معالجة الدفع عبر Pi Network...');
+    
+    const paymentData = {
+        amount: currentProduct.price,
+        memo: `شراء ${currentProduct.name}`,
+        metadata: {
+            productId: currentProduct.id,
+            productName: currentProduct.name,
+            buyerId: currentUser.id
+        }
+    };
+    
+    // Create Pi payment
+    Pi.createPayment(paymentData, {
+        onReadyForServerApproval: (paymentId) => {
+            safeLog('✅ Pi payment ready for approval:', paymentId);
+            approvePiPayment(paymentId);
+        },
+        onReadyForServerCompletion: (paymentId, txid) => {
+            safeLog('✅ Pi payment ready for completion:', paymentId, txid);
+            completePiPayment(paymentId, txid);
+        },
+        onCancel: (paymentId) => {
+            safeLog('❌ Pi payment cancelled:', paymentId);
+            hideLoading();
+            showNotification('❌ تم إلغاء الدفع');
+        },
+        onError: (error, payment) => {
+            safeLog('❌ Pi payment error:', error);
+            hideLoading();
+            alert('حدث خطأ في عملية الدفع: ' + error.message);
+        }
+    });
+}
+
+function approvePiPayment(paymentId) {
+    // Simulate backend approval (in production, call your backend)
+    setTimeout(() => {
+        Pi.approvePayment(paymentId);
+        safeLog(`✅ Pi payment ${paymentId} approved`);
+    }, 1500);
+}
+
+function completePiPayment(paymentId, txid) {
+    // Simulate backend completion (in production, call your backend)
+    setTimeout(() => {
+        Pi.completePayment(paymentId, txid);
+        hideLoading();
+        
+        // Show success
+        document.getElementById('pi-payment-modal').style.display = 'none';
+        showNotification(`✅ تمت عملية الدفع بنجاح! رقم المعاملة: ${txid.substring(0, 12)}...`);
+        
+        // Create order
+        createOrder(paymentId, txid);
+        
+        safeLog(`✅ Pi payment completed: ${paymentId}, TXID: ${txid}`);
+    }, 2000);
+}
+
+function processDemoPayment() {
+    showLoading('جاري معالجة الدفع التجريبي...');
+    
+    setTimeout(() => {
+        hideLoading();
+        
+        // Demo order creation
+        const orderId = `DEMO_${Date.now()}`;
+        createOrder(orderId, `demo_tx_${Date.now()}`);
+        
+        showNotification(`✅ تمت عملية الدفع التجريبي بنجاح! رقم الطلب: ${orderId}`);
+        closeProductDetailModal();
+        
+        safeLog(`✅ Demo payment completed for order: ${orderId}`);
+    }, 1500);
+}
+
+function createOrder(paymentId, txid) {
+    const order = {
+        id: `ORDER_${Date.now()}`,
+        productId: currentProduct.id,
+        productName: currentProduct.name,
+        price: currentProduct.price,
+        paymentId: paymentId,
+        transactionId: txid,
+        status: 'processing',
+        createdAt: new Date().toISOString(),
+        shipping: {
+            carrier: 'Logy AI Express',
+            estimatedDays: '3-5',
+            trackingId: `TRACK_${Date.now()}`
+        }
+    };
+    
+    // Save order
+    let orders = JSON.parse(localStorage.getItem('forsale_orders') || '[]');
+    orders.push(order);
+    localStorage.setItem('forsale_orders', JSON.stringify(orders));
+    
+    safeLog(`📦 Order created:`, order);
+}
+
+function closePaymentModal() {
+    document.getElementById('pi-payment-modal').style.display = 'none';
+    document.getElementById('product-detail-modal').style.display = 'block';
+}
+
+// ============================================
+// 🤖 LOGY AI CHAT FUNCTIONS
 // ============================================
 
 function openLogyAiModal() {
@@ -206,142 +466,220 @@ function closeLogyAiModal() {
     document.getElementById('logyAiModal').style.display = 'none';
 }
 
+function initializeChat() {
+    const input = document.getElementById('logy-input');
+    if (input) {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    }
+}
+
 function renderChat() {
     const area = document.getElementById('logy-chat-area');
-    area.innerHTML = logyMsgs.map(m => 
-        `<div class="message-bubble msg-${m.s}">${m.t}</div>`
-    ).join('');
+    if (!area) return;
+    
+    area.innerHTML = logyMessages.map(msg => `
+        <div class="message-bubble msg-${msg.sender}">
+            ${msg.text}
+        </div>
+    `).join('');
+    
     area.scrollTop = area.scrollHeight;
 }
 
 function sendMessage() {
     const input = document.getElementById('logy-input');
-    const text = input.value.trim();
-    if (!text) return;
+    const message = input.value.trim();
     
-    logyMsgs.push({s:'user', t:text});
+    if (!message) return;
+    
+    // Add user message
+    logyMessages.push({
+        sender: 'user',
+        text: message
+    });
+    
     input.value = '';
     renderChat();
     
+    // AI response (simulated)
     setTimeout(() => {
-        logyMsgs.push({s:'ai', t:'شكراً! 🤖 يمكنني مساعدتك.'});
+        const responses = [
+            'أنا Logy AI! 🤖 يمكنني مساعدتك في البحث عن المنتجات، تحليل الأسعار، ومتابعة الشحنات.',
+            'لشراء منتج، اضغط على الزر "شراء" وسأدير عملية الدفع والضمان تلقائياً.',
+            'أنت تستخدم حالياً شبكة Pi Testnet. المعاملات هنا تجريبية ولأغراض الاختبار فقط.',
+            'هل لديك أي استفسار عن منتج معين؟ يمكنني تحليل السعر والجودة لك.',
+            'نظام الضمان (Escrow) لدينا يحفظ أموالك حتى تستلم المنتج ويوافق البائع على الإفراج.'
+        ];
+        
+        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+        
+        logyMessages.push({
+            sender: 'ai',
+            text: randomResponse
+        });
+        
         renderChat();
     }, 1000);
 }
 
 // ============================================
-// OTHER FUNCTIONS
+// 📱 UI HELPER FUNCTIONS
 // ============================================
 
-function openNotificationsModal() {
-    alert('🔔 لا توجد إشعارات');
+function showLoading(message = 'جاري التحميل...') {
+    const overlay = document.getElementById('loading-overlay');
+    const text = document.getElementById('loading-text');
+    
+    if (overlay && text) {
+        text.textContent = message;
+        overlay.style.display = 'flex';
+    }
 }
 
-function openSettingsModal() {
-    alert('⚙️ الإعدادات قريباً');
+function hideLoading() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
 }
 
-function openOrdersModal() {
-    alert('📦 لا توجد طلبات');
-}
-
-function openWalletModal() {
-    alert('💰 المحفظة قريباً');
-}
-
-function showView(v) {
-    document.querySelectorAll('.footer-nav .nav-item').forEach(i => i.classList.remove('active'));
-    if (event?.currentTarget) event.currentTarget.classList.add('active');
+function showNotification(message) {
+    safeLog('📢 Notification:', message);
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: var(--primary);
+        color: black;
+        padding: 15px;
+        border-radius: 10px;
+        z-index: 9999;
+        max-width: 300px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        animation: slideIn 0.3s ease;
+    `;
+    
+    notification.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;">
+            <i class="fa-solid fa-bell"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
 }
 
 function updateNotificationDot() {
     const dot = document.getElementById('notification-dot');
-    if (dot) dot.style.display = unreadNotifications > 0 ? 'block' : 'none';
+    if (dot) {
+        dot.style.display = unreadNotifications > 0 ? 'block' : 'none';
+    }
 }
 
-function initializeApp() {
-    renderCategories();
-    renderProducts();
-    updateNotificationDot();
+function showView(viewName) {
+    safeLog(`Switching to view: ${viewName}`);
+    showNotification(`تم التبديل إلى: ${viewName}`);
 }
 
-// ============================================
-// MAIN - PAGE LOAD
-// ============================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('═══════════════════════════════════════');
-    console.log('🚀 Forsale AI Loading...');
-    console.log('═══════════════════════════════════════');
+function showOrders() {
+    const orders = JSON.parse(localStorage.getItem('forsale_orders') || '[]');
     
-    // Get buttons
-    const loginBtn = document.getElementById('login-btn');
-    const piLoginBtn = document.getElementById('pi-login-btn');
-    
-    console.log('🔍 Buttons found:');
-    console.log('  login-btn:', loginBtn ? '✅' : '❌');
-    console.log('  pi-login-btn:', piLoginBtn ? '✅' : '❌');
-    
-    // Setup Demo Login Button
-    if (loginBtn) {
-        console.log('🔧 Setting up login-btn...');
-        
-        // Remove any existing listeners
-        const newLoginBtn = loginBtn.cloneNode(true);
-        loginBtn.parentNode.replaceChild(newLoginBtn, loginBtn);
-        
-        // Add new listener
-        newLoginBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('🎯 Login button CLICKED!');
-            demoLogin();
-        });
-        
-        console.log('✅ login-btn ready!');
+    if (orders.length === 0) {
+        alert('📦 لا توجد طلبات حالياً.');
     } else {
-        console.error('❌ login-btn NOT FOUND!');
+        const ordersList = orders.map(order => 
+            `رقم الطلب: ${order.id}\nالمنتج: ${order.productName}\nالحالة: ${order.status}`
+        ).join('\n\n');
+        
+        alert(`📦 طلباتك:\n\n${ordersList}`);
+    }
+}
+
+function showWallet() {
+    const balance = currentUser ? currentUser.balance : 0;
+    alert(`💰 رصيدك: ${balance} Pi\n\nالمعاملات:\n${currentUser.isPiUser ? '✅ حساب Pi Network نشط' : '👤 حساب تجريبي'}`);
+}
+
+function openAiUploadModal() {
+    alert('📤 ميزة إضافة المنتج بواسطة AI قريباً!');
+}
+
+function openNotificationsModal() {
+    showNotification('🔔 لا توجد إشعارات جديدة');
+}
+
+function openSettingsModal() {
+    alert('⚙️ صفحة الإعدادات قيد التطوير');
+}
+
+// ============================================
+// 🌐 PI NETWORK SDK SETUP
+// ============================================
+
+function setupPiSDK() {
+    // Wait for Pi SDK to load
+    if (typeof window.Pi === 'undefined') {
+        setTimeout(setupPiSDK, 500);
+        return;
     }
     
-    // Setup Pi Login Button
-    if (piLoginBtn) {
-        console.log('🔧 Setting up pi-login-btn...');
-        
-        const newPiBtn = piLoginBtn.cloneNode(true);
-        piLoginBtn.parentNode.replaceChild(newPiBtn, piLoginBtn);
-        
-        newPiBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('🎯 Pi button CLICKED!');
-            alert('⚠️ Pi Network login\n\nيحتاج Pi Browser\n\nاستخدم الدخول التجريبي للاختبار.');
-        });
-        
-        console.log('✅ pi-login-btn ready!');
-    }
+    Pi = window.Pi;
     
-    // Setup chat
-    const logyInput = document.getElementById('logy-input');
-    if (logyInput) {
-        logyInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') sendMessage();
-        });
-    }
-    
-    // Check stored user
-    const stored = localStorage.getItem('forsale_current_user');
-    if (stored) {
-        try {
-            currentUser = JSON.parse(stored);
-            console.log('✅ Found stored user');
-            showApp();
-        } catch (e) {
-            console.error('❌ Error:', e);
+    // Initialize Pi SDK
+    Pi.init({
+        version: "2.0",
+        sandbox: !IS_PRODUCTION  // Use sandbox in development
+    }).then(() => {
+        piSDKInitialized = true;
+        safeLog('✅ Pi Network SDK initialized successfully');
+        
+        // Check for incomplete payments
+        const authData = localStorage.getItem('pi_auth_data');
+        if (authData) {
+            try {
+                Pi.authenticate(['username', 'payments'], onPiAuthSuccess);
+            } catch (error) {
+                safeLog('⚠️ Auto-authentication failed:', error);
+            }
         }
+    }).catch(error => {
+        safeLog('❌ Pi Network SDK initialization failed:', error);
+        piSDKInitialized = false;
+    });
+}
+
+// ============================================
+// 🎨 ANIMATION STYLES
+// ============================================
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
     }
     
-    console.log('═══════════════════════════════════════');
-    console.log('✅ Forsale AI READY!');
-    console.log('Try clicking the login button now!');
-    console.log('═══════════════════════════════════════');
-});
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+
+safeLog('🎉 Forsale AI Frontend loaded successfully!');

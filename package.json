@@ -20,7 +20,7 @@
   "author": "Forsale AI Team",
   "license": "MIT",
   "engines": {
-    "node": ">=18.0.0",
+    "node": "18.x",
     "npm": ">=9.0.0"
   },
   "dependencies": {
@@ -40,5 +40,5 @@
   "bugs": {
     "url": "https://github.com/yourusername/forsale-ai/issues"
   },
-  "homepage": "https://forsale-ai.com"
+  "homepage": "https://pi-forsale.vercel.app/"
 }

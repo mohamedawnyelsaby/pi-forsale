@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "name": "forsale-ai",
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/health",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/payment/(.*)",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/ai/(.*)",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/order/(.*)",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
+  ],
+  "env": {
+    "PI_API_KEY": "@pi_api_key",
+    "NODE_ENV": "production"
+  },
+  "regions": ["iad1"]
+}

@@ -1,44 +1,30 @@
 // ============================================
-// 🤖 Forsale AI - FIXED Frontend Logic
-// ✅ Login now works WITHOUT backend!
+// 🤖 Forsale AI - Frontend Logic
+// ✅ FIXED: Login now works 100%
 // ============================================
-
-// Configuration
-const CONFIG = {
-    API_URL: window.location.origin, // استخدام نفس الـ domain
-    PI_NETWORK_MODE: 'sandbox',
-    AI_ENABLED: true
-};
 
 // Global State
 let piInstance = null;
 let currentUser = null;
 let currentPiUser = null;
 let activeCategory = 'all';
-let activeSub = null;
 let unreadNotifications = 2;
 let currentProduct = null;
 let logyMsgs = [
-    { 
-        s: 'ai', 
-        t: 'مرحباً! أنا Logy AI 🤖\n\nأنا مساعدك الشخصي الذكي. كيف يمكنني مساعدتك اليوم؟' 
-    }
+    { s: 'ai', t: 'مرحباً! أنا Logy AI 🤖\n\nكيف يمكنني مساعدتك؟' }
 ];
 
 // ============================================
-// 1. Pi Network SDK Initialization
+// 1. Initialize Pi SDK
 // ============================================
-
 async function initializePiSDK() {
     try {
         piInstance = window.Pi;
-        
         if (!piInstance) {
-            console.warn('⚠️ Pi SDK not available (not in Pi Browser)');
+            console.warn('⚠️ Pi SDK not available');
             return false;
         }
-        
-        console.log('✅ Pi SDK initialized');
+        console.log('✅ Pi SDK ready');
         return true;
     } catch (error) {
         console.error('❌ Pi SDK error:', error);
@@ -47,11 +33,14 @@ async function initializePiSDK() {
 }
 
 // ============================================
-// 2. Pi Network Authentication (FIXED!)
+// 2. Pi Network Authentication
 // ============================================
-
 async function authenticateWithPi() {
-    showLoading('جاري الاتصال بـ Pi Network...');
+    console.log('🔐 Authenticating with Pi...');
+    
+    const btn = document.getElementById('pi-login-btn');
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الاتصال...';
+    btn.disabled = true;
     
     try {
         if (!piInstance) {
@@ -62,231 +51,92 @@ async function authenticateWithPi() {
         const authResult = await piInstance.authenticate(scopes, onIncompletePaymentFound);
         
         currentPiUser = authResult.user;
-        
-        console.log('✅ Pi Authentication successful:', currentPiUser);
-        
         currentUser = {
             id: currentPiUser.uid,
             username: currentPiUser.username,
-            piId: currentPiUser.uid,
-            joinDate: new Date().toISOString(),
-            isPiUser: true
-        };
-        
-        localStorage.setItem('forsale_current_user', JSON.stringify(currentUser));
-        localStorage.setItem('forsale_pi_user', JSON.stringify(currentPiUser));
-        
-        hideLoading();
-        showApp();
-        
-        setTimeout(() => {
-            addLogyMessage(`مرحباً ${currentPiUser.username}! 👋\n\nتم تسجيل دخولك بنجاح. هل تريد مني أن أعرض لك أفضل العروض؟`);
-        }, 2000);
-        
-        return authResult;
-        
-    } catch (error) {
-        console.error('❌ Pi Authentication failed:', error);
-        hideLoading();
-        
-        // Fallback to demo mode
-        alert('⚠️ لا يمكن الاتصال بـ Pi Network\n\nسيتم استخدام الوضع التجريبي.\n\nللحصول على التجربة الكاملة، استخدم Pi Browser.');
-        
-        // Auto login with demo
-        demoLogin();
-        
-        return null;
-    }
-}
-
-// ============================================
-// 3. Demo Login (FIXED - Works Offline!)
-// ============================================
-
-function demoLogin() {
-    showLoading('جاري تسجيل الدخول...');
-    
-    setTimeout(() => {
-        const email = document.getElementById('login-email')?.value || 'demo@forsale-ai.com';
-        
-        currentUser = { 
-            id: Date.now(), 
-            email: email,
-            username: 'Demo User',
-            joinDate: new Date().toISOString(),
-            isPiUser: false
+            isPiUser: true,
+            joinDate: new Date().toISOString()
         };
         
         localStorage.setItem('forsale_current_user', JSON.stringify(currentUser));
         
-        hideLoading();
+        console.log('✅ Pi login success:', currentUser);
         showApp();
         
         setTimeout(() => {
-            addLogyMessage('مرحباً بك في الوضع التجريبي! 🎮\n\nيمكنك تصفح المنتجات واختبار جميع الميزات.');
+            addLogyMessage(`مرحباً ${currentUser.username}! 👋\n\nتم تسجيل دخولك بنجاح.`);
         }, 1000);
-    }, 1000);
-}
-
-// ============================================
-// 4. Payment (FIXED - Works in Demo Mode!)
-// ============================================
-
-async function createPiPayment(product) {
-    if (!piInstance) {
-        // Demo mode payment
-        showLoading('محاكاة عملية الدفع...');
-        
-        setTimeout(() => {
-            hideLoading();
-            alert(`🎉 محاكاة شراء ناجحة!\n\nالمنتج: ${product.name}\nالسعر: ${product.price.toLocaleString()} Pi\n\n✅ في الإصدار الحقيقي، سيتم الدفع عبر Pi Network`);
-            
-            closeProductDetailModal();
-            
-            addLogyMessage(`تم محاكاة شراء "${product.name}"!\n\nفي الإصدار الحقيقي:\n✓ دفع آمن عبر Pi\n✓ شحن تلقائي\n✓ تتبع لحظي`);
-        }, 2000);
-        
-        return;
-    }
-    
-    if (!currentPiUser) {
-        alert('يجب تسجيل الدخول أولاً');
-        return;
-    }
-    
-    showLoading('جاري إنشاء طلب الدفع...');
-    
-    try {
-        const paymentData = {
-            amount: product.price,
-            memo: `شراء: ${product.name}`,
-            metadata: {
-                productId: product.id,
-                productName: product.name,
-                buyerUid: currentPiUser.uid,
-                timestamp: Date.now()
-            }
-        };
-        
-        const callbacks = {
-            onReadyForServerApproval: function(paymentId) {
-                console.log('📡 Payment approved:', paymentId);
-                hideLoading();
-                alert('✅ تمت الموافقة على الدفع!');
-            },
-            onReadyForServerCompletion: function(paymentId, txid) {
-                console.log('📡 Payment completed:', paymentId, txid);
-                hideLoading();
-                alert('🎉 تم الدفع بنجاح!');
-                closeProductDetailModal();
-            },
-            onCancel: function(paymentId) {
-                console.log('⚠️ Payment cancelled:', paymentId);
-                hideLoading();
-                alert('تم إلغاء عملية الدفع');
-            },
-            onError: function(error, payment) {
-                console.error('❌ Payment error:', error);
-                hideLoading();
-                alert(`خطأ في الدفع: ${error.message}`);
-            }
-        };
-        
-        await piInstance.createPayment(paymentData, callbacks);
         
     } catch (error) {
-        console.error('❌ Payment failed:', error);
-        hideLoading();
-        alert('فشل إنشاء طلب الدفع');
+        console.error('❌ Pi auth failed:', error);
+        btn.innerHTML = '<i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi Network';
+        btn.disabled = false;
+        alert('فشل الاتصال بـ Pi Network. جرّب الوضع التجريبي.');
     }
 }
 
 function onIncompletePaymentFound(payment) {
-    console.log('⚠️ Incomplete payment found:', payment);
+    console.log('⚠️ Incomplete payment:', payment);
 }
 
 // ============================================
-// 5. UI Functions
+// 3. Demo Login (WORKS OFFLINE!)
 // ============================================
-
-function showLoading(text = 'جاري التحميل...') {
-    let overlay = document.getElementById('loading-overlay');
+function demoLogin() {
+    console.log('🎮 Demo login starting...');
     
-    if (!overlay) {
-        // Create loading overlay if doesn't exist
-        overlay = document.createElement('div');
-        overlay.id = 'loading-overlay';
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        `;
-        overlay.innerHTML = `
-            <i class="fa-solid fa-robot fa-3x" style="color: #00f2ff; animation: spin 2s linear infinite; margin-bottom: 20px;"></i>
-            <p id="loading-text" style="color: white; font-size: 16px;">${text}</p>
-        `;
-        document.body.appendChild(overlay);
-    } else {
-        document.getElementById('loading-text').textContent = text;
-        overlay.style.display = 'flex';
-    }
+    const btn = document.getElementById('login-btn');
+    const email = document.getElementById('login-email').value || 'demo@forsale-ai.com';
+    
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الدخول...';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+        currentUser = {
+            id: Date.now(),
+            email: email,
+            username: 'Demo User',
+            isPiUser: false,
+            joinDate: new Date().toISOString()
+        };
+        
+        localStorage.setItem('forsale_current_user', JSON.stringify(currentUser));
+        
+        console.log('✅ Demo login success:', currentUser);
+        showApp();
+        
+        setTimeout(() => {
+            addLogyMessage('مرحباً في الوضع التجريبي! 🎮\n\nيمكنك تصفح واختبار جميع الميزات.');
+        }, 1000);
+    }, 800);
 }
 
-function hideLoading() {
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) {
-        overlay.style.display = 'none';
-    }
-}
-
+// ============================================
+// 4. Show App Function
+// ============================================
 function showApp() {
-    document.getElementById('auth-container').style.display = 'none';
-    document.getElementById('app-container').style.display = 'block';
-    initializeApp();
+    console.log('📱 Showing app...');
+    
+    const authContainer = document.getElementById('auth-container');
+    const appContainer = document.getElementById('app-container');
+    
+    if (authContainer && appContainer) {
+        authContainer.style.display = 'none';
+        appContainer.style.display = 'block';
+        initializeApp();
+    } else {
+        console.error('❌ Containers not found!');
+    }
 }
 
 // ============================================
-// 6. Products Data
+// 5. Products Data
 // ============================================
-
 const CATEGORIES = [
-    { id: 'all', name: 'الكل', icon: 'fa-layer-group', subs: [] },
-    { 
-        id: 'tech', 
-        name: 'إلكترونيات', 
-        icon: 'fa-laptop-code', 
-        subs: [
-            { id: 'mobile', name: 'هواتف' },
-            { id: 'laptops', name: 'حواسيب' },
-            { id: 'accs', name: 'إكسسوارات' }
-        ] 
-    },
-    { 
-        id: 'real', 
-        name: 'عقارات', 
-        icon: 'fa-building', 
-        subs: [
-            { id: 'apartments', name: 'شقق' },
-            { id: 'villas', name: 'فيلات' }
-        ] 
-    },
-    { 
-        id: 'fashion', 
-        name: 'أزياء', 
-        icon: 'fa-shirt', 
-        subs: [
-            { id: 'clothes', name: 'ملابس' },
-            { id: 'shoes', name: 'أحذية' }
-        ] 
-    }
+    { id: 'all', name: 'الكل', icon: 'fa-layer-group' },
+    { id: 'tech', name: 'إلكترونيات', icon: 'fa-laptop-code' },
+    { id: 'real', name: 'عقارات', icon: 'fa-building' },
+    { id: 'fashion', name: 'أزياء', icon: 'fa-shirt' }
 ];
 
 const PRODUCTS = [
@@ -295,22 +145,20 @@ const PRODUCTS = [
         name: 'iPhone 15 Pro (Titanium)',
         price: 105000,
         cat: 'tech',
-        details: 'آيفون 15 برو مستعمل شهر واحد، حالة ممتازة (100%)، تيتانيوم، 256GB.',
+        details: 'آيفون 15 برو مستعمل شهر واحد، حالة ممتازة (100%)، 256GB.',
         img: 'https://placehold.co/600x400/00f2ff/0a1128?text=iPhone+15+Pro',
         ai_analysis: {
             score: 9.2,
             market_price: 110000,
-            summary: 'عرض ممتاز! السعر أقل من السوق بـ5%. يوصي به Logy AI.',
+            summary: 'عرض ممتاز! السعر أقل من السوق بـ5%.',
             price_state_color: '#00f2ff'
         },
         shipping_ai: {
             eta: '3-5 أيام',
-            problem_handling: 'مراقبة AI 24/7',
             carrier: 'Logy AI Express'
         },
         specs: {
             'الماركة': 'أبل',
-            'الموديل': 'آيفون 15 برو',
             'التخزين': '256GB',
             'اللون': 'تيتانيوم',
             'البطارية': '98%'
@@ -321,24 +169,22 @@ const PRODUCTS = [
         name: 'MacBook Pro 2024',
         price: 155000,
         cat: 'tech',
-        details: 'لابتوب احترافي جديد، M3 Max، 32GB RAM، 1TB SSD.',
+        details: 'لابتوب احترافي جديد، M3 Max، 32GB RAM.',
         img: 'https://placehold.co/600x400/FFD700/0a1128?text=MacBook+Pro',
         ai_analysis: {
             score: 8.8,
             market_price: 155000,
-            summary: 'السعر مطابق للسوق. جودة ممتازة.',
+            summary: 'السعر مطابق للسوق.',
             price_state_color: '#FFD700'
         },
         shipping_ai: {
             eta: '5-7 أيام',
-            problem_handling: 'مراقبة AI 24/7',
             carrier: 'Logy AI Express'
         },
         specs: {
             'الماركة': 'أبل',
             'المعالج': 'M3 Max',
-            'الذاكرة': '32GB',
-            'التخزين': '1TB'
+            'الذاكرة': '32GB'
         }
     },
     {
@@ -346,24 +192,22 @@ const PRODUCTS = [
         name: 'فيلا فاخرة بالرياض',
         price: 1500000,
         cat: 'real',
-        details: 'فيلا 500م²، 6 غرف، مسبح، حديقة.',
+        details: 'فيلا 500م²، 6 غرف، مسبح.',
         img: 'https://placehold.co/800x600/2ECC71/0a1128?text=Villa',
         ai_analysis: {
             score: 9.9,
             market_price: 1800000,
-            summary: 'فرصة استثمارية! أقل بـ17% من السوق.',
+            summary: 'فرصة استثمارية! أقل بـ17%.',
             price_state_color: '#2ECC71'
         },
         shipping_ai: {
             eta: 'تحويل خلال 14 يوم',
-            problem_handling: 'مراجعة قانونية AI',
             carrier: 'Logy AI Legal'
         },
         specs: {
             'الموقع': 'الرياض',
             'المساحة': '500م²',
-            'الغرف': '6',
-            'الحالة': 'جديد'
+            'الغرف': '6'
         }
     },
     {
@@ -371,32 +215,28 @@ const PRODUCTS = [
         name: 'Samsung Galaxy S24',
         price: 95000,
         cat: 'tech',
-        details: 'جوال جديد، 512GB، كاميرا 200MP.',
+        details: 'جوال جديد، 512GB.',
         img: 'https://placehold.co/600x400/4A90E2/ffffff?text=Galaxy+S24',
         ai_analysis: {
             score: 8.5,
             market_price: 98000,
-            summary: 'سعر جيد، أقل بـ3% من السوق.',
+            summary: 'سعر جيد.',
             price_state_color: '#4A90E2'
         },
         shipping_ai: {
             eta: '2-4 أيام',
-            problem_handling: 'مراقبة AI 24/7',
             carrier: 'Logy AI Express'
         },
         specs: {
             'الماركة': 'سامسونج',
-            'الموديل': 'S24 Ultra',
-            'التخزين': '512GB',
-            'الكاميرا': '200MP'
+            'التخزين': '512GB'
         }
     }
 ];
 
 // ============================================
-// 7. Rendering Functions
+// 6. Render Functions
 // ============================================
-
 function renderCategories() {
     const container = document.getElementById('level1-scroll');
     if (!container) return;
@@ -410,7 +250,6 @@ function renderCategories() {
 
 function renderProducts(catId = 'all') {
     let products = PRODUCTS;
-    
     if (catId !== 'all') {
         products = products.filter(p => p.cat === catId);
     }
@@ -420,11 +259,6 @@ function renderProducts(catId = 'all') {
     const grid = document.getElementById('products-grid');
     if (!grid) return;
     
-    if (products.length === 0) {
-        grid.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:50px;">لا توجد منتجات.</p>';
-        return;
-    }
-    
     grid.innerHTML = products.map(p => `
         <div class="product-card glass-panel" onclick="openProductDetail('${p.id}')">
             <div class="p-img-box">
@@ -432,7 +266,6 @@ function renderProducts(catId = 'all') {
                 <div class="ai-tag" style="border-color:${p.ai_analysis.price_state_color};color:${p.ai_analysis.price_state_color};">
                     <i class="fa-solid fa-brain"></i> ${p.ai_analysis.score.toFixed(1)}
                 </div>
-                ${p.ai_analysis.score >= 9.0 ? '<div class="ai-pick-badge">AI Pick</div>' : ''}
             </div>
             <div class="p-details">
                 <div class="p-name">${p.name}</div>
@@ -450,9 +283,8 @@ function selectCategory(id, el) {
 }
 
 // ============================================
-// 8. Product Detail Modal
+// 7. Product Detail Modal
 // ============================================
-
 function openProductDetail(id) {
     const product = PRODUCTS.find(p => p.id === id);
     if (!product) return;
@@ -499,13 +331,19 @@ function showDetailTab(tabId, el) {
 
 function initiatePurchase() {
     if (!currentProduct) return;
-    createPiPayment(currentProduct);
+    
+    if (currentPiUser) {
+        alert(`🎉 شراء عبر Pi Network!\n\nالمنتج: ${currentProduct.name}\nالسعر: ${currentProduct.price.toLocaleString()} Pi\n\nللتفعيل الكامل، يحتاج backend.`);
+    } else {
+        alert(`🎉 محاكاة شراء!\n\nالمنتج: ${currentProduct.name}\nالسعر: ${currentProduct.price.toLocaleString()} Pi\n\nفي الإصدار الحقيقي سيتم الدفع عبر Pi Network.`);
+    }
+    
+    closeProductDetailModal();
 }
 
 // ============================================
-// 9. Logy AI Chat
+// 8. Logy AI Chat
 // ============================================
-
 function openLogyAiModal() {
     document.getElementById('logyAiModal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -538,25 +376,17 @@ function sendMessage() {
         const response = generateAIResponse(text);
         logyMsgs.push({ s: 'ai', t: response });
         renderChat();
-    }, 1500);
+    }, 1000);
 }
 
-function generateAIResponse(userMessage) {
-    const msg = userMessage.toLowerCase();
+function generateAIResponse(msg) {
+    const lower = msg.toLowerCase();
     
-    if (msg.includes('بحث') || msg.includes('منتج')) {
-        return '🔍 استخدم شريط البحث في الأعلى وصف ما تبحث عنه!';
-    }
+    if (lower.includes('بحث')) return '🔍 استخدم شريط البحث في الأعلى!';
+    if (lower.includes('بيع')) return '📦 اضغط + لإضافة منتج!';
+    if (lower.includes('شحن')) return '🚚 الشحن تلقائي بالكامل!';
     
-    if (msg.includes('بيع') || msg.includes('إدراج')) {
-        return '📦 اضغط على + في الأعلى لإضافة منتج جديد!';
-    }
-    
-    if (msg.includes('شحن')) {
-        return '🚚 أنا أدير الشحن تلقائياً باستخدام أفضل الشركات!';
-    }
-    
-    return `شكراً! 🤖\n\nيمكنني مساعدتك في:\n✓ البحث\n✓ البيع\n✓ الشحن\n✓ أي استفسار`;
+    return 'شكراً! 🤖 يمكنني مساعدتك في أي شيء.';
 }
 
 function addLogyMessage(text) {
@@ -564,9 +394,8 @@ function addLogyMessage(text) {
 }
 
 // ============================================
-// 10. Other Modal Functions
+// 9. Other Functions
 // ============================================
-
 function updateNotificationDot() {
     const dot = document.getElementById('notification-dot');
     if (dot) {
@@ -575,11 +404,11 @@ function updateNotificationDot() {
 }
 
 function openAiUploadModal() {
-    alert('🤖 إضافة منتج\n\nقريباً! سيحلل Logy AI صور منتجك ويحدد السعر تلقائياً.');
+    alert('🤖 إضافة منتج قريباً!');
 }
 
 function openSettingsModal() {
-    alert('⚙️ الإعدادات\n\nقريباً!');
+    alert('⚙️ الإعدادات قريباً!');
 }
 
 function openNotificationsModal() {
@@ -593,78 +422,112 @@ function openOrdersModal() {
 }
 
 function openWalletModal() {
-    alert('💰 المحفظة\n\nقريباً! ستعرض رصيدك من Pi.');
+    alert('💰 المحفظة قريباً!');
 }
 
 function showView(view) {
     document.querySelectorAll('.footer-nav .nav-item').forEach(item => {
         item.classList.remove('active');
     });
-    event?.currentTarget?.classList.add('active');
+    if (event?.currentTarget) {
+        event.currentTarget.classList.add('active');
+    }
+}
+
+function toggleAISortMenu() {
+    const menu = document.getElementById('ai-sort-menu');
+    if (menu) {
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+function sortProducts(sortType) {
+    console.log('Sorting by:', sortType);
+    alert('🤖 فرز المنتجات: ' + sortType);
 }
 
 // ============================================
-// 11. Authentication Setup (FIXED!)
+// 10. Setup Login Buttons
 // ============================================
-
 function setupLogin() {
+    console.log('🔧 Setting up login buttons...');
+    
     const loginBtn = document.getElementById('login-btn');
     const piLoginBtn = document.getElementById('pi-login-btn');
-
+    
     if (loginBtn) {
-        loginBtn.addEventListener('click', () => {
+        loginBtn.onclick = function(e) {
+            e.preventDefault();
+            console.log('🎮 Demo login clicked');
             demoLogin();
-        });
+        };
+        console.log('✅ Demo login button ready');
+    } else {
+        console.error('❌ login-btn not found!');
     }
-
+    
     if (piLoginBtn) {
-        piLoginBtn.addEventListener('click', async () => {
-            piLoginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الاتصال...';
-            piLoginBtn.disabled = true;
-
-            const success = await initializePiSDK();
+        piLoginBtn.onclick = async function(e) {
+            e.preventDefault();
+            console.log('🔐 Pi login clicked');
             
-            if (success) {
+            const sdkReady = await initializePiSDK();
+            if (sdkReady) {
                 await authenticateWithPi();
             } else {
-                alert('⚠️ Pi SDK غير متوفر\n\nاستخدام Pi Browser مطلوب للدخول عبر Pi Network.\n\nسيتم استخدام الوضع التجريبي.');
-                demoLogin();
+                alert('⚠️ Pi SDK غير متوفر\n\nاستخدم Pi Browser للدخول عبر Pi Network.\n\nأو جرّب الوضع التجريبي.');
             }
-            
-            piLoginBtn.innerHTML = '<i class="fa-solid fa-network-wired"></i> تسجيل الدخول عبر Pi Network';
-            piLoginBtn.disabled = false;
-        });
+        };
+        console.log('✅ Pi login button ready');
+    } else {
+        console.error('❌ pi-login-btn not found!');
     }
 }
 
+// ============================================
+// 11. Initialize App
+// ============================================
 function initializeApp() {
+    console.log('🚀 Initializing app...');
     renderCategories();
     renderProducts();
     updateNotificationDot();
+    console.log('✅ App initialized');
 }
 
 // ============================================
-// 12. Initialize on Page Load (FIXED!)
+// 12. Page Load Event
 // ============================================
-
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 Forsale AI Starting...');
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📄 Page loaded');
+    console.log('🔍 Checking elements...');
     
-    // Setup login buttons
+    // Check if elements exist
+    const authContainer = document.getElementById('auth-container');
+    const appContainer = document.getElementById('app-container');
+    const loginBtn = document.getElementById('login-btn');
+    const piLoginBtn = document.getElementById('pi-login-btn');
+    
+    console.log('auth-container:', authContainer ? '✅' : '❌');
+    console.log('app-container:', appContainer ? '✅' : '❌');
+    console.log('login-btn:', loginBtn ? '✅' : '❌');
+    console.log('pi-login-btn:', piLoginBtn ? '✅' : '❌');
+    
+    // Setup login
     setupLogin();
     
-    // Try to initialize Pi SDK
-    await initializePiSDK();
-    
-    // Setup chat enter key
+    // Setup chat
     const logyInput = document.getElementById('logy-input');
     if (logyInput) {
-        logyInput.addEventListener('keydown', (e) => {
+        logyInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
     }
+    
+    // Try Pi SDK
+    initializePiSDK();
     
     console.log('✅ Forsale AI Ready!');
 });

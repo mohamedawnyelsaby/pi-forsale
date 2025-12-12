@@ -9,9 +9,10 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Pi Network](https://img.shields.io/badge/Pi%20Network-Integrated-9453A9)](https://minepi.com)
-[![AI Powered](https://img.shields.io/badge/AI-Logy%20AI-00f2ff)](https://forsale-ai.com)
+[![AI Powered](https://img.shields.io/badge/AI-Logy%20AI-00f2ff)](https://forsale0409.minepiapp.com)
 
-[Live Demo](https://forsale-ai.com) | [Documentation](https://docs.forsale-ai.com) | [Report Bug](https://github.com/yourusername/forsale-ai/issues)
+[Live Demo](https://forsale0409.minepiapp.com) | [Documentation](https://github.com/mohamedawnyelsaby/pi-forsale) | [Report Bug](https://github.com/mohamedawnyelsaby/pi-forsale/issues)
+
 
 </div>
 
@@ -416,7 +417,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Email**: support@forsale-ai.com
 - **Discord**: [Join our community](https://discord.gg/forsale-ai)
 - **Twitter**: [@ForsaleAI](https://twitter.com/forsaleai)
-- **GitHub Issues**: [Report bugs](https://github.com/yourusername/forsale-ai/issues)
+- **GitHub Issues**: [Report bugs](https://github.com/mohamedawnyelsaby/pi-forsale/issues)
+
 
 ---
 
@@ -456,6 +458,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Made with 🤖 by Forsale AI Team**
 
-[Website](https://forsale-ai.com) • [Documentation](https://docs.forsale-ai.com) • [Blog](https://blog.forsale-ai.com)
+[Website](https://pi-forsale.vercel.app)
+[Documentation](https://github.com/mohamedawnyelsaby/pi-forsale)
+[Blog](https://github.com/mohamedawnyelsaby/pi-forsale)
+
 
 </div>

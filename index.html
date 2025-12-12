@@ -1,54 +1,41 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pi Network Payment Test</title>
-    <link rel="stylesheet" href="style.css">
-
-    <!-- Load Pi SDK -->
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-
-    <script>
-        // Configuration for Pi App
-        window.__PI_APP_CONFIG = {
-            sandbox: true,  // true = sandbox test | false = mainnet after approval
-            appPublicKey: "f4b7067baebc91e85f31794ff320c6720a0fcf3f3f0912ac69a59933a1dd160feded8cab1dbffd4eb9de8752bfa7d4bf8ecbf23b7165fb43c8cfe2d4aacfe1d7"
-        };
-    </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pi Payment Test — Forsale AI</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Pi SDK -->
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <script>
+    // set your Pi app public key here (DO NOT commit private keys)
+    window.__PI_APP_CONFIG = {
+      sandbox: true,
+      appPublicKey: "REPLACE_WITH_YOUR_APP_PUBLIC_KEY"
+    };
+  </script>
 </head>
-
 <body>
-
-    <header>
-        <h1>Pi Payment Test App</h1>
-    </header>
+  <main class="container">
+    <h1>Pi Payment Test App — Forsale AI</h1>
 
     <section class="products">
-        <div class="product-card">
-            <h3>Premium Membership</h3>
-            <p>Price: <span class="price">5</span> Pi</p>
-            <button onclick="openCheckout('Premium Membership', 5)">Buy Now</button>
-        </div>
+      <article class="card">
+        <h2>Premium Membership</h2>
+        <p class="price">5 Pi</p>
+        <button class="buy" data-title="Premium Membership" data-price="5">Buy Now</button>
+      </article>
 
-        <div class="product-card">
-            <h3>Gold Upgrade</h3>
-            <p>Price: <span class="price">10</span> Pi</p>
-            <button onclick="openCheckout('Gold Upgrade', 10)">Buy Now</button>
-        </div>
+      <article class="card">
+        <h2>Gold Upgrade</h2>
+        <p class="price">10 Pi</p>
+        <button class="buy" data-title="Gold Upgrade" data-price="10">Buy Now</button>
+      </article>
     </section>
 
-    <!-- Checkout Modal -->
-    <div id="checkout-modal" class="modal">
-        <div class="modal-content">
-            <h2>Confirm Payment</h2>
-            <p id="checkout-product"></p>
-            <p id="checkout-price"></p>
-            <button onclick="checkout()">Confirm & Pay</button>
-            <button onclick="closeCheckout()">Cancel</button>
-        </div>
-    </div>
+    <div id="message" class="message" aria-live="polite"></div>
+  </main>
 
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

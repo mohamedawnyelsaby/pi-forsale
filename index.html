@@ -8,18 +8,249 @@
 
   <!-- Pi SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-
+  
   <script>
-    // Pi App Config
-    window.__PI_APP_CONFIG = {
-      sandbox: true,
-      appPublicKey: "f4b7067baebc91e85f31794ff320c6720a0fcf3f3f0912ac69a59933a1dd160feded8cab1dbffd4eb9de8752bfa7d4bf8ecbf23b7165fb43c8cfe2d4aacfe1d7"
+    let piInitialized = false;
+    let currentUser = null;
+
+    // Initialize Pi SDK
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('🚀 Starting initialization...');
+      
+      try {
+        if (typeof Pi === 'undefined') {
+          throw new Error('Pi SDK not loaded');
+        }
+
+        await Pi.init({ version: "2.0", sandbox: true });
+        piInitialized = true;
+        console.log('✅ Pi SDK initialized');
+        
+        updateStatus('✅ Ready', 'success');
+        setupButtons();
+        
+      } catch (error) {
+        console.error('❌ Init failed:', error);
+        updateStatus('❌ Open in Pi Browser', 'error');
+      }
+    });
+
+    function setupButtons() {
+      document.querySelectorAll(".buy").forEach(btn => {
+        btn.addEventListener("click", handlePayment);
+      });
+    }
+
+    async function handlePayment(event) {
+      const btn = event.target;
+      const title = btn.dataset.title;
+      const amount = parseFloat(btn.dataset.price);
+
+      console.log(`\n💰 Payment: ${title} - ${amount} Pi`);
+
+      if (!piInitialized) {
+        alert('Pi SDK not ready. Refresh page.');
+        return;
+      }
+
+      try {
+        btn.disabled = true;
+        btn.textContent = 'Authenticating...';
+        updateStatus('🔐 Authenticating...', 'info');
+
+        // Authenticate
+        console.log('🔐 Authenticating...');
+        const authResult = await Pi.authenticate(
+          ['payments'],
+          (payment) => payment.identifier
+        );
+
+        currentUser = authResult.user;
+        console.log('✅ Authenticated:', currentUser.username);
+        
+        btn.textContent = 'Creating payment...';
+        updateStatus(`Welcome ${currentUser.username}!`, 'success');
+
+        // Small delay to show status
+        await new Promise(r => setTimeout(r, 500));
+
+        // Create payment
+        console.log('💳 Creating payment...');
+        updateStatus('Creating payment...', 'info');
+        
+        const paymentData = {
+          amount: amount,
+          memo: `Forsale AI: ${title}`,
+          metadata: { 
+            productTitle: title,
+            userId: currentUser.uid,
+            timestamp: Date.now()
+          }
+        };
+
+        const payment = await Pi.createPayment(paymentData, {
+          onReadyForServerApproval: async (paymentId) => {
+            console.log('\n📤 Approval callback:', paymentId);
+            updateStatus('Approving payment...', 'info');
+            
+            try {
+              // Get backend URL
+              const backendUrl = window.location.origin;
+              console.log('Backend URL:', backendUrl);
+              
+              const response = await fetch(`${backendUrl}/payment/approve`, {
+                method: "POST",
+                headers: { 
+                  "Content-Type": "application/json",
+                  "Accept": "application/json"
+                },
+                body: JSON.stringify({ 
+                  paymentId,
+                  userId: currentUser.uid,
+                  amount,
+                  title
+                })
+              });
+
+              console.log('Response status:', response.status);
+              
+              if (!response.ok) {
+                const text = await response.text();
+                console.error('Response error:', text);
+                throw new Error(`Server error: ${response.status}`);
+              }
+
+              const result = await response.json();
+              console.log('✅ Approval result:', result);
+              
+              if (!result.success) {
+                throw new Error(result.error || 'Approval failed');
+              }
+              
+              updateStatus('Payment approved! ✅', 'success');
+              
+            } catch (error) {
+              console.error('❌ Approval error:', error);
+              updateStatus(`Error: ${error.message}`, 'error');
+              throw error;
+            }
+          },
+
+          onReadyForServerCompletion: async (paymentId, txid) => {
+            console.log('\n🎉 Completion callback:', paymentId, txid);
+            updateStatus('Completing payment...', 'info');
+            
+            try {
+              const backendUrl = window.location.origin;
+              
+              const response = await fetch(`${backendUrl}/payment/complete`, {
+                method: "POST",
+                headers: { 
+                  "Content-Type": "application/json",
+                  "Accept": "application/json"
+                },
+                body: JSON.stringify({ 
+                  paymentId,
+                  txid,
+                  userId: currentUser.uid
+                })
+              });
+
+              console.log('Response status:', response.status);
+              
+              if (!response.ok) {
+                const text = await response.text();
+                console.error('Response error:', text);
+                throw new Error(`Server error: ${response.status}`);
+              }
+
+              const result = await response.json();
+              console.log('✅ Completion result:', result);
+              
+              if (!result.success) {
+                throw new Error(result.error || 'Completion failed');
+              }
+              
+              updateStatus(`✅ Payment Complete! Order: ${result.orderId}`, 'success');
+              
+              // Keep success message
+              setTimeout(() => {
+                updateStatus('Ready for next payment', 'info');
+              }, 10000);
+              
+            } catch (error) {
+              console.error('❌ Completion error:', error);
+              updateStatus(`Error: ${error.message}`, 'error');
+              throw error;
+            }
+          },
+
+          onCancel: (paymentId) => {
+            console.log('🚫 Cancelled:', paymentId);
+            updateStatus('Payment cancelled', 'notice');
+          },
+
+          onError: (error, payment) => {
+            console.error('❌ Payment error:', error, payment);
+            updateStatus(`Error: ${error.message}`, 'error');
+          }
+        });
+
+        console.log('✅ Payment initiated:', payment);
+
+      } catch (error) {
+        console.error('💥 Fatal error:', error);
+        updateStatus(`Error: ${error.message}`, 'error');
+        alert(`Error: ${error.message}\n\nCheck console for details.`);
+        
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Buy Now';
+      }
+    }
+
+    function updateStatus(text, type = 'info') {
+      console.log(`📢 ${text}`);
+      
+      const statusDiv = document.getElementById('status');
+      if (statusDiv) {
+        statusDiv.textContent = text;
+        
+        const colors = {
+          info: { bg: 'rgba(0,242,255,0.1)', text: '#00f2ff' },
+          success: { bg: 'rgba(46,204,113,0.1)', text: '#2ECC71' },
+          error: { bg: 'rgba(255,82,82,0.1)', text: '#FF5252' },
+          notice: { bg: 'rgba(255,215,0,0.1)', text: '#FFD700' }
+        };
+        
+        const color = colors[type] || colors.info;
+        statusDiv.style.background = color.bg;
+        statusDiv.style.color = color.text;
+      }
+    }
+
+    // Debug helper
+    window.testBackend = async () => {
+      console.log('\n=== Testing Backend ===');
+      try {
+        const response = await fetch('/health');
+        const data = await response.json();
+        console.log('Backend status:', data);
+        return data;
+      } catch (error) {
+        console.error('Backend unreachable:', error);
+        return null;
+      }
     };
   </script>
 </head>
 <body>
   <main class="container">
-    <h1>Pi Payment Test App — Forsale AI</h1>
+    <h1>🤖 Pi Payment Test — Forsale AI</h1>
+
+    <div id="status" style="text-align: center; padding: 15px; margin-bottom: 20px; background: rgba(0,242,255,0.1); border-radius: 10px; color: #00f2ff; font-weight: bold;">
+      ⏳ Initializing...
+    </div>
 
     <section class="products">
       <article class="card">
@@ -33,11 +264,19 @@
         <p class="price">10 Pi</p>
         <button class="buy" data-title="Gold Upgrade" data-price="10">Buy Now</button>
       </article>
+
+      <article class="card">
+        <h2>VIP Package</h2>
+        <p class="price">25 Pi</p>
+        <button class="buy" data-title="VIP Package" data-price="25">Buy Now</button>
+      </article>
     </section>
 
-    <div id="message" class="message" aria-live="polite"></div>
+    <div style="margin-top: 30px; padding: 20px; background: rgba(255,215,0,0.1); border-radius: 10px; text-align: center;">
+      <p style="margin: 0; color: #FFD700; font-size: 14px;">
+        💡 <strong>Debug:</strong> Open console (F12) and run <code>testBackend()</code>
+      </p>
+    </div>
   </main>
-
-  <script src="script.js"></script>
 </body>
 </html>

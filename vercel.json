@@ -1,8 +1,8 @@
 {
   "version": 2,
   "routes": [
-    { "src": "/payment/approve", "dest": "/api/approve.js" },
-    { "src": "/payment/complete", "dest": "/api/complete.js" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "src": "/payment/approve", "dest": "api/approve.js" },
+    { "src": "/payment/complete", "dest": "api/complete.js" },
+    { "src": "/(.*)", "dest": "index.html" }
   ]
 }

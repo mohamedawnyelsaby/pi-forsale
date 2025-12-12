@@ -414,7 +414,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- **Email**: support@forsale-ai.com
+- **Email**: mohamed.awny.00000@gmail.com
 - **Discord**: [Join our community](https://discord.gg/forsale-ai)
 - **Twitter**: [@ForsaleAI](https://twitter.com/forsaleai)
 - **GitHub Issues**: [Report bugs](https://github.com/mohamedawnyelsaby/pi-forsale/issues)

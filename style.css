@@ -1,40 +1,38 @@
 /* ========================================== */
-/* Forsale AI - Complete Stylesheet */
-/* Glassmorphism + Modern UI + RTL Support */
+/* 1. الثوابت والتصميم الأساسي (Glassmorphism) */
 /* ========================================== */
-
 :root {
     --primary: #FFD700;
-    --accent: #00f2ff;
+    --accent: #00f2ff; 
     --glass-bg: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
     --text-main: #ffffff;
     --text-muted: #a0a0a0;
     --radius: 14px;
     --bg-dark: #0a1128;
-    --content-padding-h: 15px;
-    --chat-user-bg: #4A90E2;
+    --content-padding-h: 15px; 
+    --chat-user-bg: #4A90E2; /* لون رسائل المستخدم */
     --chat-ai-bg: #1A2E44;
+    /* لون رسائل الذكاء الاصطناعي */
     --success-color: #2ECC71;
+    /* لون النجاح */
     --header-height: 65px;
+    /* ارتفاع الهيدر الأساسي */
     --danger: #FF5252;
     --pi-purple: #9453A9;
 }
 
-* {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none;
 }
 
+/* ROOT FIX - فرض الثبات */
 html, body {
     margin: 0;
     padding: 0;
-    width: 100%;
-    max-width: 100vw;
-    overflow-x: hidden !important;
+    width: 100%; max-width: 100vw; 
+    overflow-x: hidden !important; 
     background: var(--bg-dark);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
     color: var(--text-main);
     min-height: 100vh;
 }
@@ -42,7 +40,7 @@ html, body {
 body {
     background: radial-gradient(circle at top left, #1a2e44 0%, #000000 100%);
     background-attachment: fixed;
-    padding-top: calc(var(--header-height) + 15px);
+    padding-top: calc(var(--header-height) + 15px); /* قيمة مناسبة للهاتف */
     padding-bottom: 70px;
 }
 
@@ -51,7 +49,6 @@ body {
     padding-right: var(--content-padding-h);
     width: 100%;
     margin: 0 auto;
-    max-width: 1200px;
 }
 
 .glass-panel {
@@ -63,9 +60,8 @@ body {
 }
 
 /* ========================================== */
-/* Authentication Screen */
+/* صفحة تسجيل الدخول */
 /* ========================================== */
-
 #auth-container {
     position: fixed;
     top: 0;
@@ -86,9 +82,6 @@ body {
     font-weight: 900;
     color: var(--primary);
     margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
 }
 
 .auth-card {
@@ -96,7 +89,7 @@ body {
     backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
-    padding: 30px 25px;
+    padding: 25px;
     width: 100%;
     max-width: 400px;
     text-align: center;
@@ -105,7 +98,6 @@ body {
 .input-group {
     position: relative;
     margin-bottom: 15px;
-    text-align: right;
 }
 
 .input-group input {
@@ -116,12 +108,6 @@ body {
     background: rgba(255,255,255,0.05);
     color: white;
     font-size: 14px;
-    transition: all 0.3s ease;
-}
-
-.input-group input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(0, 242, 255, 0.1);
 }
 
 .input-group i {
@@ -129,7 +115,6 @@ body {
     right: 15px;
     top: 14px;
     color: var(--accent);
-    pointer-events: none;
 }
 
 .main-btn {
@@ -155,18 +140,24 @@ body {
     box-shadow: 0 5px 15px rgba(255,215,0,0.3);
 }
 
-.main-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
 .pi-btn {
     background: linear-gradient(90deg, var(--pi-purple), #612F74);
     color: white;
 }
 
-.pi-btn:hover {
-    box-shadow: 0 5px 15px rgba(148, 83, 169, 0.3);
+.fingerprint-scan {
+    font-size: 40px;
+    color: var(--accent);
+    margin: 20px 0;
+    cursor: pointer;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1);
+    opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8;
+    }
 }
 
 .auth-footer {
@@ -175,515 +166,269 @@ body {
     color: var(--text-muted);
 }
 
+.auth-footer a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
 /* ========================================== */
-/* Header */
+/* 2. الهيكل العام - (إصلاح تثبيت الهيدر) */
 /* ========================================== */
 
 .fixed-header-wrapper {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
+    top: 0; 
+    left: 0; 
+    width: 100%; 
     z-index: 100;
 }
 
 .header {
     padding: 15px 0;
-    background: rgba(10, 17, 40, 0.95);
+    margin-top: 0;
+    background: rgba(10, 17, 40, 0.95); 
     border-bottom: 1px solid var(--glass-border);
-    backdrop-filter: blur(10px);
+    width: 100%;
 }
 
-.header .content-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.logo {
-    font-size: 22px;
-    font-weight: 900;
-    color: var(--primary);
-    letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
+.header .content-wrapper { display: flex;
+    justify-content: space-between; align-items: center; }
+.logo { font-size: 22px; font-weight: 900; color: var(--primary);
+    letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
 .logo .ai-badge {
+    /* تصميم شعار "AI" المميز للتطبيق */
     font-size: 10px;
     background: var(--accent);
     color: var(--bg-dark);
     padding: 2px 6px;
     border-radius: 4px;
+    margin-right: 5px;
     font-weight: bold;
 }
 
-.icon-btn {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    color: white;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
+.icon-btn { background: var(--glass-bg);
+    border: 1px solid var(--glass-border); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;
+    cursor: pointer; transition: background 0.2s; }
+.icon-btn.primary { background: var(--primary); color: black;
+    border-color: var(--primary); }
+/* NEW: Notification bell with a red dot */
+.notification-icon-container { position: relative;
 }
-
-.icon-btn:hover {
-    background: rgba(255,255,255,0.1);
-    transform: scale(1.05);
-}
-
-.icon-btn.primary {
-    background: var(--primary);
-    color: black;
-    border-color: var(--primary);
-}
-
-.notification-icon-container {
-    position: relative;
-}
-
 .notification-dot {
     position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 8px;
-    height: 8px;
-    background: var(--danger);
+    top: 5px; right: 5px;
+    width: 8px; height: 8px;
+    background: red;
     border-radius: 50%;
     border: 1px solid var(--bg-dark);
     z-index: 5;
-    animation: pulse-dot 2s infinite;
 }
 
-@keyframes pulse-dot {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.2); opacity: 0.8; }
+.search-box { margin: 15px 0; position: relative; width: 100%;
+}
+/* Updated placeholder for AI Personal Shopper concept */
+.search-box input { width: 100%;
+    padding: 12px 40px 12px 15px; border-radius: 50px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); color: white; font-size: 14px;
+}
+.search-icon { position: absolute; right: 15px; top: 13px; color: var(--text-muted);
 }
 
-/* ========================================== */
-/* Search Box */
-/* ========================================== */
-
-.search-box {
-    margin: 15px 0;
-    position: relative;
-    width: 100%;
+.cats-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none;
+    margin-bottom: 15px; width: 100%; }
+.cats-scroll::-webkit-scrollbar { display: none;
+}
+.cat-item { flex: 0 0 auto; padding: 10px 20px; border-radius: 30px;
+    background: var(--glass-bg); border: 1px solid var(--glass-border); font-size: 13px; color: var(--text-muted); transition: 0.3s; cursor: pointer; display: flex; align-items: center; gap: 8px;
+}
+.cat-item.active { background: var(--primary); color: #000; font-weight: bold; border-color: var(--primary);
 }
 
-.search-box input {
-    width: 100%;
-    padding: 12px 40px 12px 15px;
-    border-radius: 50px;
-    border: 1px solid var(--glass-border);
-    background: rgba(255,255,255,0.05);
-    color: white;
-    font-size: 14px;
-    transition: all 0.3s ease;
+/* ستايل لوحة الفلاتر الديناميكية (مستوى 2 و 3) */
+.dynamic-filters { overflow: hidden;
+    max-height: 0; transition: max-height 0.4s ease, opacity 0.4s ease; background: rgba(0,0,0,0.2); border-radius: var(--radius); margin-bottom: 0; opacity: 0;
+}
+.dynamic-filters.open { 
+    margin-bottom: 20px;
+    opacity: 1; 
+    padding: 10px; 
+    border: 1px solid var(--glass-border); 
+    max-height: 400px; 
+    overflow-y: auto; 
+    -webkit-overflow-scrolling: touch;
 }
 
-.search-box input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(0, 242, 255, 0.1);
-}
+.sub-chips { display: flex;
+    flex-wrap: wrap; gap: 8px; }
+.chip { font-size: 12px; padding: 6px 12px;
+    border-radius: 20px; background: rgba(255,255,255,0.08); color: #ddd; cursor: pointer; }
+.chip.active { background: var(--accent);
+    color: #000; }
 
-.search-icon {
-    position: absolute;
-    right: 15px;
-    top: 13px;
-    color: var(--text-muted);
-    pointer-events: none;
-}
-
-/* ========================================== */
-/* Categories */
-/* ========================================== */
-
-.cats-scroll {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 5px;
-    scrollbar-width: none;
-    margin-bottom: 15px;
-}
-
-.cats-scroll::-webkit-scrollbar {
-    display: none;
-}
-
-.cat-item {
-    flex: 0 0 auto;
-    padding: 10px 20px;
-    border-radius: 30px;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    font-size: 13px;
-    color: var(--text-muted);
-    transition: all 0.3s;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-}
-
-.cat-item:hover {
-    background: rgba(255,255,255,0.1);
-}
-
-.cat-item.active {
-    background: var(--primary);
-    color: #000;
-    font-weight: bold;
-    border-color: var(--primary);
-}
-
-/* ========================================== */
-/* AI Sort Menu */
-/* ========================================== */
-
-.filter-toggle {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.filter-toggle:hover {
-    background: var(--accent);
-    color: black;
-}
-
-.ai-sort-menu {
-    padding: 10px;
-    margin-bottom: 15px;
-    animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.sort-option {
-    padding: 12px 15px;
-    border-radius: 8px;
-    margin-bottom: 5px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-}
-
-.sort-option:hover {
-    background: rgba(255,255,255,0.1);
-}
-
-.sort-option.active {
-    background: var(--accent);
-    color: black;
-    font-weight: bold;
-}
-
-/* ========================================== */
-/* Products Grid */
-/* ========================================== */
-
-.products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 12px;
-    width: 100%;
-}
-
-.product-card {
-    position: relative;
-    overflow: hidden;
-    display: flex;
+/* ستايل حقول الإدخال والقوائم المنسدلة (المستوى 3) */
+.filter-group { 
+    margin-bottom: 12px;
+    width: 100%; 
+    display: flex; 
     flex-direction: column;
-    cursor: pointer;
-    transition: all 0.3s;
+    gap: 5px;
 }
-
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 242, 255, 0.2);
-}
-
-.p-img-box {
-    width: 100%;
-    height: 140px;
-    background: #000;
-    position: relative;
-    overflow: hidden;
-}
-
-.p-img-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s;
-}
-
-.product-card:hover .p-img-box img {
-    transform: scale(1.1);
-}
-
-.ai-tag {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    background: rgba(0,0,0,0.8);
-    color: var(--accent);
-    font-size: 10px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    border: 1px solid var(--accent);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-weight: bold;
-}
-
-.ai-pick-badge {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: var(--primary);
-    color: black;
-    font-size: 9px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-weight: bold;
-    animation: glow 2s infinite;
-}
-
-@keyframes glow {
-    0%, 100% { box-shadow: 0 0 5px var(--primary); }
-    50% { box-shadow: 0 0 15px var(--primary); }
-}
-
-.p-details {
-    padding: 10px;
-}
-
-.p-name {
+.filter-group label { 
     font-size: 13px;
+    color: var(--text-main); 
     font-weight: bold;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 4px;
 }
-
-.p-price {
-    color: var(--primary);
-    font-weight: bold;
-    font-size: 15px;
-}
-
-/* ========================================== */
-/* Modals */
-/* ========================================== */
-
-#product-detail-modal,
-#ai-upload-modal,
-#settingsModal,
-#checkoutModal,
-#ordersModal,
-#walletModal,
-#evidenceUploadModal,
-#notificationsModal,
-#sellerDashboardModal {
-    position: fixed;
-    top: 0;
-    left: 0;
+.filter-group select, 
+.filter-group input[type="text"],
+.filter-group input[type="number"],
+.filter-group textarea {
     width: 100%;
-    height: 100%;
-    background: var(--bg-dark);
-    z-index: 200;
-    overflow-y: auto;
-    display: none;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    font-size: 14px;
+    appearance: none;
+}
+.filter-group select {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path fill="rgba(255,255,255,0.7)" d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 16px;
+}
+.filter-group select:focus, 
+.filter-group input[type="text"]:focus,
+.filter-group textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(0, 242, 255, 0.2);
+}
+
+.products-grid { display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; width: 100%; }
+.product-card { position: relative;
+    overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: 0.2s;
+}
+.product-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0, 242, 255, 0.1);
+}
+.p-img-box { width: 100%; height: 140px; background: #000; position: relative;
+}
+.p-img-box img { width: 100%; height: 100%; object-fit: cover;
+}
+.ai-tag { 
+    /* مؤشر تحليل AI على كرت المنتج */
+    position: absolute;
+    top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: var(--accent); font-size: 10px; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--accent);
+    display: flex; align-items: center; gap: 4px; 
+}
+.p-details { padding: 10px;
+}
+.p-name { font-size: 13px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-bottom: 4px; }
+.p-price { color: var(--primary); font-weight: bold; font-size: 15px;
+}
+
+/* ========================================== */
+/* 3. ستايل النوافذ المنبثقة (Modals) */
+/* ========================================== */
+#product-detail-modal, #ai-upload-modal, #settingsModal, #checkoutModal, #ordersModal, #walletModal, #evidenceUploadModal, #notificationsModal, #sellerDashboardModal { 
+    /* تظليل ورفع النوافذ المنبثقة فوق المحتوى الرئيسي */
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%; 
+    background: var(--bg-dark); z-index: 200; overflow-y: auto; display: none; 
     padding-bottom: 140px;
 }
 
-.detail-header {
-    position: sticky;
-    top: 0;
-    background: rgba(10, 17, 40, 0.95);
-    padding: 15px;
-    z-index: 10;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--glass-border);
-    backdrop-filter: blur(10px);
+/* Logy AI Chat Modal Fix */
+#logyAiModal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%; 
+    background: var(--bg-dark); z-index: 600; overflow: hidden; 
+    display: none; 
+    flex-direction: column;
 }
 
-.detail-img {
+.detail-header { position: sticky; top: 0; background: rgba(10, 17, 40, 0.95);
+    padding: 15px; z-index: 10; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border);
+}
+.detail-img { 
     width: 100%;
-    height: 250px;
-    object-fit: cover;
-    margin-bottom: 15px;
-    border-radius: var(--radius);
+    height: 200px; 
+    object-fit: cover; 
+    margin-bottom: 15px; 
+}
+.detail-title { font-size: 24px; font-weight: 700;
+    margin-bottom: 5px; }
+.detail-price { font-size: 28px; color: var(--primary); font-weight: 900;
+}
+.ai-section-title { font-size: 16px; font-weight: bold; color: var(--accent); margin: 20px 0 10px;
+    display: flex; align-items: center; gap: 8px; }
+.ai-price-card { padding: 15px; display: grid;
+    grid-template-columns: 1fr 1fr; gap: 15px; }
+.stat-box { text-align: center; padding: 10px;
+    border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03); }
+.stat-box .value { font-size: 20px;
+    font-weight: bold; margin-bottom: 3px; }
+.stat-box .label { font-size: 11px; color: var(--text-muted);
+}
+.buy-fixed-bar { 
+    position: fixed;
+    bottom: 60px; 
+    width: 100%; background: rgba(10, 17, 40, 0.95); backdrop-filter: blur(10px); padding: 10px 0; z-index: 20; border-top: 1px solid var(--glass-border);
+}
+.buy-btn { width: 100%; padding: 15px; border: none; border-radius: 50px; background: var(--primary);
+    color: black; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 10px;
+}
+.buy-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
-.detail-title {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 5px;
-    line-height: 1.3;
-}
-
-.detail-price {
-    font-size: 28px;
-    color: var(--primary);
-    font-weight: 900;
-    margin-bottom: 20px;
-}
-
-.ai-section-title {
-    font-size: 16px;
-    font-weight: bold;
-    color: var(--accent);
-    margin: 20px 0 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.ai-price-card {
-    padding: 15px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
-
-.stat-box {
-    text-align: center;
-    padding: 15px 10px;
-    border-radius: 8px;
-    border: 2px solid var(--glass-border);
-    background: rgba(255,255,255,0.03);
-}
-
-.stat-box .value {
-    font-size: 22px;
-    font-weight: 900;
-    margin-bottom: 5px;
-}
-
-.stat-box .label {
-    font-size: 11px;
-    color: var(--text-muted);
-    line-height: 1.3;
-}
-
-.price-chart-mock {
+/* ستايل مؤشر السعر التاريخي (Mockup) */
+.price-chart-mock { 
     height: 80px;
-    width: 100%;
-    margin-top: 15px;
-    background: repeating-linear-gradient(
-        to top,
-        rgba(0,0,0,0.1),
-        rgba(0,0,0,0.1) 1px,
-        transparent 1px,
-        transparent 20px
-    );
-    position: relative;
+    width: 100%; 
+    margin-top: 10px; 
+    background: repeating-linear-gradient(to top, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 1px, transparent 1px, transparent 20px); 
+    position: relative; 
     border-radius: 8px;
-    overflow: hidden;
 }
-
-.chart-line {
+.chart-line { 
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to right, var(--accent), var(--success-color));
-    clip-path: polygon(0 80%, 15% 60%, 30% 70%, 50% 40%, 70% 55%, 85% 30%, 100% 45%, 100% 100%, 0 100%);
+    bottom: 0; left: 0; width: 100%; height: 100%; 
+    background: linear-gradient(to right, #00f2ff, #2ECC71);
+    mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2' d='M0,80 Q25,20 50,70 T100,30'/%3E%3C/svg%3E"); 
+    mask-size: 100% 100%;
 }
 
-/* ========================================== */
-/* Shipping & Logistics */
-/* ========================================== */
-
-.ai-logistics-card {
-    padding: 15px;
+/* ستايل لوجستيات الشحن (مستعاد) */
+.ai-logistics-card { padding: 15px;
+}
+.step { display: flex; gap: 10px; margin-bottom: 10px; align-items: center;
+}
+.step-icon { width: 25px; height: 25px; border-radius: 50%; background: var(--accent); color: black;
+    display: flex; align-items: center; justify-content: center; font-size: 12px; }
+.step-text { font-size: 13px;
 }
 
-.step {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 15px;
-    align-items: flex-start;
-}
-
-.step-icon {
-    min-width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: black;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    flex-shrink: 0;
-}
-
-.step-text {
-    font-size: 13px;
-    line-height: 1.6;
-    flex: 1;
-}
-
-/* ========================================== */
-/* Detail Tabs */
-/* ========================================== */
-
+/* NEW: Detail Tabs */
 .detail-tabs-container {
     padding: 15px;
-    margin-top: 20px;
+    margin-top: 20px; 
     margin-bottom: 20px;
 }
-
 .detail-tabs-scroll {
     display: flex;
     gap: 10px;
     overflow-x: auto;
-    padding-bottom: 10px;
-    scrollbar-width: none;
+    padding-bottom: 10px; 
+    scrollbar-width: none; 
     margin-bottom: 15px;
     border-bottom: 1px solid var(--glass-border);
 }
-
 .detail-tabs-scroll::-webkit-scrollbar {
     display: none;
 }
-
 .detail-tab-item {
     flex: 0 0 auto;
     padding: 10px 18px;
@@ -692,136 +437,108 @@ body {
     border: 1px solid transparent;
     font-size: 13px;
     color: var(--text-muted);
-    transition: all 0.3s;
+    transition: 0.3s;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 8px;
-    white-space: nowrap;
+    font-weight: 500;
 }
-
 .detail-tab-item.active {
     background: var(--primary);
     color: #000;
     font-weight: bold;
     border-color: var(--primary);
 }
-
 .detail-tab-item:hover:not(.active) {
     background: rgba(255, 255, 255, 0.15);
+    color: var(--text-main);
 }
-
 .detail-tab-content {
     padding-top: 10px;
 }
 
-/* ========================================== */
-/* Escrow Steps */
-/* ========================================== */
-
-.escrow-step {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 15px;
-    gap: 12px;
-}
-
+/* ستايل خطوات نظام Escrow الآمن */
+.escrow-step { display: flex;
+    align-items: center; margin-bottom: 15px; }
 .escrow-step-icon {
-    min-width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    background: var(--glass-bg);
-    border: 2px solid var(--glass-border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    color: var(--text-muted);
-    transition: all 0.5s;
-    flex-shrink: 0;
+    width: 30px;
+    height: 30px; border-radius: 50%; background: var(--glass-bg);
+    border: 1px solid var(--glass-border); display: flex; align-items: center;
+    justify-content: center; font-size: 14px; color: var(--text-muted);
+    margin-left: 10px; transition: all 0.5s;
 }
-
 .escrow-step.active .escrow-step-icon {
+    /* التلوين بالأخضر عند التفعيل */
     background: var(--success-color);
-    color: black;
-    border-color: var(--success-color);
-    box-shadow: 0 0 10px var(--success-color);
+    color: black; border-color: var(--success-color);
 }
+.escrow-step-text { font-size: 14px; font-weight: 500;
+}
+/* End of Escrow Steps */
 
-.escrow-step-text {
-    font-size: 14px;
-    line-height: 1.6;
-    flex: 1;
-}
 
 /* ========================================== */
-/* Buy Button */
+/* 4. شريط التنقل السفلي */
 /* ========================================== */
-
-.buy-fixed-bar {
+.footer-nav {
     position: fixed;
-    bottom: 60px;
-    width: 100%;
-    background: rgba(10, 17, 40, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 10px 0;
-    z-index: 20;
-    border-top: 1px solid var(--glass-border);
-}
-
-.buy-btn {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 50px;
-    background: var(--primary);
-    color: black;
-    font-weight: bold;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-}
-
-.buy-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
-}
-
-.buy-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* ========================================== */
-/* Logy AI Chat */
-/* ========================================== */
-
-#logyAiModal {
-    position: fixed;
-    top: 0;
+    bottom: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    background: var(--bg-dark);
-    z-index: 600;
-    overflow: hidden;
-    display: none;
+    height: 60px;
+    /* استخدام خلفية شفافة ومزج الألوان */
+    background: rgba(10, 17, 40, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--glass-border); z-index: 500;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.nav-item {
+    display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 11px;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 5px 0;
+    min-width: 60px;
+}
+.nav-item i {
+    font-size: 18px;
+    margin-bottom: 3px;
+}
+.nav-item.active {
+    color: var(--primary);
+}
+.nav-item:hover {
+    color: var(--text-main);
 }
 
+/* ========================================== */
+/* 5. ستايل Logy AI Chat */
+/* ========================================== */
+#logyAiModal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%; 
+    background: var(--bg-dark); z-index: 600; overflow: hidden; 
+    display: none; 
+    flex-direction: column;
+}
 .logy-chat-header {
     padding: 15px;
-    background: rgba(10, 17, 40, 0.95);
-    z-index: 10;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--glass-border);
-    flex-shrink: 0;
+    background: rgba(10, 17, 40, 0.95); 
+    z-index: 10; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-bottom: 1px solid var(--glass-border); 
+    color: white;
+}
+.logy-chat-header .logo { font-size: 18px; color: var(--accent);
 }
 
 .logy-chat-area {
@@ -830,48 +547,35 @@ body {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 .message-bubble {
     max-width: 80%;
-    padding: 12px 16px;
+    padding: 10px 15px;
     border-radius: 18px;
     font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.5;
     white-space: pre-wrap;
-    word-wrap: break-word;
-    animation: messageIn 0.3s ease;
-}
-
-@keyframes messageIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 .msg-user {
     background: var(--chat-user-bg);
     color: white;
-    align-self: flex-start;
-    border-bottom-right-radius: 4px;
+    align-self: flex-start; 
+    border-bottom-right-radius: 2px;
 }
 
 .msg-ai {
     background: var(--chat-ai-bg);
     color: white;
-    align-self: flex-end;
-    border-bottom-left-radius: 4px;
+    align-self: flex-end; 
+    border-bottom-left-radius: 2px;
     border: 1px solid var(--glass-border);
 }
 
 .logy-input-bar {
-    padding: 12px 15px;
+    padding: 10px 15px;
     background: rgba(10, 17, 40, 0.95);
     border-top: 1px solid var(--glass-border);
     display: flex;
@@ -882,8 +586,8 @@ body {
 
 .logy-input-bar input {
     flex-grow: 1;
-    padding: 12px 15px;
-    border-radius: 25px;
+    padding: 10px;
+    border-radius: 20px;
     border: 1px solid var(--glass-border);
     background: rgba(255, 255, 255, 0.05);
     color: white;
@@ -893,8 +597,8 @@ body {
 .logy-send-btn {
     background: var(--primary);
     color: black;
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -902,105 +606,12 @@ body {
     font-size: 16px;
     cursor: pointer;
     flex-shrink: 0;
-    transition: all 0.2s;
 }
 
-.logy-send-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+/* Settings Modal Specific Styles */
+#settingsModal .content-wrapper, #notificationsModal .content-wrapper {
+    padding-top: 20px;
 }
-
-/* ========================================== */
-/* Footer Navigation */
-/* ========================================== */
-
-.footer-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    background: rgba(10, 17, 40, 0.95);
-    backdrop-filter: blur(10px);
-    border-top: 1px solid var(--glass-border);
-    z-index: 500;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-}
-
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted);
-    font-size: 11px;
-    cursor: pointer;
-    transition: all 0.2s;
-    padding: 8px 12px;
-    min-width: 70px;
-    border-radius: 10px;
-}
-
-.nav-item i {
-    font-size: 20px;
-    margin-bottom: 4px;
-}
-
-.nav-item.active {
-    color: var(--primary);
-    background: rgba(255, 215, 0, 0.1);
-}
-
-.nav-item:hover {
-    color: var(--text-main);
-    background: rgba(255, 255, 255, 0.05);
-}
-
-/* ========================================== */
-/* Loading Overlay */
-/* ========================================== */
-
-#loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-}
-
-.loading-spinner {
-    text-align: center;
-}
-
-.loading-spinner i {
-    color: var(--accent);
-    animation: spin 2s linear infinite;
-    margin-bottom: 20px;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-#loading-text {
-    color: var(--text-main);
-    font-size: 16px;
-    margin-top: 15px;
-}
-
-/* ========================================== */
-/* Settings & Forms */
-/* ========================================== */
-
 .settings-group {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
@@ -1008,23 +619,15 @@ body {
     padding: 15px;
     margin-bottom: 15px;
 }
-
 .settings-group h4 {
     color: var(--primary);
-    margin: 0 0 15px 0;
+    margin-top: 0;
+    margin-bottom: 15px;
     font-size: 16px;
     display: flex;
     align-items: center;
     gap: 8px;
 }
-
-.settings-group p {
-    font-size: 13px;
-    color: var(--text-muted);
-    line-height: 1.6;
-    margin-bottom: 10px;
-}
-
 .settings-group button {
     width: 100%;
     padding: 12px;
@@ -1032,59 +635,126 @@ body {
     border: none;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background 0.2s;
     margin-top: 10px;
 }
-
 .settings-group button.primary {
     background: var(--primary);
     color: var(--bg-dark);
 }
-
 .settings-group button.accent {
     background: var(--accent);
     color: var(--bg-dark);
 }
-
-.filter-group {
-    margin-bottom: 15px;
-}
-
-.filter-group label {
+.settings-group p {
     font-size: 13px;
-    color: var(--text-main);
-    font-weight: bold;
-    display: block;
-    margin-bottom: 8px;
+    color: var(--text-muted);
+    line-height: 1.5;
 }
 
-.filter-group input,
-.filter-group textarea,
-.filter-group select {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid var(--glass-border);
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-main);
+/* NEW: Notification Item Style */
+.notification-item {
+    border-bottom: 1px solid var(--glass-border);
+    padding: 10px 0;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+.notification-item:last-child {
+    border-bottom: none;
+}
+.notification-icon {
+    min-width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 14px;
 }
-
-.filter-group textarea {
-    resize: vertical;
-    min-height: 80px;
-    font-family: inherit;
+.notification-item.unread .notification-icon {
+    background: var(--primary);
+}
+.notification-content {
+    flex-grow: 1;
+}
+.notification-title {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 3px;
+}
+.notification-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+.notification-time {
+    font-size: 10px;
+    color: #555;
+    text-align: left;
 }
 
-/* ========================================== */
-/* Responsive Design */
-/* ========================================== */
+/* إضافة التطبيق الرئيسي */
+#app-container {
+    display: none;
+}
 
-@media (max-width: 480px) {
-    .products-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .ai-price-card {
-        grid-template-columns: 1fr;
-    }
+/* NEW: Seller Dashboard Modal Style */
+#sellerDashboardModal { 
+    /* نفس ستايل النوافذ المنبثقة الأخرى */
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%; 
+    background: var(--bg-dark); z-index: 200; overflow-y: auto; display: none; 
+    padding-bottom: 70px;
+    /* لتجنب تداخل شريط التنقل */
+}
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.kpi-card {
+    padding: 15px;
+    border-radius: var(--radius);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    text-align: center;
+}
+.kpi-card .value {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--primary);
+    margin-bottom: 5px;
+}
+.kpi-card .label {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+.dashboard-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    cursor: pointer;
+}
+.dashboard-list-item:hover {
+    background: rgba(255,255,255,0.02);
+}
+.list-item-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.list-item-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+.list-item-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+}

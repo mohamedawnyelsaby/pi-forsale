@@ -1,61 +1,68 @@
 (function () {
   const msg = document.getElementById("message");
 
-  function show(txt, type = "info") {
-    msg.textContent = txt;
+  function show(text, type = "info") {
+    msg.textContent = text;
     msg.className = "message " + type;
   }
 
   function piAvailable() {
-    return window.Pi && window.Pi.createPayment;
+    return window.Pi && typeof window.Pi.createPayment === "function";
   }
 
   async function openCheckout(title, amount) {
     if (!piAvailable()) {
-      show("افتح الصفحة داخل Pi Browser – SDK مش شغال", "error");
+      show("افتح الصفحة داخل Pi Browser – الـ SDK غير متوفر", "error");
       return;
     }
 
-    show("جاري فتح عملية الدفع…");
+    show("جاري بدء عملية الدفع…");
 
     try {
-      const payment = await Pi.createPayment({
-        amount,
-        memo: title,
-        metadata: { product: title }
-      },
-      {
-        onReadyForServerApproval: async (paymentId) => {
-          // إرسال للسيرفر للموافقة
-          await fetch("/payment/approve", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ paymentId })
-          });
-          show("تمت الموافقة على العملية. استكمال الدفع…", "info");
+      await Pi.createPayment(
+        {
+          amount,
+          memo: title,
+          metadata: { product: title }
         },
+        {
+          onReadyForServerApproval: async (paymentId) => {
+            console.log("approval step", paymentId);
 
-        onReadyForServerCompletion: async (paymentId, txid) => {
-          await fetch("/payment/complete", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ paymentId, txid })
-          });
-          show("تمت العملية بنجاح ✔️", "success");
-        },
+            await fetch("/payment/approve", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ paymentId })
+            });
 
-        onCancel: () => show("تم إلغاء العملية ❌", "error"),
-        onError: (err) => {
-          console.error(err);
-          show("خطأ أثناء الدفع!", "error");
+            show("تمت الموافقة وتأكيد الخطوة الأولى ✔️", "info");
+          },
+
+          onReadyForServerCompletion: async (paymentId, txid) => {
+            console.log("completion step", paymentId, txid);
+
+            await fetch("/payment/complete", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ paymentId, txid })
+            });
+
+            show("اكتملت عملية الدفع بنجاح ✔️🎉", "success");
+          },
+
+          onCancel: () => {
+            show("تم إلغاء العملية ❌", "error");
+          },
+
+          onError: (err) => {
+            console.error(err);
+            show("حدث خطأ أثناء الدفع ❌", "error");
+          }
         }
-      });
-
-      console.log("Pi payment object:", payment);
-
-    } catch (err) {
-      console.error("Payment error", err);
-      show("خطأ — راجع الكونسول", "error");
+      );
+    } catch (e) {
+      console.error(e);
+      show("تعذر بدء الدفع — راجع الكونسول", "error");
     }
   }
 
@@ -66,6 +73,6 @@
   });
 
   if (!piAvailable()) {
-    show("Tip: افتح الموقع داخل Pi Browser", "notice");
+    show("Tip: لازم تفتح الموقع من داخل Pi Browser", "notice");
   }
 })();

@@ -58,6 +58,25 @@
     }
   }
 
+  // 🔥🔥🔥 اضيف الكود هنا بالظبط 🔥🔥🔥
+  function enableButtons() {
+    const ready = window.Pi && typeof window.Pi.createPayment === "function";
+
+    document.querySelectorAll("button.buy").forEach(btn => {
+      btn.disabled = !ready;
+      btn.style.opacity = ready ? "1" : "0.4";
+      btn.style.cursor = ready ? "pointer" : "not-allowed";
+    });
+
+    if (!ready) {
+      show("يجب فتح الموقع داخل Pi Browser ليعمل الدفع", "notice");
+    }
+  }
+
+  window.addEventListener("load", enableButtons);
+  // 🔥🔥🔥 نهاية الإضافة 🔥🔥🔥
+
+
   document.querySelectorAll("button.buy").forEach((btn) =>
     btn.addEventListener("click", () =>
       openCheckout(btn.dataset.title, Number(btn.dataset.price))
@@ -65,6 +84,4 @@
   );
 
   if (!piAvailable()) {
-    show("Tip: افتح الموقع داخل Pi Browser", "notice");
-  }
-})();
+    show("Tip: افتح ال

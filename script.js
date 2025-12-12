@@ -1,59 +1,66 @@
-// Minimal frontend to demo Pi checkout integration (sandbox)
-// Replace appPublicKey in index.html with your app public key (from Pi Developer -> API Key area).
-(function(){
-  const messageEl = document.getElementById('message');
+let selectedProduct = null;
+let selectedPrice = 0;
 
-  function showMessage(txt, type='info') {
-    messageEl.textContent = txt;
-    messageEl.className = 'message ' + type;
-  }
+document.addEventListener("DOMContentLoaded", () => {
 
-  // Check Pi SDK loaded
-  function piAvailable() {
-    return window.Pi && typeof window.Pi.request === 'function';
-  }
-
-  async function openCheckout(title, price) {
-    showMessage('Opening Pi checkout...', 'info');
-
-    if (!piAvailable()) {
-      console.error('Pi SDK not available. Make sure you open the page inside Pi Browser or include the SDK.');
-      showMessage('Pi SDK not available. Open inside Pi Browser or check console.', 'error');
-      return;
+    // Ensure Pi SDK is loaded
+    if (typeof Pi === "undefined") {
+        console.warn("Pi SDK not loaded");
+        return;
     }
 
-    try {
-      // This is an example: the Pi SDK may provide different methods.
-      // The official flow is: open payment request and listen for callbacks.
-      const payment = {
-        name: title,
-        price: price,
-        currency: 'PI',
-        // other metadata...
-      };
-
-      // In many Pi SDK versions the method is window.Pi.requestPayment or similar.
-      // For sandbox/demo we use a generic example:
-      const res = await window.Pi.request(payment);
-      console.log('Pi SDK response:', res);
-      showMessage('Payment initiated. Check Pi Browser UI.', 'success');
-    } catch (err) {
-      console.error('Payment error', err);
-      showMessage('Payment Failed. Check console for details.', 'error');
-    }
-  }
-
-  // attach handlers
-  document.querySelectorAll('button.buy').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const title = btn.dataset.title;
-      const price = Number(btn.dataset.price);
-      openCheckout(title, price);
+    // Init SDK
+    Pi.init({
+        version: "2.0",
+        sandbox: true
     });
-  });
 
-  // friendly note
-  if (!piAvailable()) {
-    showMessage('Tip: Open this page inside the Pi Browser for working payments.', 'notice');
-  }
-})();
+    console.log("Pi SDK initialized successfully");
+});
+
+function openCheckout(product, price) {
+    selectedProduct = product;
+    selectedPrice = price;
+
+    document.getElementById("checkout-product").innerText = "Product: " + product;
+    document.getElementById("checkout-price").innerText = "Price: " + price + " Pi";
+
+    document.getElementById("checkout-modal").style.display = "flex";
+}
+
+function closeCheckout() {
+    document.getElementById("checkout-modal").style.display = "none";
+}
+
+async function checkout() {
+    try {
+        const payment = await Pi.createPayment({
+            amount: selectedPrice,
+            memo: selectedProduct,
+            metadata: { product: selectedProduct }
+        }, {
+            onReadyForServerApproval: (paymentId) => {
+                return fetch("/payment/approve", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ paymentId })
+                });
+            },
+            onReadyForServerCompletion: (paymentId, txid) => {
+                return fetch("/payment/complete", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ paymentId, txid })
+                });
+            },
+            onCancel: () => alert("Payment canceled"),
+            onError: (err) => alert("Payment error: " + err)
+        });
+
+        console.log(payment);
+
+    } catch (error) {
+        alert("Error: " + error);
+        console.error(error);
+    }
+}

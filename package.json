@@ -12,8 +12,6 @@
   },
 
   "scripts": {
-    "dev": "vercel dev",
-    "build": "echo 'No build step required'",
     "start": "node server.js"
   },
 

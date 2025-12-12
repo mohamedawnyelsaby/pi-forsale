@@ -1,76 +1,84 @@
-// ============================================
-// 🤖 Forsale AI - Complete Backend Server (Provided)
-// Node.js + Express + Pi Network API Integration
-// Keep PI_API_KEY in environment — DO NOT COMMIT SECRET KEYS
-// ============================================
-require('dotenv').config();
+// server.js
 const express = require('express');
-const axios = require('axios');
-const cors = require('cors');
 const bodyParser = require('body-parser');
-const path = require('path');
+const helmet = require('helmet');
+const crypto = require('crypto');
+const axios = require('axios');
+require('dotenv').config();
 
 const app = express();
-
-app.use(cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
-    credentials: true
-}));
-
-app.use(bodyParser.json({ limit: '10mb' }));
-app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
-
-// serve static files from repo root (index.html, css, js)
-app.use(express.static(path.join(__dirname)));
-
-app.use((req, res, next) => {
-    console.log(`📥 ${new Date().toISOString()} - ${req.method} ${req.path}`);
-    next();
-});
-
-const PI_API_KEY = process.env.PI_API_KEY;
-const PI_PLATFORM_API_URL = "https://api.minepi.com/v2";
-const NODE_ENV = process.env.NODE_ENV || 'development';
-
-if (!PI_API_KEY) {
-    console.warn('⚠️ PI_API_KEY not set in environment. Set it in Vercel/Env before using production endpoints.');
-}
-
-// In-memory store (for demo)
-const database = { payments: new Map(), orders: new Map(), disputes: new Map() };
-
-// simple health
-app.get('/health', (req, res) => {
-    res.json({ status: 'OK', piIntegration: !!PI_API_KEY, time: new Date().toISOString() });
-});
-
-// Payment endpoints (thin wrappers) - require PI_API_KEY to actually call Pi APIs
-app.post('/payment/approve', async (req, res) => {
-    const { paymentId } = req.body;
-    if (!paymentId) return res.status(400).json({ error: 'Missing paymentId' });
-    // Simulate approval (in production call Pi API)
-    database.payments.set(paymentId, { status: 'approved', id: paymentId });
-    return res.json({ success: true, paymentId });
-});
-
-app.post('/payment/complete', async (req, res) => {
-    const { paymentId, txid } = req.body;
-    if (!paymentId || !txid) return res.status(400).json({ error: 'Missing paymentId or txid' });
-    const p = database.payments.get(paymentId) || {};
-    p.status = 'completed'; p.txid = txid;
-    database.payments.set(paymentId, p);
-    // create simple order
-    const orderId = `ORDER_${Date.now()}`;
-    database.orders.set(orderId, { paymentId, status: 'processing' });
-    return res.json({ success: true, orderId });
-});
-
-// fallback to index.html for any unmatched route (single page)
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+app.use(helmet());
+app.use(bodyParser.json({ limit: '1mb' }));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server started on port ${PORT}`);
+
+// simple health check
+app.get('/health', (req, res) => {
+  return res.json({ status: 'OK', piIntegration: !!process.env.PI_API_KEY });
 });
+
+/**
+ * Create payment (Frontend calls this to create a payment)
+ * - Validate product, create DB order as PENDING
+ * - Call Pi create-payment API (server side) -> return paymentId + paymentUrl
+ */
+app.post('/api/payment/create', async (req, res) => {
+  const { productId, buyerId } = req.body;
+  // TODO: validate product in DB, price, inventory
+  // create order in DB with status=PENDING
+  // call Pi create-payment endpoint using PI_API_KEY
+  try {
+    // placeholder payload - adapt to Pi API format
+    const payload = {
+      app_id: process.env.PI_APP_ID,
+      product_id: productId,
+      amount: 100, // Pi amount
+      currency: 'PI',
+      callback_url: `${process.env.PI_CALLBACK_BASE}/complete`
+    };
+    // call Pi server (replace URL by Pi's API)
+    const piResp = await axios.post('https://api.minepi.com/v1/payments/create', payload, {
+      headers: { 'Authorization': `Bearer ${process.env.PI_API_KEY}` }
+    });
+    // store piResp.data.payment_id in DB etc.
+    return res.json({ ok: true, payment: piResp.data });
+  } catch (err) {
+    console.error('create payment err', err?.response?.data || err.message);
+    return res.status(500).json({ ok: false, error: 'Failed to create payment' });
+  }
+});
+
+/**
+ * Pi callback / webhook when payment is updated (approve/complete)
+ * Pi will call this endpoint.
+ * IMPORTANT: verify signature according to Pi docs (HMAC or other).
+ */
+app.post('/api/pi/complete', async (req, res) => {
+  // Example: check HMAC signature header (customize per Pi docs)
+  const signature = req.headers['x-pi-signature'] || req.headers['x-signature'];
+  const body = JSON.stringify(req.body);
+  const secret = process.env.PI_APP_SECRET || '';
+  // Basic HMAC verify (adapt to Pi specification)
+  const expected = crypto.createHmac('sha256', secret).update(body).digest('hex');
+  if (signature && expected !== signature) {
+    console.warn('Invalid signature for Pi webhook');
+    return res.status(401).send('Invalid signature');
+  }
+
+  const { paymentId, status, txid } = req.body;
+  // TODO: update DB order status based on paymentId
+  // If completed -> set order.paid = true; release escrow accordingly
+  console.log('Pi webhook received', paymentId, status);
+  return res.json({ ok: true });
+});
+
+/**
+ * Approve endpoint — developer/admin triggers approve if needed
+ */
+app.post('/api/payment/approve', async (req, res) => {
+  const { paymentId, productId } = req.body;
+  // TODO: verify order, check inventory, then call Pi approve API if required
+  return res.json({ ok: true, paymentId, productId });
+});
+
+app.listen(PORT, () => console.log(`Forsale API listening on ${PORT}`));

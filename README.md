@@ -31,4 +31,9 @@ Useful commands: `npm run typecheck`, `npm test`, `npm run build`, `npm run db:g
 - `PI_API_KEY` is server-only. The client never decides a payment amount: the server compares it with `expectedAmountPi()` (`src/lib/pricing.ts`) before approving.
 - Payments are intentionally **disabled** until Phase 3 (see `ROADMAP.md`).
 
+## Database setup
+
+First time: paste `db/setup.sql` into the Supabase SQL Editor and run it once (creates tables and turns on Row Level Security).
+Later schema changes: edit `src/db/schema.ts`, run `npm run db:generate`, and apply the new file in `drizzle/`.
+
 See `ROADMAP.md` for the plan and current status.

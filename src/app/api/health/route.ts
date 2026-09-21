@@ -16,6 +16,12 @@ const EXPECTED_TABLES = [
   "flagged_listings",
 ];
 
+function sessionSecretState(): "missing" | "too_short" | "ok" {
+  const value = process.env.SESSION_SECRET;
+  if (!value) return "missing";
+  return value.length >= 32 ? "ok" : "too_short";
+}
+
 /**
  * Setup check. Reports only yes/no flags, never values or error details,
  * so it is safe to leave public.
@@ -25,7 +31,7 @@ export async function GET() {
     database: "not_configured" as "not_configured" | "connected" | "error",
     tablesFound: 0,
     tablesExpected: EXPECTED_TABLES.length,
-    sessionSecretSet: (process.env.SESSION_SECRET?.length ?? 0) >= 32,
+    sessionSecret: sessionSecretState(),
     piApiKeySet: Boolean(process.env.PI_API_KEY),
     piSandbox: process.env.NEXT_PUBLIC_PI_SANDBOX !== "false",
   };
@@ -49,6 +55,6 @@ export async function GET() {
   const ready =
     result.database === "connected" &&
     result.tablesFound === result.tablesExpected &&
-    result.sessionSecretSet;
+    result.sessionSecret === "ok";
   return NextResponse.json({ ready, ...result }, { status: ready ? 200 : 503 });
 }

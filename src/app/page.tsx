@@ -1,11 +1,13 @@
+import Link from "next/link";
 import { ListingCard } from "@/components/ListingCard";
 import { SearchForm } from "@/components/SearchForm";
 import { getDict, getLocale } from "@/lib/i18n";
-import { sampleListings } from "@/lib/sample-data";
+import { searchListings } from "@/lib/listings";
 
 export default async function Home() {
   const locale = await getLocale();
   const t = getDict(locale);
+  const { items, demo, error } = await searchListings({ limit: 6 });
   return (
     <>
       <section className="hero">
@@ -16,13 +18,24 @@ export default async function Home() {
         </div>
       </section>
       <section className="wrap section">
-        <p className="notice">{t.demoNotice}</p>
+        {demo && <p className="notice">{t.demoNotice}</p>}
         <h2 className="section-title">{t.latest}</h2>
-        <div className="grid">
-          {sampleListings.map((item) => (
-            <ListingCard key={item.id} item={item} t={t} locale={locale} />
-          ))}
-        </div>
+        {error ? (
+          <p className="empty">{t.loadError}</p>
+        ) : items.length === 0 ? (
+          <div className="empty">
+            <p>{t.emptyListings}</p>
+            <Link href="/listings/new" className="btn btn-primary">
+              {t.emptyCta}
+            </Link>
+          </div>
+        ) : (
+          <div className="grid">
+            {items.map((item) => (
+              <ListingCard key={item.id} item={item} t={t} locale={locale} />
+            ))}
+          </div>
+        )}
       </section>
     </>
   );

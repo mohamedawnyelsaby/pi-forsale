@@ -1,9 +1,9 @@
 import Link from "next/link";
 import type { Dict, Locale } from "@/lib/i18n";
 import { formatMoney, formatNumber } from "@/lib/format";
-import type { SampleListing } from "@/lib/sample-data";
+import type { ListingView } from "@/lib/sample-data";
 
-export function ListingCard({ item, t, locale }: { item: SampleListing; t: Dict; locale: Locale }) {
+export function ListingCard({ item, t, locale }: { item: ListingView; t: Dict; locale: Locale }) {
   const title = locale === "ar" ? item.titleAr : item.titleEn;
   const city = locale === "ar" ? item.cityAr : item.cityEn;
   return (

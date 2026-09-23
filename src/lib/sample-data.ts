@@ -1,5 +1,5 @@
 // Demo data used until the database is connected (see README). Not real listings.
-export type SampleListing = {
+export type ListingView = {
   id: string;
   type: "sale" | "rent";
   kind: "apartment" | "villa" | "land" | "commercial" | "chalet" | "building";
@@ -12,7 +12,11 @@ export type SampleListing = {
   areaSqm: number;
   bedrooms?: number;
   verified: boolean;
+  descriptionAr?: string;
+  descriptionEn?: string;
 };
+
+export type SampleListing = ListingView;
 
 export const sampleListings: SampleListing[] = [
   { id: "demo-1", type: "sale", kind: "apartment", titleAr: "شقة 3 غرف بإطلالة على النيل", titleEn: "3-bedroom apartment with Nile view", cityAr: "دمياط", cityEn: "Damietta", priceMinor: 2_400_000_00, currency: "EGP", areaSqm: 145, bedrooms: 3, verified: true },

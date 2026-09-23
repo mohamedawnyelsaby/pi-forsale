@@ -3,11 +3,11 @@ import { notFound } from "next/navigation";
 import { commissionConfig, computeCommission } from "@/lib/commission";
 import { formatMoney, formatNumber } from "@/lib/format";
 import { getDict, getLocale } from "@/lib/i18n";
-import { sampleListings } from "@/lib/sample-data";
+import { getListing } from "@/lib/listings";
 
 export default async function ListingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const item = sampleListings.find((l) => l.id === id);
+  const { item } = await getListing(id);
   if (!item) notFound();
 
   const locale = await getLocale();
@@ -43,6 +43,9 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
       <span className={item.verified ? "badge badge-ok" : "badge"}>
         {item.verified ? t.verified : t.unverified}
       </span>
+      {(locale === "ar" ? item.descriptionAr : item.descriptionEn) && (
+        <p className="detail-desc">{locale === "ar" ? item.descriptionAr : item.descriptionEn}</p>
+      )}
 
       <div className="panel">
         <h2>{t.commissionTitle}</h2>

@@ -1,6 +1,7 @@
-import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, desc, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
 import { listings } from "@/db/schema";
 import { getDb, hasDatabase } from "./db";
+import { parseQuery } from "./nlq";
 import { type ListingView, sampleListings } from "./sample-data";
 
 export type ListingFilters = { q?: string; kind?: string; type?: string; limit?: number };
@@ -39,10 +40,19 @@ function likePattern(q: string): string {
 export async function searchListings(filters: ListingFilters = {}): Promise<ListingResult> {
   const limit = Math.min(filters.limit ?? 50, 100);
 
+  const parsed = filters.q ? parseQuery(filters.q) : null;
+  const kind = filters.kind || parsed?.kind;
+  const type = filters.type || parsed?.type;
+  const minBedrooms = parsed?.minBedrooms;
+  const maxPriceMinor = parsed?.maxPriceEgp ? Math.round(parsed.maxPriceEgp * 100) : undefined;
+  const textQuery = (parsed?.remainder ?? filters.q ?? "").trim();
+
   if (!hasDatabase()) {
-    const q = filters.q?.trim().toLowerCase();
+    const q = textQuery.toLowerCase();
     const items = sampleListings
-      .filter((l) => (!filters.kind || l.kind === filters.kind) && (!filters.type || l.type === filters.type))
+      .filter((l) => (!kind || l.kind === kind) && (!type || l.type === type))
+      .filter((l) => minBedrooms === undefined || (l.bedrooms ?? 0) >= minBedrooms)
+      .filter((l) => maxPriceMinor === undefined || l.priceMinor <= maxPriceMinor)
       .filter((l) => !q || [l.titleAr, l.titleEn, l.cityAr, l.cityEn].some((s) => s.toLowerCase().includes(q)))
       .slice(0, limit);
     return { items, demo: true, error: false };
@@ -50,9 +60,11 @@ export async function searchListings(filters: ListingFilters = {}): Promise<List
 
   try {
     const conditions = [eq(listings.status, "active")];
-    if (filters.kind) conditions.push(eq(listings.kind, filters.kind as Row["kind"]));
-    if (filters.type) conditions.push(eq(listings.type, filters.type as Row["type"]));
-    const q = filters.q?.trim().slice(0, 100);
+    if (kind) conditions.push(eq(listings.kind, kind as Row["kind"]));
+    if (type) conditions.push(eq(listings.type, type as Row["type"]));
+    if (minBedrooms !== undefined) conditions.push(gte(listings.bedrooms, minBedrooms));
+    if (maxPriceMinor !== undefined) conditions.push(lte(listings.priceMinor, maxPriceMinor));
+    const q = textQuery.slice(0, 100);
     if (q) {
       const p = likePattern(q);
       conditions.push(

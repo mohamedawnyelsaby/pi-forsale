@@ -15,7 +15,9 @@ Legend: [x] done, [ ] not started.
 
 ## Phase 2: Core marketplace
 - [ ] Create / edit / publish listings, photo upload
-- [ ] Map-first search (add PostGIS), natural-language search in Arabic and English
+- [x] Marwan v0: rule-based Arabic/English query parser (kind, sale/rent, bedrooms, price ceiling) — no AI API key needed yet
+- [ ] Marwan v1: swap the rule-based parser for a real AI model once an API key is configured (fuzzier language, typo tolerance, follow-up questions)
+- [ ] Map-first search (add PostGIS)
 - [ ] Internal chat and viewing bookings (no phone numbers shared before a deal)
 - [ ] Admin dashboard: review queue, flagged listings, user roles
 

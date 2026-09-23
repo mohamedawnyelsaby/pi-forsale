@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Header } from "@/components/Header";
 import { getDict, getLocale } from "@/lib/i18n";
+import { getTheme } from "@/lib/theme";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -11,8 +12,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
+  const theme = await getTheme();
   return (
-    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>
+    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} {...(theme ? { "data-theme": theme } : {})}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />

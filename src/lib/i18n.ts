@@ -74,6 +74,8 @@ const dict = {
       errorLimit: "وصلت للحد اليومي للإعلانات. حاول غدًا.",
       errorAuth: "انتهت الجلسة. سجّل الدخول من جديد.",
     },
+    dayMode: "الوضع النهاري",
+    nightMode: "الوضع الليلي",
     switchLang: "English",
   },
   en: {
@@ -141,6 +143,8 @@ const dict = {
       errorLimit: "You reached the daily listing limit. Try again tomorrow.",
       errorAuth: "Your session expired. Sign in again.",
     },
+    dayMode: "Day mode",
+    nightMode: "Night mode",
     switchLang: "العربية",
   },
 } as const;

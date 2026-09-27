@@ -2,43 +2,50 @@
 
 import { useState } from "react";
 import { COUNTRIES, CURRENCIES, KINDS, TYPES } from "@/lib/constants";
+import { resizeImageFile } from "@/lib/image-resize";
 import type { Dict, Locale } from "@/lib/i18n";
 
 type Status = "idle" | "busy" | "done" | "limit" | "auth" | "error";
+const MAX_PHOTOS = 6;
 
 export function NewListingForm({ t, locale }: { t: Dict; locale: Locale }) {
   const [status, setStatus] = useState<Status>("idle");
   const f = t.form;
   const countries = new Intl.DisplayNames([locale], { type: "region" });
 
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+
+  function onPhotosChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []).filter((f) => f.type.startsWith("image/"));
+    setPhotoFiles(files.slice(0, MAX_PHOTOS));
+  }
+
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const data = new FormData(form);
     const text = (k: string) => String(data.get(k) ?? "").trim();
-    const num = (k: string) => (text(k) === "" ? undefined : Number(text(k)));
 
     setStatus("busy");
     try {
-      const res = await fetch("/api/listings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: text("type"),
-          kind: text("kind"),
-          title: text("title"),
-          description: text("description") || undefined,
-          price: num("price"),
-          currency: text("currency"),
-          areaSqm: num("areaSqm"),
-          bedrooms: num("bedrooms"),
-          country: text("country"),
-          city: text("city"),
-          district: text("district") || undefined,
-        }),
-      });
+      const body = new FormData();
+      for (const k of ["type", "kind", "title", "description", "price", "currency", "areaSqm", "bedrooms", "country", "city", "district"]) {
+        const v = text(k);
+        if (v) body.append(k, v);
+      }
+      for (const file of photoFiles) {
+        try {
+          const resized = await resizeImageFile(file);
+          body.append("photos", resized, "photo.jpg");
+        } catch {
+          // If resizing fails in this browser, skip that photo rather than fail the whole listing.
+        }
+      }
+
+      const res = await fetch("/api/listings", { method: "POST", body });
       if (res.ok) {
         form.reset();
+        setPhotoFiles([]);
         setStatus("done");
       } else {
         setStatus(res.status === 429 ? "limit" : res.status === 401 ? "auth" : "error");
@@ -153,6 +160,14 @@ export function NewListingForm({ t, locale }: { t: Dict; locale: Locale }) {
           {f.description} ({f.optional})
         </span>
         <textarea name="description" rows={5} maxLength={4000} />
+      </label>
+
+      <label className="field">
+        <span>
+          {f.photos} ({f.optional})
+        </span>
+        <input type="file" accept="image/*" multiple onChange={onPhotosChange} />
+        {photoFiles.length > 0 && <span className="hint">{f.photosCount.replace("{n}", String(photoFiles.length))}</span>}
       </label>
 
       {error && (

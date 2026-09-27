@@ -20,9 +20,24 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
       <Link href="/listings" className="back">
         {t.back}
       </Link>
-      <div className={`detail-media kind-${item.kind}`} aria-hidden="true">
-        <span className="card-kind">{t.kind[item.kind]}</span>
+      <div className={item.photos?.length ? "detail-media" : `detail-media kind-${item.kind}`}>
+        {item.photos?.length ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={item.photos[0]} alt="" />
+        ) : (
+          <span className="card-kind" aria-hidden="true">
+            {t.kind[item.kind]}
+          </span>
+        )}
       </div>
+      {item.photos && item.photos.length > 1 && (
+        <div className="gallery-thumbs">
+          {item.photos.slice(1).map((url) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img key={url} src={url} alt="" loading="lazy" />
+          ))}
+        </div>
+      )}
       <h1 className="detail-title">{locale === "ar" ? item.titleAr : item.titleEn}</h1>
       <dl className="facts">
         <div>

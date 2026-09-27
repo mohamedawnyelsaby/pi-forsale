@@ -33,7 +33,7 @@ Useful commands: `npm run typecheck`, `npm test`, `npm run build`, `npm run db:g
 
 ## Database setup
 
-First time: paste `db/setup.sql` into the Supabase SQL Editor and run it once (creates tables and turns on Row Level Security).
+First time: paste `db/setup.sql` into the Supabase SQL Editor and run it once (creates tables and turns on Row Level Security). For listing photos, also run `db/storage-bucket.sql` once and set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (the service-role key bypasses RLS — keep it server-side only, never expose it to the browser).
 Later schema changes: edit `src/db/schema.ts`, run `npm run db:generate`, and apply the new file in `drizzle/`.
 
 See `ROADMAP.md` for the plan and current status.

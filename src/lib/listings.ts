@@ -1,5 +1,5 @@
-import { and, desc, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
-import { listings } from "@/db/schema";
+import { and, asc, desc, eq, gte, ilike, inArray, lte, or, sql } from "drizzle-orm";
+import { listingMedia, listings } from "@/db/schema";
 import { getDb, hasDatabase } from "./db";
 import { parseQuery } from "./nlq";
 import { type ListingView, sampleListings } from "./sample-data";
@@ -11,7 +11,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 type Row = typeof listings.$inferSelect;
 
-function toView(r: Row): ListingView {
+function toView(r: Row, photos?: string[]): ListingView {
   const titleAr = r.titleAr ?? r.titleEn ?? "";
   const titleEn = r.titleEn ?? r.titleAr ?? "";
   return {
@@ -29,7 +29,21 @@ function toView(r: Row): ListingView {
     verified: r.verification !== "none",
     descriptionAr: r.descriptionAr ?? r.descriptionEn ?? undefined,
     descriptionEn: r.descriptionEn ?? r.descriptionAr ?? undefined,
+    photos,
   };
+}
+
+/** Fetches the first photo (by position) for each listing id, for card thumbnails. */
+async function firstPhotosByListing(ids: string[]): Promise<Map<string, string>> {
+  if (ids.length === 0) return new Map();
+  const rows = await getDb()
+    .select({ listingId: listingMedia.listingId, url: listingMedia.url, position: listingMedia.position })
+    .from(listingMedia)
+    .where(and(inArray(listingMedia.listingId, ids), eq(listingMedia.kind, "photo")))
+    .orderBy(asc(listingMedia.position));
+  const map = new Map<string, string>();
+  for (const row of rows) if (!map.has(row.listingId)) map.set(row.listingId, row.url);
+  return map;
 }
 
 /** Escapes LIKE wildcards so user input is matched literally. */
@@ -84,7 +98,12 @@ export async function searchListings(filters: ListingFilters = {}): Promise<List
       .where(and(...conditions))
       .orderBy(desc(listings.createdAt))
       .limit(limit);
-    return { items: rows.map(toView), demo: false, error: false };
+    const photoMap = await firstPhotosByListing(rows.map((r) => r.id));
+    return {
+      items: rows.map((r) => toView(r, photoMap.has(r.id) ? [photoMap.get(r.id)!] : undefined)),
+      demo: false,
+      error: false,
+    };
   } catch {
     return { items: [], demo: false, error: true };
   }
@@ -101,7 +120,13 @@ export async function getListing(id: string): Promise<{ item: ListingView | null
       .from(listings)
       .where(and(eq(listings.id, id), eq(listings.status, "active")))
       .limit(1);
-    return { item: row ? toView(row) : null, demo: false };
+    if (!row) return { item: null, demo: false };
+    const photoRows = await getDb()
+      .select({ url: listingMedia.url })
+      .from(listingMedia)
+      .where(and(eq(listingMedia.listingId, id), eq(listingMedia.kind, "photo")))
+      .orderBy(asc(listingMedia.position));
+    return { item: toView(row, photoRows.map((p) => p.url)), demo: false };
   } catch {
     return { item: null, demo: false };
   }

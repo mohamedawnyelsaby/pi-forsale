@@ -14,6 +14,7 @@ export type ListingView = {
   verified: boolean;
   descriptionAr?: string;
   descriptionEn?: string;
+  photos?: string[];
 };
 
 export type SampleListing = ListingView;

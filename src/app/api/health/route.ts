@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getDb, hasDatabase } from "@/lib/db";
+import { hasStorage } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,7 @@ export async function GET() {
     sessionSecret: sessionSecretState(),
     piApiKeySet: Boolean(process.env.PI_API_KEY),
     piSandbox: process.env.NEXT_PUBLIC_PI_SANDBOX !== "false",
+    storageSet: hasStorage(),
   };
 
   if (hasDatabase()) {
